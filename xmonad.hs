@@ -398,11 +398,12 @@ myLogHook xmproc =
         -- ppVisible = xmobarColor "#b48ead" "#434c5e" . wrap " " " " . clickable,  -- Visible but not current workspace (other monitor)
         ppHidden = xmobarColor "#d8dee9" "" . wrap "" "" . clickable, -- Hidden workspaces, contain windows
         -- ppHiddenNoWindows = xmobarColor "#4c566a" "" . clickable,  -- Hidden workspaces, no windows
-        ppTitle = xmobarColor "#a3be8c" "" . xmobarRaw . shorten 50, -- Title of active window
+        ppTitle = xmobarColor "#a3be8c" "" . shorten 50, -- Title of active window
         ppSep = "<fc=#434c5e> | </fc>", -- Separator
         ppUrgent = xmobarColor "#ff6c6b" "" . wrap "!" "!" . clickable, -- Urgent workspaces
         ppExtras = [windowCount], -- Number of windows in current workspace
-        ppOrder = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
+        ppOrder = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t],
+        ppSort = fmap (namedScratchpadFilterOutWorkspace .) (ppSort def)
       }
 
 ------------------------------------------------------------------------
