@@ -1,0 +1,17 @@
+#!/bin/sh
+
+case $1 in
+	-f|full)        scrot '%d-%m-%Y_%H-%M-%S.png' -e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures';
+			        notify-send --icon=gnome-screenshot 'Scrot' 'Fullscreen screenshot saved';;
+	-w|window) 	    scrot -u '%d-%m-%Y_%H-%M-%S.png' -e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures';
+			        notify-send --icon=gnome-screenshot 'Scrot' 'Screenshot of focused window saved';;
+	-s|selection) 	scrot -a $(slop -f '%x,%y,%w,%h') '%d-%m-%Y_%H-%M-%S.png' -e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures';
+			        notify-send --icon=gnome-screenshot 'Scrot' 'Screenshot of selected screen saved';;
+	*)              echo "Take screenshots with scrot"
+		            echo "---------------------------"
+		            echo "options:"
+		            echo "-f, full          Take fullscreen screenshot"
+		            echo "-w, window        Take screenshot of focused window"
+		            echo "-s, selection     Take screenshot of interactively chosen window or rectangle"
+		            echo "-h, help          Display all available options";;
+esac
