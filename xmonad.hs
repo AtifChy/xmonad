@@ -24,9 +24,11 @@ import XMonad.Actions.Promote
 import XMonad.Hooks.DynamicLog -- show workspaces on xmobar
 import XMonad.Hooks.EwmhDesktops -- _NET_ACTIVE_WINDOW & fullscreen events support
 import XMonad.Hooks.ManageDocks
-import XMonad.Hooks.ManageHelpers (doCenterFloat, doFullFloat, isFullscreen)
+import XMonad.Hooks.ManageHelpers (doCenterFloat, doFullFloat, isDialog, isFullscreen)
 import XMonad.Hooks.UrgencyHook
 -- Layout
+
+import XMonad.Layout.Accordion
 import XMonad.Layout.NoBorders
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.Simplest
@@ -49,6 +51,10 @@ import XMonad.Util.SpawnOnce (spawnOnce)
 -- certain contrib modules.
 --
 myTerminal = "alacritty"
+
+-- My launcher
+--
+myLauncher = "rofi -theme ~/.config/rofi/themes/slate.rasi -width 624 -lines 12"
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
@@ -112,11 +118,11 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       -- launch greenclip-dmenu
       ((altMask, xK_c), spawn "greenclip print | sed '/^$/d' | dmenu -s -l 10 -g 2 -w 1916 -p 'Clipboard:' | xargs -r -d'\n' -I '{}' greenclip print '{}'"),
       -- launch rofi
-      ((modm, xK_p), spawn "rofi -show drun -show-icons"),
+      ((modm, xK_p), spawn (myLauncher ++ " -show drun -show-icons")),
       -- launch rofi-greenclip
-      ((modm, xK_c), spawn "rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'"),
+      ((modm, xK_c), spawn (myLauncher ++ " -show Clipboard -modi 'Clipboard:greenclip print' -run-command '{cmd}'")),
       -- launch gmrun
-      --, ((modm .|. shiftMask, xK_p ), spawn "gmrun")
+      -- ((modm .|. shiftMask, xK_p ), spawn "gmrun"),
       -- close focused window
       ((modm .|. shiftMask, xK_c), kill),
       -- Rotate through the available layout algorithms
@@ -180,15 +186,16 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       ((altMask, xK_d), decScreenSpacing 4),
       ((altMask .|. shiftMask, xK_i), incWindowSpacing 4),
       ((altMask .|. shiftMask, xK_d), decWindowSpacing 4),
-      -- Screenshot shortcuts (Requires: scrot & slop)
-      ((0, xK_Print), spawn "$HOME/.config/xmonad/scripts/ssclip -f"),
-      ((0 .|. controlMask, xK_Print), spawn "$HOME/.config/xmonad/scripts/ssclip -w"),
-      ((0 .|. shiftMask, xK_Print), spawn "$HOME/.config/xmonad/scripts/ssclip -s"),
+      -- Screenshot shortcuts (Requires: maim & xclip)
+      ((0, xK_Print), spawn "$HOME/.config/xmonad/scripts/msclip -f"),
+      ((0 .|. controlMask, xK_Print), spawn "$HOME/.config/xmonad/scripts/msclip -w"),
+      ((0 .|. shiftMask, xK_Print), spawn "$HOME/.config/xmonad/scripts/msclip -s"),
       -- SubLayouts
       ((modm .|. controlMask, xK_h), sendMessage $ pullGroup L),
       ((modm .|. controlMask, xK_l), sendMessage $ pullGroup R),
       ((modm .|. controlMask, xK_k), sendMessage $ pullGroup U),
       ((modm .|. controlMask, xK_j), sendMessage $ pullGroup D),
+      ((modm .|. controlMask, xK_space), toSubl NextLayout),
       ((modm .|. controlMask, xK_m), withFocused (sendMessage . MergeAll)),
       ((modm .|. controlMask, xK_u), withFocused (sendMessage . UnMerge)),
       ((modm .|. controlMask, xK_period), onGroup W.focusUp'),
@@ -279,14 +286,14 @@ myLayout =
     tiled =
       windowNavigation $
         addTabs shrinkText myTabConfig $
-          subLayout [] Simplest $
+          subLayout [] (Simplest ||| Accordion) $
             mySpacing 10 $
               ResizableTall nmaster delta ratio []
 
     center =
       windowNavigation $
         addTabs shrinkText myTabConfig $
-          subLayout [] Simplest $
+          subLayout [] (Simplest ||| Accordion) $
             mySpacing 10 $
               ThreeColMid nmaster delta ratio
 
@@ -331,20 +338,14 @@ myScratchpads =
 myManageHook =
   composeAll
     [ className =? "MPlayer" --> doFloat,
-      --      className =? "Gimp" --> doFloat,
       resource =? "desktop_window" --> doIgnore,
       resource =? "kdesktop" --> doIgnore,
       resource =? "Toolkit" <||> resource =? "Browser" --> doFloat,
-      isFullscreen --> doFullFloat,
       resource =? "redshift-gtk" --> doCenterFloat,
-      resource =? "nm-applet" --> doCenterFloat,
-      resource =? "volumeicon" --> doCenterFloat,
-      role =? "GtkFileChooserDialog" --> doCenterFloat,
-      role =? "gimp-message-dialog" --> doCenterFloat
+      isFullscreen --> doFullFloat,
+      isDialog --> doCenterFloat
     ]
     <+> namedScratchpadManageHook myScratchpads
-  where
-    role = stringProperty "WM_WINDOW_ROLE"
 
 -- Fix for firefox fullscreen
 --

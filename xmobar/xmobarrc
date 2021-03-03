@@ -61,8 +61,12 @@ Config
     alignSep = "}{",
     template =
       " %UnsafeStdinReader% }{ \
-      \<fc=#ecbe7b>%cpu%</fc> <fc=#434c5e>|</fc> \
-      \<fc=#ff6c6b>%memory%</fc> <fc=#434c5e>|</fc> \
+      \<fc=#ecbe7b>\
+      \<action=`alacritty -e htop -s PERCENT_CPU` button=1>%cpu%</action>\
+      \</fc> <fc=#434c5e>|</fc> \
+      \<fc=#ff6c6b>\
+      \<action=`alacritty -e htop -s PERCENT_MEM` button=1>%memory%</action>\
+      \</fc> <fc=#434c5e>|</fc> \
       \<fc=#51afef>%wlp0s20u3%</fc> <fc=#434c5e>|</fc> \
       \<fc=#c678dd>%date%</fc> <fc=#434c5e>|</fc>%trayerpad%"
   }

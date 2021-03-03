@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Required softwares: scrot, slop, xclip
+
 case $1 in
 	-f|full)        scrot '%d-%m-%Y_%H-%M-%S.png' -e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures';
 			        notify-send --icon=gnome-screenshot 'Scrot' 'Fullscreen screenshot saved';;
