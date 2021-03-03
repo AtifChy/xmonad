@@ -21,25 +21,24 @@ import XMonad
 import XMonad.Actions.CycleWS
 import XMonad.Actions.Promote
 -- Hooks
-import XMonad.Hooks.DynamicLog -- show workspaces on xmobar
-import XMonad.Hooks.EwmhDesktops -- _NET_ACTIVE_WINDOW & fullscreen events support
+import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers (doCenterFloat, doFullFloat, isDialog, isFullscreen)
 import XMonad.Hooks.UrgencyHook
 -- Layout
-
 import XMonad.Layout.Accordion
 import XMonad.Layout.NoBorders
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.Simplest
-import XMonad.Layout.Spacing -- gaps
+import XMonad.Layout.Spacing
 import XMonad.Layout.SubLayouts
 import XMonad.Layout.Tabbed
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.WindowNavigation
 import qualified XMonad.StackSet as W
 -- Util
-import XMonad.Util.Cursor (setDefaultCursor) -- fix cursor
+import XMonad.Util.Cursor (setDefaultCursor)
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.NamedWindows (getName)
 import XMonad.Util.Run (hPutStrLn, safeSpawn, spawnPipe)
@@ -172,7 +171,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       ((modm, xK_Return), promote),
       -- Run xmessage with a summary of the default keybindings (useful for beginners)
       ((modm .|. shiftMask, xK_slash), spawn ("echo \"" ++ help ++ "\" | xmessage -file -")),
-      -- a basic CycleWS setup
+      -- A basic CycleWS setup
       ((modm, xK_Right), nextWS),
       ((modm, xK_Left), prevWS),
       ((modm .|. shiftMask, xK_Right), shiftToNext),
@@ -198,8 +197,8 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       ((modm .|. controlMask, xK_space), toSubl NextLayout),
       ((modm .|. controlMask, xK_m), withFocused (sendMessage . MergeAll)),
       ((modm .|. controlMask, xK_u), withFocused (sendMessage . UnMerge)),
-      ((modm .|. controlMask, xK_period), onGroup W.focusUp'),
-      ((modm .|. controlMask, xK_comma), onGroup W.focusDown'),
+      ((modm .|. controlMask, xK_comma), onGroup W.focusUp'),
+      ((modm .|. controlMask, xK_period), onGroup W.focusDown'),
       -- Scratchpad
       ((modm .|. controlMask, xK_Return), namedScratchpadAction myScratchpads "terminal")
     ]
@@ -548,6 +547,17 @@ help =
       "mod-button1          Set the window to floating mode and move by dragging",
       "mod-button2          Raise the window to the top of the stack",
       "mod-button3          Set the window to floating mode and resize by dragging",
+      "",
+      "-- Sublayout bindings",
+      "mod-Ctrl-h           Merge with left client",
+      "mod-Ctrl-l           Merge with right client",
+      "mod-Ctrl-k           Merge with upper client",
+      "mod-Ctrl-j           Merge with lower client",
+      "mod-Ctrl-Space       Switch to next sublayout",
+      "mod-Ctrl-m           Merge all available clients on the workspace",
+      "mod-Ctrl-u           Unmerge currently focused client",
+      "mod-Ctrl-period (.)  Move focus to the next window in the sublayout",
+      "mod-Ctrl-comma (,)   Move focus to the previous window in the sublayout",
       "",
       "-- Shortcuts for taking screenshots",
       "Print                Take fullscreen screenshot",
