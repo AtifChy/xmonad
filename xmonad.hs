@@ -16,19 +16,21 @@ import Data.Maybe (fromJust, maybeToList)
 import Data.Monoid
 import System.Exit
 import System.IO (Handle)
-import XMonad
+import XMonad hiding ((|||))
 -- Actions
 import XMonad.Actions.CycleWS
 import XMonad.Actions.Promote
 -- Hooks
-import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.DynamicLog (PP (..), dynamicLogWithPP, shorten, wrap, xmobarColor, xmobarPP)
 import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageDocks (ToggleStruts (..), avoidStruts, docks, manageDocks)
 import XMonad.Hooks.ManageHelpers (doCenterFloat, doFullFloat, isDialog, isFullscreen)
-import XMonad.Hooks.UrgencyHook
+import XMonad.Hooks.UrgencyHook (UrgencyHook, urgencyHook, withUrgencyHook)
 -- Layout
 import XMonad.Layout.Accordion
+import XMonad.Layout.LayoutCombinators
 import XMonad.Layout.NoBorders
+import XMonad.Layout.Renamed
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.Simplest
 import XMonad.Layout.Spacing
@@ -49,7 +51,7 @@ import XMonad.Util.SpawnOnce (spawnOnce)
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
-myTerminal = "st"
+myTerminal = "alacritty"
 
 -- My launcher
 --
@@ -89,6 +91,8 @@ altMask = mod1Mask
 --
 myWorkspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
+-- Enable clickable workspaces
+--
 myWorkspaceIndices = M.fromList $ zip myWorkspaces [1 ..] -- (,) == \x y -> (x,y)
 
 clickable ws = "<action=xdotool key super+" ++ show i ++ ">" ++ ws ++ "</action>"
@@ -176,7 +180,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       ((modm, xK_Left), prevWS),
       ((modm .|. shiftMask, xK_Right), shiftToNext),
       ((modm .|. shiftMask, xK_Left), shiftToPrev),
-      ((modm, xK_z), toggleWS),
+      ((modm, xK_z), toggleWS' ["NSP"]),
       ((modm, xK_f), moveTo Next EmptyWS), -- find a free workspace
       -- Increase/Decrease spacing (gaps)
       ((modm, xK_i), incScreenWindowSpacing 4),
@@ -200,7 +204,13 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       ((modm .|. controlMask, xK_comma), onGroup W.focusUp'),
       ((modm .|. controlMask, xK_period), onGroup W.focusDown'),
       -- Scratchpad
-      ((modm .|. controlMask, xK_Return), namedScratchpadAction myScratchpads "terminal")
+      ((modm .|. controlMask, xK_Return), namedScratchpadAction myScratchpads "terminal"),
+      -- Picom on/off
+      ((altMask, xK_F9), spawn "killall picom || picom --experimental-backends -b"),
+      -- Easily switch your layouts
+      ((altMask, xK_t), sendMessage $ JumpToLayout "tiled"),
+      ((altMask, xK_c), sendMessage $ JumpToLayout "center"),
+      ((altMask, xK_f), sendMessage $ JumpToLayout "full")
     ]
       ++
       --
@@ -276,27 +286,43 @@ myLayout =
   avoidStruts $
     lessBorders OnlyScreenFloat $
       tiled
-        ||| Mirror tiled
+        ||| mtiled
         ||| center
-        ||| Full
+        ||| full
         ||| tabs
   where
     -- default tiling algorithm partitions the screen into two panes
     tiled =
-      windowNavigation $
-        addTabs shrinkText myTabConfig $
-          subLayout [] (Simplest ||| Accordion) $
-            mySpacing 10 $
-              ResizableTall nmaster delta ratio []
+      renamed [Replace "tiled"] $
+        windowNavigation $
+          addTabs shrinkText myTabConfig $
+            subLayout [] (Simplest ||| Accordion) $
+              mySpacing 5 $
+                ResizableTall nmaster delta ratio []
+
+    mtiled =
+      renamed [Replace "mtiled"] $
+        windowNavigation $
+          addTabs shrinkText myTabConfig $
+            subLayout [] (Simplest ||| Accordion) $
+              mySpacing 5 $
+                Mirror tiled
 
     center =
-      windowNavigation $
-        addTabs shrinkText myTabConfig $
-          subLayout [] (Simplest ||| Accordion) $
-            mySpacing 10 $
-              ThreeColMid nmaster delta ratio
+      renamed [Replace "center"] $
+        windowNavigation $
+          addTabs shrinkText myTabConfig $
+            subLayout [] (Simplest ||| Accordion) $
+              mySpacing 5 $
+                ThreeColMid nmaster delta ratio
 
-    tabs = tabbed shrinkText myTabConfig
+    full =
+      renamed [Replace "full"] $
+        noBorders Full
+
+    tabs =
+      renamed [Replace "tabs"] $
+        tabbed shrinkText myTabConfig
 
     -- The default number of windows in the master pane
     nmaster = 1
@@ -311,12 +337,12 @@ myLayout =
 -- Scratchpad
 --
 myScratchpads =
-  [ -- run htop in xterm, find it by title, use default floating window placement
+  [ -- run a terminal inside scratchpad
     NS "terminal" spawnTerm findTerm manageTerm
   ]
   where
-    spawnTerm = myTerminal ++ " -c scratchpad"
-    findTerm = className =? "scratchpad"
+    spawnTerm = myTerminal ++ " --class scratchpad"
+    findTerm = resource =? "scratchpad"
     manageTerm = customFloating $ W.RationalRect (1 / 6) (1 / 8) (2 / 3) (3 / 4)
 
 ------------------------------------------------------------------------
@@ -383,18 +409,18 @@ myEventHook = handleEventHook def <+> fullscreenEventHook
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
 myLogHook xmproc =
-  dynamicLogWithPP
+  dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $
     xmobarPP
       { -- Xmobar workspace config
         --
         ppOutput = hPutStrLn xmproc,
         ppCurrent = xmobarColor "#ebcb8b" "" . wrap "[" "]", -- Current workspace
         ppLayout = \case
-          "Tabbed Spacing ResizableTall" -> "[]="
-          "Mirror Tabbed Spacing ResizableTall" -> "TTT"
-          "Tabbed Spacing ThreeCol" -> "|M|"
-          "Full" -> "[F]"
-          "Tabbed Simplest" -> "[T]"
+          "tiled" -> "[]="
+          "mtiled" -> "TTT"
+          "center" -> "|M|"
+          "full" -> "[F]"
+          "tabs" -> "[T]"
           _ -> "?",
         -- ppVisible = xmobarColor "#b48ead" "#434c5e" . wrap " " " " . clickable,  -- Visible but not current workspace (other monitor)
         ppHidden = xmobarColor "#d8dee9" "" . wrap "" "" . clickable, -- Hidden workspaces, contain windows
@@ -403,8 +429,7 @@ myLogHook xmproc =
         ppSep = "<fc=#434c5e> | </fc>", -- Separator
         ppUrgent = xmobarColor "#ff6c6b" "" . wrap "!" "!" . clickable, -- Urgent workspaces
         ppExtras = [windowCount], -- Number of windows in current workspace
-        ppOrder = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t],
-        ppSort = fmap (namedScratchpadFilterOutWorkspace .) (ppSort def)
+        ppOrder = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
       }
 
 ------------------------------------------------------------------------
@@ -490,8 +515,8 @@ help =
       "mod-Shift-Enter      Launch terminal",
       "mod-p                Launch rofi",
       "mod-c                Launch greenclip with rofi",
-      "alt-p                Launch dmenu",
-      "alt-c                Launch greenclip with dmenu",
+      "Alt-p                Launch dmenu",
+      "Alt-c                Launch greenclip with dmenu",
       --"mod-Shift-p          Launch gmrun",
       "mod-Shift-c          Close/kill the focused window",
       "mod-Space            Rotate through the available layout algorithms",
@@ -519,10 +544,10 @@ help =
       "-- increase or decrease spacing (gaps)",
       "mod-i                Increment both screen and window borders",
       "mod-d                Deincrement both screen and window borders",
-      "alt-i                Increment screen borders",
-      "alt-d                Deincrement screen borders",
-      "alt-Shift-i          Increment window borders",
-      "alt-Shift-d          Deincrement window borders",
+      "Alt-i                Increment screen borders",
+      "Alt-d                Deincrement screen borders",
+      "Alt-Shift-i          Increment window borders",
+      "Alt-Shift-d          Deincrement window borders",
       "",
       "-- floating layer support",
       "mod-t                Push window back into tiling; unfloat and re-tile it",
@@ -552,6 +577,11 @@ help =
       "mod-button2          Raise the window to the top of the stack",
       "mod-button3          Set the window to floating mode and resize by dragging",
       "",
+      "-- Switch layouts",
+      "Alt-t                Switch to 'Tall' layout",
+      "Alt-c                Switch to 'ThreeColMid' layout",
+      "Alt-f                Switch to 'Full' layout",
+      "",
       "-- Sublayout bindings",
       "mod-Ctrl-h           Merge with left client",
       "mod-Ctrl-l           Merge with right client",
@@ -566,5 +596,8 @@ help =
       "-- Shortcuts for taking screenshots",
       "Print                Take fullscreen screenshot",
       "Shift-Print          Take screenshot of selected screen",
-      "Ctrl-Print           Take screenshot of focused window"
+      "Ctrl-Print           Take screenshot of focused window",
+      "",
+      "-- Application",
+      "Alt-F9               Turn on/off picom"
     ]
