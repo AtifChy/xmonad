@@ -441,16 +441,17 @@ myLogHook xmproc =
 --
 myStartupHook = do
   setDefaultCursor xC_left_ptr
+  spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 1 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 &"
   spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0143.jpg"
   spawnOnce "nm-applet &"
   spawnOnce "picom --experimental-backends -b"
   spawnOnce "dunst &"
   spawnOnce "greenclip daemon &"
   spawnOnce "redshift-gtk &"
-  --  spawnOnce "systemctl --user start redshift-gtk.service"
-  spawnOnce "volumeicon &"
-  spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 1 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 &"
+  -- spawn "systemctl --user restart redshift-gtk.service"
+  -- spawnOnce "volumeicon &"
   spawnOnce "numlockx &"
+  spawnOnce "ibus-daemon -drx"
   spawnOnce "light-locker &"
 
 ------------------------------------------------------------------------
