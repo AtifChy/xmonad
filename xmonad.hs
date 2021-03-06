@@ -19,6 +19,7 @@ import System.IO (Handle)
 import XMonad hiding ((|||))
 -- Actions
 import XMonad.Actions.CycleWS
+import XMonad.Actions.GridSelect
 import XMonad.Actions.Promote
 -- Hooks
 import XMonad.Hooks.DynamicLog (PP (..), dynamicLogWithPP, shorten, wrap, xmobarColor, xmobarPP)
@@ -213,7 +214,10 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       -- Easily switch your layouts
       ((altMask, xK_t), sendMessage $ JumpToLayout "tiled"),
       ((altMask, xK_c), sendMessage $ JumpToLayout "center"),
-      ((altMask, xK_f), sendMessage $ JumpToLayout "full")
+      ((altMask, xK_f), sendMessage $ JumpToLayout "full"),
+      -- GridSelect
+      ((modm .|. shiftMask, xK_g), goToSelected $ mygsConfig myColorizer),
+      ((modm .|. shiftMask, xK_b), bringSelected $ mygsConfig myColorizer)
     ]
       ++
       --
@@ -255,6 +259,27 @@ myMouseBindings XConfig {XMonad.modMask = modm} =
       )
       -- you may also bind events to the mouse scroll wheel (button4 and button5)
     ]
+
+------------------------------------------------------------------------
+-- GridSelect
+--
+myColorizer =
+  colorRangeFromClassName
+    (0x28, 0x2c, 0x34) -- lowest inactive bg
+    (0x28, 0x2c, 0x34) -- highest inactive bg
+    (0x36, 0x67, 0x99) -- active bg
+    (0x4c, 0x56, 0x6a) -- inactive fg
+    (0xec, 0xff, 0xf4) -- active fg
+
+mygsConfig colorizer =
+  (buildDefaultGSConfig myColorizer)
+    { gs_cellheight = 50,
+      gs_cellwidth = 300,
+      gs_cellpadding = 10,
+      gs_originFractX = 0.5,
+      gs_originFractY = 0.5,
+      gs_font = myFont
+    }
 
 ------------------------------------------------------------------------
 -- Spacing (gaps)
