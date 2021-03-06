@@ -109,6 +109,9 @@ myNormalBorderColor = "#282c34"
 
 myFocusedBorderColor = "#366799"
 
+-- Custom font
+myFont = "xft:JetBrains Mono:style=Bold:size=10:antialias=true:hinting=true"
+
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
 --
@@ -270,59 +273,62 @@ mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 -- Tabbed layout config
 myTabConfig =
   def
-    { activeColor = "#366799",
-      activeBorderColor = "#366799",
+    { activeColor = myFocusedBorderColor,
+      activeBorderColor = myFocusedBorderColor,
       activeTextColor = "#eceff4",
-      inactiveColor = "#282c34",
-      inactiveBorderColor = "#282c34",
+      inactiveColor = myNormalBorderColor,
+      inactiveBorderColor = myNormalBorderColor,
       inactiveTextColor = "#4c566a",
       urgentColor = "#282c34",
       urgentBorderColor = "#282c34",
       urgentTextColor = "#ebcb8b",
-      fontName = "xft:JetBrains Mono:style=Bold:size=10:antialias=true:hinting=true"
+      fontName = myFont
     }
 
 myLayout =
   avoidStruts $
-    lessBorders OnlyScreenFloat $
-      tiled
-        ||| mtiled
-        ||| center
-        ||| full
-        ||| tabs
+    tiled
+      ||| mtiled
+      ||| center
+      ||| full
+      ||| tabs
   where
     -- default tiling algorithm partitions the screen into two panes
     tiled =
       renamed [Replace "tiled"] $
-        windowNavigation $
-          addTabs shrinkText myTabConfig $
-            subLayout [] (Simplest ||| Accordion) $
-              mySpacing 5 $
-                ResizableTall nmaster delta ratio []
+        lessBorders OnlyScreenFloat $
+          windowNavigation $
+            addTabs shrinkText myTabConfig $
+              subLayout [] (Simplest ||| Accordion) $
+                mySpacing 5 $
+                  ResizableTall nmaster delta ratio []
 
     mtiled =
       renamed [Replace "mtiled"] $
-        windowNavigation $
-          addTabs shrinkText myTabConfig $
-            subLayout [] (Simplest ||| Accordion) $
-              mySpacing 5 $
-                Mirror tiled
+        lessBorders OnlyScreenFloat $
+          windowNavigation $
+            addTabs shrinkText myTabConfig $
+              subLayout [] (Simplest ||| Accordion) $
+                mySpacing 5 $
+                  Mirror tiled
 
     center =
       renamed [Replace "center"] $
-        windowNavigation $
-          addTabs shrinkText myTabConfig $
-            subLayout [] (Simplest ||| Accordion) $
-              mySpacing 5 $
-                ThreeColMid nmaster delta ratio
+        lessBorders OnlyScreenFloat $
+          windowNavigation $
+            addTabs shrinkText myTabConfig $
+              subLayout [] (Simplest ||| Accordion) $
+                mySpacing 5 $
+                  ThreeColMid nmaster delta ratio
 
     full =
       renamed [Replace "full"] $
-        noBorders Full
+        lessBorders Screen Full
 
     tabs =
       renamed [Replace "tabs"] $
-        tabbed shrinkText myTabConfig
+        lessBorders OnlyScreenFloat $
+          tabbed shrinkText myTabConfig
 
     -- The default number of windows in the master pane
     nmaster = 1
