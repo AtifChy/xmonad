@@ -18,9 +18,9 @@ import System.Exit (exitSuccess)
 import System.IO (Handle)
 import XMonad hiding ((|||))
 -- Actions
-import XMonad.Actions.CycleWS
-import XMonad.Actions.GridSelect
-import XMonad.Actions.Promote
+import XMonad.Actions.CycleWS (Direction1D (..), WSType (..), moveTo, shiftTo, toggleWS')
+import XMonad.Actions.GridSelect (GSConfig (..), bringSelected, buildDefaultGSConfig, colorRangeFromClassName, goToSelected)
+import XMonad.Actions.Promote (promote)
 -- Hooks
 import XMonad.Hooks.DynamicLog (PP (..), dynamicLogWithPP, shorten, wrap, xmobarColor, xmobarPP)
 import XMonad.Hooks.EwmhDesktops (ewmh, ewmhDesktopsEventHook, fullscreenEventHook)
@@ -90,7 +90,7 @@ altMask = mod1Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+myWorkspaces = ["1:term", "2:web", "3:chat", "4:code", "5:movie", "6:game", "7:vbox", "8:tor", "9:misc"]
 
 -- Enable clickable workspaces
 --
@@ -180,10 +180,10 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       -- Run xmessage with a summary of the default keybindings (useful for beginners)
       ((modm .|. shiftMask, xK_slash), spawn ("echo \"" ++ help ++ "\" | xmessage -file -")),
       -- A basic CycleWS setup
-      ((modm, xK_Right), nextWS),
-      ((modm, xK_Left), prevWS),
-      ((modm .|. shiftMask, xK_Right), shiftToNext),
-      ((modm .|. shiftMask, xK_Left), shiftToPrev),
+      ((modm, xK_Right), moveTo Next (WSIs $ return ((/= "NSP") . W.tag))),
+      ((modm, xK_Left), moveTo Prev (WSIs $ return ((/= "NSP") . W.tag))),
+      ((modm .|. shiftMask, xK_Right), shiftTo Next (WSIs $ return ((/= "NSP") . W.tag))),
+      ((modm .|. shiftMask, xK_Left), shiftTo Prev (WSIs $ return ((/= "NSP") . W.tag))),
       ((modm, xK_z), toggleWS' ["NSP"]),
       ((modm, xK_f), moveTo Next EmptyWS), -- find a free workspace
       -- Increase/Decrease spacing (gaps)
@@ -391,6 +391,8 @@ myScratchpads =
 -- To match on the WM_NAME, you can use 'title' in the same way that
 -- 'className' and 'resource' are used below.
 --
+-- workspace number starts from 0
+--
 myManageHook =
   composeOne
     [ className =? "MPlayer" -?> doFloat,
@@ -400,7 +402,12 @@ myManageHook =
       resource =? "redshift-gtk" -?> doCenterFloat,
       isFullscreen -?> doFullFloat,
       isDialog -?> doCenterFloat,
-      className =? "ibus-ui-gtk3" -?> doIgnore
+      className =? "ibus-ui-gtk3" -?> doIgnore,
+      className =? "firefox" -?> doShift (myWorkspaces !! 1),
+      className =? "discord" -?> doShift (myWorkspaces !! 2),
+      className =? "code-oss" -?> doShift (myWorkspaces !! 3),
+      className =? "Lutris" -?> doShift (myWorkspaces !! 5),
+      className =? "VirtualBox Manager" <||> className =? "gnome-boxes" -?> (myWorkspaces !! 6)
     ]
     <+> manageDocks
     <+> namedScratchpadManageHook myScratchpads
@@ -446,7 +453,7 @@ myLogHook xmproc =
       { -- Xmobar workspace config
         --
         ppOutput = hPutStrLn xmproc,
-        ppCurrent = xmobarColor "#ebcb8b" "" . wrap "[" "]", -- Current workspace
+        ppCurrent = xmobarColor "#ff6c6b" "" . wrap "[" "]", -- Current workspace
         ppLayout = \case
           "tiled" -> "[]="
           "mtiled" -> "TTT"
@@ -484,7 +491,6 @@ myStartupHook = do
   -- spawnOnce "volumeicon &"
   spawnOnce "numlockx &"
   spawnOnce "ibus-daemon -drx"
-  spawnOnce "light-locker &"
 
 ------------------------------------------------------------------------
 -- Urgency hook

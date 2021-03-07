@@ -1,13 +1,13 @@
 Config
-  { font = "xft:JetBrains Mono:weight=bold:size=10:antialias=true:hinting=true,Noto Sans Bengali:weight=bold:size=10:antialias=true:hinting=true",
+  { font = "xft:JetBrains Mono:size=10:weight=bold:antialias=true:hinting=true, Noto Sans Bengali:size=10:weight=bold:antialias=true:hinting=true",
     additionalFonts =
       [ -- "xft:Symbols Nerd Font:size=10:antialias=true:hinting=true",
         -- awesome is better
-        "xft:Font Awesome 5 Free Solid:size=10",
-        "xft:Font Awesome 5 Brands:size=10"
+        "xft:Font Awesome 5 Free Solid:size=10"
+        -- "xft:Font Awesome 5 Brands:size=10"
       ],
-    -- , borderColor = "black"
-    -- , border = TopB
+    -- borderColor = "#646464",
+    -- border = BottomB,
     bgColor = "#282c34",
     fgColor = "#d8dee9",
     alpha = 255,
@@ -23,37 +23,53 @@ Config
     -- overrideRedirect = True,
     commands =
       [ Run
-          Network
-          "wlp0s20u3"
-          [ "-t",
-            "<fn=1>\xf0ab</fn> <rx>KB  <fn=1>\xf0aa</fn> <tx>KB",
-            "-L",
-            "0",
-            "-H",
-            "131072",
-            "--normal",
-            "#ff6c6b",
-            "--high",
-            "#98be65"
-          ]
-          20,
-        Run
           Cpu
           [ "-t",
             "<fn=1>\xf108</fn> <total>%",
             "-L",
-            "3",
-            "-H",
             "50",
-            "--normal",
+            "-H",
+            "85",
+            "--low",
             "#98be65",
+            "--normal",
+            "#ecbe8b",
             "--high",
             "#ff6c6b"
           ]
           20,
-        Run Memory ["-t", "<fn=1>\xf538</fn> <usedratio>%"] 30,
-        -- Run Swap [] 10,
-        -- Run Com "uname" ["-s","-r"] "" 36000,
+        Run
+          Memory
+          [ "-t",
+            "<fn=1>\xf538</fn> <usedratio>%",
+            "-L",
+            "50",
+            "-H",
+            "85",
+            "--low",
+            "#98be65",
+            "--normal",
+            "#ecbe8b",
+            "--high",
+            "#ff6c6b"
+          ]
+          30,
+        Run
+          DynNetwork
+          [ "-t",
+            "<fn=1>\xf0ab</fn> <rx>KB  <fn=1>\xf0aa</fn> <tx>KB",
+            "-L",
+            "10000",
+            "-H",
+            "130000",
+            "--low",
+            "#ff6c6b",
+            "--normal",
+            "#ecbe8b",
+            "--high",
+            "#98be65"
+          ]
+          20,
         Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300,
         Run
           Volume
@@ -80,19 +96,24 @@ Config
           1,
         Run UnsafeStdinReader,
         -- trayer padding icon
-        Run Com "/home/atif/.config/xmonad/scripts/trayer-padding-icon.sh" ["panel"] "trayerpad" 10
+        Run
+          Com
+          "/home/atif/.config/xmonad/scripts/trayer-padding-icon.sh"
+          ["panel"]
+          "trayerpad"
+          10
       ],
     sepChar = "%",
     alignSep = "}{",
     template =
       " %UnsafeStdinReader% }{ \
-      \<fc=#ecbe7b>\
+      \<fc=#88c0d0>\
       \<action=`st -e htop -s PERCENT_CPU` button=1>%cpu%</action>\
       \</fc> <fc=#434c5e>|</fc> \
-      \<fc=#ff6c6b>\
+      \<fc=#b58fae>\
       \<action=`st -e htop -s PERCENT_MEM` button=1>%memory%</action>\
       \</fc> <fc=#434c5e>|</fc> \
-      \<fc=#51afef>%wlp0s20u3%</fc> <fc=#434c5e>|</fc> \
+      \<fc=#51afef>%dynnetwork%</fc> <fc=#434c5e>|</fc> \
       \<action=`$HOME/.config/xmonad/scripts/volctl -t` button=1>\
       \<action=`$HOME/.config/xmonad/scripts/volctl -d` button=5>\
       \<action=`$HOME/.config/xmonad/scripts/volctl -i` button=4>\
