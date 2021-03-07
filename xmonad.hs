@@ -14,7 +14,7 @@ import Control.Monad (join, liftM, when, (>=>))
 import qualified Data.Map as M
 import Data.Maybe (fromJust, maybeToList)
 import Data.Monoid
-import System.Exit
+import System.Exit (exitSuccess)
 import System.IO (Handle)
 import XMonad hiding ((|||))
 -- Actions
@@ -23,7 +23,7 @@ import XMonad.Actions.GridSelect
 import XMonad.Actions.Promote
 -- Hooks
 import XMonad.Hooks.DynamicLog (PP (..), dynamicLogWithPP, shorten, wrap, xmobarColor, xmobarPP)
-import XMonad.Hooks.EwmhDesktops
+import XMonad.Hooks.EwmhDesktops (ewmh, ewmhDesktopsEventHook, fullscreenEventHook)
 import XMonad.Hooks.ManageDocks (ToggleStruts (..), avoidStruts, docks, manageDocks)
 import XMonad.Hooks.ManageHelpers (composeOne, doCenterFloat, doFullFloat, isDialog, isFullscreen, (-?>))
 import XMonad.Hooks.UrgencyHook (UrgencyHook, urgencyHook, withUrgencyHook)
@@ -42,7 +42,7 @@ import XMonad.Layout.WindowNavigation
 import qualified XMonad.StackSet as W
 -- Util
 import XMonad.Util.Cursor (setDefaultCursor)
-import XMonad.Util.NamedScratchpad
+import XMonad.Util.NamedScratchpad (NamedScratchpad (NS), customFloating, namedScratchpadAction, namedScratchpadFilterOutWorkspacePP, namedScratchpadManageHook)
 import XMonad.Util.NamedWindows (getName)
 import XMonad.Util.Run (hPutStrLn, safeSpawn, spawnPipe)
 import XMonad.Util.SpawnOnce (spawnOnce)
