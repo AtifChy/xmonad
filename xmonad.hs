@@ -407,7 +407,7 @@ myManageHook =
       className =? "discord" -?> doShift (myWorkspaces !! 2),
       className =? "code-oss" -?> doShift (myWorkspaces !! 3),
       className =? "Lutris" -?> doShift (myWorkspaces !! 5),
-      className =? "VirtualBox Manager" <||> className =? "gnome-boxes" -?> (myWorkspaces !! 6)
+      className =? "VirtualBox Manager" <||> className =? "gnome-boxes" -?> doShift (myWorkspaces !! 6)
     ]
     <+> manageDocks
     <+> namedScratchpadManageHook myScratchpads
