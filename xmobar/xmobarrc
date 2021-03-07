@@ -54,7 +54,7 @@ Config
         Run Memory ["-t", "<fn=1>\xf538</fn> <usedratio>%"] 30,
         -- Run Swap [] 10,
         -- Run Com "uname" ["-s","-r"] "" 36000,
-        Run Date "<fn=1>\xf073</fn> %a %b %d, %l:%M %p" "date" 50,
+        Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300,
         Run
           Volume
           "default"
@@ -63,13 +63,19 @@ Config
             "<status> <volume>%",
             "--",
             "-O",
-            "<fn=1>\xf028</fn>",
+            "",
             "-C",
             "#98be65",
             "-o",
             "<fn=1>\xf6a9</fn>",
             "-c",
-            "#ff6c6b"
+            "#ff6c6b",
+            "-h",
+            "<fn=1>\xf028</fn>",
+            "-m",
+            "<fn=1>\xf027</fn>",
+            "-l",
+            "<fn=1>\xf026</fn>"
           ]
           1,
         Run UnsafeStdinReader,

@@ -25,7 +25,7 @@ import XMonad.Actions.Promote
 import XMonad.Hooks.DynamicLog (PP (..), dynamicLogWithPP, shorten, wrap, xmobarColor, xmobarPP)
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks (ToggleStruts (..), avoidStruts, docks, manageDocks)
-import XMonad.Hooks.ManageHelpers (doCenterFloat, doFullFloat, isDialog, isFullscreen)
+import XMonad.Hooks.ManageHelpers (composeOne, doCenterFloat, doFullFloat, isDialog, isFullscreen, (-?>))
 import XMonad.Hooks.UrgencyHook (UrgencyHook, urgencyHook, withUrgencyHook)
 -- Layout
 import XMonad.Layout.Accordion
@@ -392,14 +392,15 @@ myScratchpads =
 -- 'className' and 'resource' are used below.
 --
 myManageHook =
-  composeAll
-    [ className =? "MPlayer" --> doFloat,
-      resource =? "desktop_window" --> doIgnore,
-      resource =? "kdesktop" --> doIgnore,
-      resource =? "Toolkit" <||> resource =? "Browser" --> doFloat,
-      resource =? "redshift-gtk" --> doCenterFloat,
-      isFullscreen --> doFullFloat,
-      isDialog --> doCenterFloat
+  composeOne
+    [ className =? "MPlayer" -?> doFloat,
+      resource =? "desktop_window" -?> doIgnore,
+      resource =? "kdesktop" -?> doIgnore,
+      resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat,
+      resource =? "redshift-gtk" -?> doCenterFloat,
+      isFullscreen -?> doFullFloat,
+      isDialog -?> doCenterFloat,
+      className =? "ibus-ui-gtk3" -?> doIgnore
     ]
     <+> manageDocks
     <+> namedScratchpadManageHook myScratchpads
