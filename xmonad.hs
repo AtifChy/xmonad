@@ -22,9 +22,9 @@ import XMonad.Actions.CycleWS (Direction1D (..), WSType (..), moveTo, shiftTo, t
 import XMonad.Actions.GridSelect (GSConfig (..), bringSelected, buildDefaultGSConfig, colorRangeFromClassName, goToSelected)
 import XMonad.Actions.Promote (promote)
 -- Hooks
-import XMonad.Hooks.DynamicLog (PP (..), dynamicLogWithPP, shorten, wrap, xmobarColor, xmobarPP)
+import XMonad.Hooks.DynamicLog (PP (..), dynamicLogWithPP, shorten, wrap, xmobarAction, xmobarColor, xmobarPP)
 import XMonad.Hooks.EwmhDesktops (ewmh, ewmhDesktopsEventHook, fullscreenEventHook)
-import XMonad.Hooks.ManageDocks (ToggleStruts (..), avoidStruts, docks, manageDocks)
+import XMonad.Hooks.ManageDocks (ToggleStruts (..), avoidStruts, docks)
 import XMonad.Hooks.ManageHelpers (composeOne, doCenterFloat, doFullFloat, isDialog, isFullscreen, (-?>))
 import XMonad.Hooks.UrgencyHook (UrgencyHook, urgencyHook, withUrgencyHook)
 -- Layout
@@ -94,7 +94,7 @@ myWorkspaces = ["1:term", "2:web", "3:chat", "4:code", "5:movie", "6:game", "7:v
 
 -- Enable clickable workspaces
 --
-myWorkspaceIndices = M.fromList $ zip myWorkspaces [1 ..] -- (,) == \x y -> (x,y)
+myWorkspaceIndices = M.fromList $ zip myWorkspaces [1 ..]
 
 clickable ws = "<action=xdotool key super+" ++ show i ++ ">" ++ ws ++ "</action>"
   where
@@ -187,6 +187,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       ((modm, xK_z), toggleWS' ["NSP"]),
       ((modm, xK_f), moveTo Next EmptyWS), -- find a free workspace
       -- Increase/Decrease spacing (gaps)
+      ((modm, xK_g), sequence_ [toggleScreenSpacingEnabled, toggleWindowSpacingEnabled]),
       ((modm, xK_i), incScreenWindowSpacing 4),
       ((modm, xK_d), decScreenWindowSpacing 4),
       ((altMask, xK_i), incScreenSpacing 4),
@@ -315,7 +316,7 @@ myLayout =
     tiled
       ||| mtiled
       ||| center
-      ||| full
+      --    ||| full
       ||| tabs
   where
     -- default tiling algorithm partitions the screen into two panes
@@ -346,9 +347,9 @@ myLayout =
                 mySpacing 5 $
                   ThreeColMid nmaster delta ratio
 
-    full =
-      renamed [Replace "full"] $
-        lessBorders Screen Full
+    -- full =
+    --   renamed [Replace "full"] $
+    --     lessBorders Screen Full
 
     tabs =
       renamed [Replace "tabs"] $
@@ -409,7 +410,6 @@ myManageHook =
       className =? "Lutris" -?> doShift (myWorkspaces !! 5),
       className =? "VirtualBox Manager" <||> className =? "gnome-boxes" -?> doShift (myWorkspaces !! 6)
     ]
-    <+> manageDocks
     <+> namedScratchpadManageHook myScratchpads
 
 -- Fix for firefox fullscreen
@@ -453,18 +453,22 @@ myLogHook xmproc =
       { -- Xmobar workspace config
         --
         ppOutput = hPutStrLn xmproc,
-        ppCurrent = xmobarColor "#ff6c6b" "" . wrap "[" "]", -- Current workspace
-        ppLayout = \case
-          "tiled" -> "[]="
-          "mtiled" -> "TTT"
-          "center" -> "|M|"
-          "full" -> "[F]"
-          "tabs" -> "[T]"
-          _ -> "?",
+        ppCurrent = xmobarColor "#a3be8c" "" . wrap "[" "]", -- Current workspace
+        ppLayout =
+          xmobarColor "#ff6c6b" "" . xmobarAction "xdotool key Super+space" "1"
+            . ( \case
+                  "tiled" -> "[]="
+                  "mtiled" -> "TTT"
+                  "center" -> "|M|"
+                  --    "full" -> "[F]"
+                  "tabs" -> "[T]"
+                  --    "float" -> "><>"
+                  _ -> "?"
+              ),
         -- ppVisible = xmobarColor "#b48ead" "#434c5e" . wrap " " " " . clickable,  -- Visible but not current workspace (other monitor)
-        ppHidden = xmobarColor "#d8dee9" "" . wrap "" "" . clickable, -- Hidden workspaces, contain windows
+        ppHidden = xmobarColor "#7a869f" "" . wrap "" "" . clickable, -- Hidden workspaces, contain windows
         -- ppHiddenNoWindows = xmobarColor "#4c566a" "" . clickable,  -- Hidden workspaces, no windows
-        ppTitle = xmobarColor "#a3be8c" "" . shorten 50, -- Title of active window
+        ppTitle = xmobarColor "#b48ead" "" . shorten 50, -- Title of active window
         ppSep = "<fc=#434c5e> | </fc>", -- Separator
         ppUrgent = xmobarColor "#ff6c6b" "" . wrap "!" "!" . clickable, -- Urgent workspaces
         ppExtras = [windowCount], -- Number of windows in current workspace
@@ -581,6 +585,7 @@ help =
       "mod-s                Expand the master height",
       "",
       "-- increase or decrease spacing (gaps)",
+      "mod-g                Toggle spacing/gaps",
       "mod-i                Increment both screen and window borders",
       "mod-d                Deincrement both screen and window borders",
       "Alt-i                Increment screen borders",

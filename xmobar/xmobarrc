@@ -71,29 +71,6 @@ Config
           ]
           20,
         Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300,
-        Run
-          Volume
-          "default"
-          "Master"
-          [ "-t",
-            "<status> <volume>%",
-            "--",
-            "-O",
-            "",
-            "-C",
-            "#98be65",
-            "-o",
-            "<fn=1>\xf6a9</fn>",
-            "-c",
-            "#ff6c6b",
-            "-h",
-            "<fn=1>\xf028</fn>",
-            "-m",
-            "<fn=1>\xf027</fn>",
-            "-l",
-            "<fn=1>\xf026</fn>"
-          ]
-          1,
         Run UnsafeStdinReader,
         -- trayer padding icon
         Run
@@ -114,11 +91,6 @@ Config
       \<action=`st -e htop -s PERCENT_MEM` button=1>%memory%</action>\
       \</fc> <fc=#434c5e>|</fc> \
       \<fc=#51afef>%dynnetwork%</fc> <fc=#434c5e>|</fc> \
-      \<action=`$HOME/.config/xmonad/scripts/volctl -t` button=1>\
-      \<action=`$HOME/.config/xmonad/scripts/volctl -d` button=5>\
-      \<action=`$HOME/.config/xmonad/scripts/volctl -i` button=4>\
-      \%default:Master%</action></action></action>\
-      \ <fc=#434c5e>|</fc> \
       \<fc=#c678dd>%date%</fc> <fc=#434c5e>|</fc>%trayerpad%"
   }
 
