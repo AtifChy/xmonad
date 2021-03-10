@@ -26,6 +26,7 @@ import XMonad.Hooks.DynamicLog (PP (..), dynamicLogWithPP, shorten, wrap, xmobar
 import XMonad.Hooks.EwmhDesktops (ewmh, ewmhDesktopsEventHook, fullscreenEventHook)
 import XMonad.Hooks.ManageDocks (ToggleStruts (..), avoidStruts, docks)
 import XMonad.Hooks.ManageHelpers (composeOne, doCenterFloat, doFullFloat, isDialog, isFullscreen, (-?>))
+import XMonad.Hooks.UrgencyHook (UrgencyHook, urgencyHook, withUrgencyHook)
 -- Layout
 import XMonad.Layout.Accordion
 import XMonad.Layout.LayoutCombinators
@@ -304,6 +305,9 @@ myTabConfig =
       inactiveColor = myNormalBorderColor,
       inactiveBorderColor = myNormalBorderColor,
       inactiveTextColor = "#4c566a",
+      urgentColor = "#282c34",
+      urgentBorderColor = "#282c34",
+      urgentTextColor = "#ebcb8b",
       fontName = myFont
     }
 
@@ -466,6 +470,7 @@ myLogHook xmproc =
         -- ppHiddenNoWindows = xmobarColor "#4c566a" "" . clickable,  -- Hidden workspaces, no windows
         ppTitle = xmobarColor "#b48ead" "" . shorten 50, -- Title of active window
         ppSep = "<fc=#434c5e> | </fc>", -- Separator
+        ppUrgent = xmobarColor "#ff6c6b" "" . wrap "!" "!" . clickable, -- Urgent workspaces
         ppExtras = [windowCount], -- Number of windows in current workspace
         ppOrder = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
       }
@@ -493,6 +498,19 @@ myStartupHook = do
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &"
 
 ------------------------------------------------------------------------
+-- Urgency hook
+--
+-- from https://pbrisbin.com/posts/using_notify_osd_for_xmonad_notifications/
+data LibNotifyUrgencyHook = LibNotifyUrgencyHook deriving (Read, Show)
+
+instance UrgencyHook LibNotifyUrgencyHook where
+  urgencyHook LibNotifyUrgencyHook w = do
+    name <- getName w
+    Just idx <- W.findTag w <$> gets windowset
+
+    safeSpawn "notify-send" [show name, "workspace " ++ idx]
+
+------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
 
 -- Run xmonad with the settings you specify. No need to modify this.
@@ -503,30 +521,32 @@ main = do
   xmonad $
     ewmh $
       docks $
-        def
-          { -- A structure containing your configuration settings, overriding
-            -- fields in the default config. Any you don't override, will
-            -- use the defaults defined in xmonad/XMonad/Config.hs
-            --
-            -- simple stuff
-            terminal = myTerminal,
-            focusFollowsMouse = myFocusFollowsMouse,
-            clickJustFocuses = myClickJustFocuses,
-            borderWidth = myBorderWidth,
-            modMask = myModMask,
-            workspaces = myWorkspaces,
-            normalBorderColor = myNormalBorderColor,
-            focusedBorderColor = myFocusedBorderColor,
-            -- key bindings
-            keys = myKeys,
-            mouseBindings = myMouseBindings,
-            -- hooks, layouts
-            layoutHook = myLayout,
-            manageHook = myManageHook,
-            handleEventHook = myEventHook,
-            logHook = myLogHook xmproc,
-            startupHook = myStartupHook >> addEWMHFullscreen
-          }
+        withUrgencyHook
+          LibNotifyUrgencyHook
+          def
+            { -- A structure containing your configuration settings, overriding
+              -- fields in the default config. Any you don't override, will
+              -- use the defaults defined in xmonad/XMonad/Config.hs
+              --
+              -- simple stuff
+              terminal = myTerminal,
+              focusFollowsMouse = myFocusFollowsMouse,
+              clickJustFocuses = myClickJustFocuses,
+              borderWidth = myBorderWidth,
+              modMask = myModMask,
+              workspaces = myWorkspaces,
+              normalBorderColor = myNormalBorderColor,
+              focusedBorderColor = myFocusedBorderColor,
+              -- key bindings
+              keys = myKeys,
+              mouseBindings = myMouseBindings,
+              -- hooks, layouts
+              layoutHook = myLayout,
+              manageHook = myManageHook,
+              handleEventHook = myEventHook,
+              logHook = myLogHook xmproc,
+              startupHook = myStartupHook >> addEWMHFullscreen
+            }
 
 ------------------------------------------------------------------------
 

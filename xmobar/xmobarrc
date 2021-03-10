@@ -1,31 +1,26 @@
 Config
-  { font = "xft:JetBrains Mono:size=10:weight=bold:antialias=true:hinting=true, Noto Sans Bengali:size=10:weight=bold:antialias=true:hinting=true",
-    additionalFonts =
-      [ -- "xft:Symbols Nerd Font:size=10:antialias=true:hinting=true",
-        -- awesome is better
-        "xft:Font Awesome 5 Free Solid:size=10"
-        -- "xft:Font Awesome 5 Brands:size=10"
-      ],
+  { font = "xft:JetBrains Mono:size=10:weight=Bold:antialias=true:hinting=true,Font Awesome 5 Free Solid:size=10,Noto Sans Bengali:size=10:weight=Bold:antialias=true:hinting=true",
+    additionalFonts = [],
     -- borderColor = "#646464",
     -- border = BottomB,
     bgColor = "#282c34",
     fgColor = "#d8dee9",
     alpha = 255,
-    position = Static {xpos = 0, ypos = 0, width = 1920, height = 24},
-    -- textOffset = -1,
+    position = Top, -- Static {xpos = 0, ypos = 0, width = 1920, height = 24},
+    textOffset = 16,
     -- iconOffset = -1,
     lowerOnStart = True,
     -- pickBroadest = False,
     persistent = True,
-    hideOnStart = False,
-    iconRoot = ".",
-    allDesktops = True,
+    -- hideOnStart = False,
+    -- iconRoot = ".",
+    -- allDesktops = True,
     -- overrideRedirect = True,
     commands =
       [ Run
           Cpu
           [ "-t",
-            "<fn=1>\xf108</fn> <total>%",
+            "\61704 <total>%",
             "-L",
             "50",
             "-H",
@@ -41,7 +36,7 @@ Config
         Run
           Memory
           [ "-t",
-            "<fn=1>\xf538</fn> <usedratio>%",
+            "\62776 <usedratio>%",
             "-L",
             "50",
             "-H",
@@ -57,7 +52,7 @@ Config
         Run
           DynNetwork
           [ "-t",
-            "<fn=1>\xf0ab</fn> <rx>KB  <fn=1>\xf0aa</fn> <tx>KB",
+            "\61611 <rx>KB  \61610 <tx>KB",
             "-L",
             "10000",
             "-H",
@@ -70,7 +65,7 @@ Config
             "#98be65"
           ]
           20,
-        Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300,
+        Run Date "\61555 %a %b %d, \61463 %l:%M %p" "date" 300,
         Run UnsafeStdinReader,
         -- trayer padding icon
         Run
