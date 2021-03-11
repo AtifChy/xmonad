@@ -9,7 +9,9 @@
 -- Normally, you'd only override those defaults you care about.
 --
 
--- Base
+-- Imports
+--
+import Control.Arrow (first)
 import Control.Monad (join, liftM, when, (>=>))
 import qualified Data.Map as M
 import Data.Maybe (fromJust, maybeToList)
@@ -17,16 +19,12 @@ import Data.Monoid
 import System.Exit (exitSuccess)
 import System.IO (Handle)
 import XMonad hiding ((|||))
--- Actions
 import XMonad.Actions.CycleWS (Direction1D (..), WSType (..), moveTo, shiftTo, toggleWS')
-import XMonad.Actions.GridSelect (GSConfig (..), bringSelected, buildDefaultGSConfig, colorRangeFromClassName, goToSelected)
 import XMonad.Actions.Promote (promote)
--- Hooks
 import XMonad.Hooks.DynamicLog (PP (..), dynamicLogWithPP, shorten, wrap, xmobarAction, xmobarColor, xmobarPP)
 import XMonad.Hooks.EwmhDesktops (ewmh, ewmhDesktopsEventHook, fullscreenEventHook)
 import XMonad.Hooks.ManageDocks (ToggleStruts (..), avoidStruts, docks)
 import XMonad.Hooks.ManageHelpers (composeOne, doCenterFloat, doFullFloat, isDialog, isFullscreen, (-?>))
--- Layout
 import XMonad.Layout.Accordion
 import XMonad.Layout.LayoutCombinators
 import XMonad.Layout.NoBorders
@@ -38,11 +36,12 @@ import XMonad.Layout.SubLayouts
 import XMonad.Layout.Tabbed
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.WindowNavigation
+import XMonad.Prompt
+import XMonad.Prompt.FuzzyMatch
+import XMonad.Prompt.Shell
 import qualified XMonad.StackSet as W
--- Util
 import XMonad.Util.Cursor (setDefaultCursor)
 import XMonad.Util.NamedScratchpad (NamedScratchpad (NS), customFloating, namedScratchpadAction, namedScratchpadFilterOutWorkspacePP, namedScratchpadManageHook)
-import XMonad.Util.NamedWindows (getName)
 import XMonad.Util.Run (hPutStrLn, safeSpawn, spawnPipe)
 import XMonad.Util.SpawnOnce (spawnOnce)
 
@@ -107,7 +106,7 @@ windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace
 --
 myNormalBorderColor = "#282c34"
 
-myFocusedBorderColor = "#366799"
+myFocusedBorderColor = "#51afef"
 
 -- Custom font
 myFont = "xft:JetBrains Mono:style=Bold:size=10:antialias=true:hinting=true"
@@ -120,11 +119,11 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
     [ -- launch a terminal
       ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf),
       -- launch dmenu
-      ((altMask, xK_p), spawn "dmenu_run -p 'Run:' -w 1916"),
+      -- ((altMask, xK_p), spawn "dmenu_run -p 'Run:' -w 1916"),
       -- launch greenclip-dmenu
-      ((altMask, xK_c), spawn "greenclip print | sed '/^$/d' | dmenu -s -l 10 -g 2 -w 1916 -p 'Clipboard:' | xargs -r -d'\n' -I '{}' greenclip print '{}'"),
+      -- ((altMask, xK_c), spawn "greenclip print | sed '/^$/d' | dmenu -s -l 10 -g 2 -w 1916 -p 'Clipboard:' | xargs -r -d'\n' -I '{}' greenclip print '{}'"),
       -- launch rofi
-      ((modm, xK_p), spawn (myLauncher ++ " -show drun -show-icons")),
+      ((altMask, xK_p), spawn (myLauncher ++ " -show combi -combi-modi window,drun -modi combi -show-icons")),
       -- launch rofi-greenclip
       ((modm, xK_c), spawn (myLauncher ++ " -show Clipboard -modi 'Clipboard:greenclip print' -run-command '{cmd}'")),
       -- launch gmrun
@@ -215,9 +214,8 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       ((altMask, xK_t), sendMessage $ JumpToLayout "tiled"),
       ((altMask, xK_c), sendMessage $ JumpToLayout "center"),
       ((altMask, xK_f), sendMessage $ JumpToLayout "full"),
-      -- GridSelect
-      ((modm .|. shiftMask, xK_g), goToSelected $ mygsConfig myColorizer),
-      ((modm .|. shiftMask, xK_b), bringSelected $ mygsConfig myColorizer)
+      -- XPrompt
+      ((modm, xK_p), shellPrompt myXPConfig)
     ]
       ++
       --
@@ -261,25 +259,67 @@ myMouseBindings XConfig {XMonad.modMask = modm} =
     ]
 
 ------------------------------------------------------------------------
--- GridSelect
+-- XPrompt
 --
-myColorizer =
-  colorRangeFromClassName
-    (0x28, 0x2c, 0x34) -- lowest inactive bg
-    (0x28, 0x2c, 0x34) -- highest inactive bg
-    (0x36, 0x67, 0x99) -- active bg
-    (0x4c, 0x56, 0x6a) -- inactive fg
-    (0xec, 0xff, 0xf4) -- active fg
-
-mygsConfig colorizer =
-  (buildDefaultGSConfig myColorizer)
-    { gs_cellheight = 50,
-      gs_cellwidth = 300,
-      gs_cellpadding = 10,
-      gs_originFractX = 0.5,
-      gs_originFractY = 0.5,
-      gs_font = myFont
+myXPConfig =
+  def
+    { font = myFont,
+      bgColor = "#282c34",
+      fgColor = "#d8dee9",
+      bgHLight = "#51afef",
+      fgHLight = "#000000",
+      borderColor = "#434c5e",
+      promptBorderWidth = 1,
+      promptKeymap = myXPKeymap,
+      position = Top,
+      -- position = CenteredAt {xpCenterY = 0.3, xpWidth = 0.3},
+      height = 22,
+      historySize = 256,
+      historyFilter = id,
+      defaultText = [],
+      -- autoComplete = Just 100000, -- set Just 100000 for .1 sec
+      showCompletionOnTab = False, -- False means auto completion
+      -- searchPredicate = isPrefixOf,
+      searchPredicate = fuzzyMatch,
+      sorter = fuzzySort,
+      -- defaultPrompter = drop 5 . (++ "Run: "), -- drop first 5 chars of prompt and add XXXX:
+      alwaysHighlight = True, -- Disables tab cycle
+      maxComplRows = Just 10 -- set to 'Just 5' for 5 rows
     }
+
+-- XPrompt keymap
+--
+myXPKeymap =
+  M.fromList $
+    map
+      (first $ (,) controlMask) -- control + <key>
+      [ (xK_u, killBefore),
+        (xK_k, killAfter),
+        (xK_a, startOfLine),
+        (xK_e, endOfLine),
+        (xK_y, pasteString),
+        (xK_Right, moveWord Next >> moveCursor Next),
+        (xK_Left, moveCursor Prev >> moveWord Prev),
+        (xK_Delete, killWord Next),
+        (xK_BackSpace, killWord Prev),
+        (xK_w, killWord Prev),
+        (xK_g, quit),
+        (xK_bracketleft, quit)
+      ]
+      ++ map
+        (first $ (,) 0)
+        [ (xK_Return, setSuccess True >> setDone True),
+          (xK_KP_Enter, setSuccess True >> setDone True),
+          (xK_BackSpace, deleteString Prev),
+          (xK_Delete, deleteString Next),
+          (xK_Left, moveCursor Prev),
+          (xK_Right, moveCursor Next),
+          (xK_Home, startOfLine),
+          (xK_End, endOfLine),
+          (xK_Down, moveHistory W.focusUp'),
+          (xK_Up, moveHistory W.focusDown'),
+          (xK_Escape, quit)
+        ]
 
 ------------------------------------------------------------------------
 -- Spacing (gaps)
@@ -451,7 +491,9 @@ myLogHook xmproc =
         ppOutput = hPutStrLn xmproc,
         ppCurrent = xmobarColor "#a3be8c" "" . wrap "[" "]", -- Current workspace
         ppLayout =
-          xmobarColor "#ff6c6b" "" . xmobarAction "xdotool key Super+space" "1"
+          xmobarColor "#ff6c6b" ""
+            . xmobarAction "xdotool key Super+space" "1"
+            . xmobarAction "xdotool key Super+shift+space" "3"
             . ( \case
                   "tiled" -> "[]="
                   "mtiled" -> "TTT"
@@ -539,8 +581,8 @@ help =
       "mod-Shift-Enter      Launch terminal",
       "mod-p                Launch rofi",
       "mod-c                Launch greenclip with rofi",
-      "Alt-p                Launch dmenu",
-      "Alt-c                Launch greenclip with dmenu",
+      -- "Alt-p                Launch dmenu",
+      -- "Alt-c                Launch greenclip with dmenu",
       --"mod-Shift-p          Launch gmrun",
       "mod-Shift-c          Close/kill the focused window",
       "mod-Space            Rotate through the available layout algorithms",
