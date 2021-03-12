@@ -190,10 +190,6 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       ((altMask, xK_d), decScreenSpacing 4),
       ((altMask .|. shiftMask, xK_i), incWindowSpacing 4),
       ((altMask .|. shiftMask, xK_d), decWindowSpacing 4),
-      -- Screenshot shortcuts (Requires: maim & xclip)
-      ((0, xK_Print), spawn "$HOME/.config/xmonad/scripts/msclip -f"),
-      ((0 .|. controlMask, xK_Print), spawn "$HOME/.config/xmonad/scripts/msclip -w"),
-      ((0 .|. shiftMask, xK_Print), spawn "$HOME/.config/xmonad/scripts/msclip -s"),
       -- SubLayouts
       ((modm .|. controlMask, xK_h), sendMessage $ pullGroup L),
       ((modm .|. controlMask, xK_l), sendMessage $ pullGroup R),
@@ -206,14 +202,18 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       ((modm .|. controlMask, xK_period), onGroup W.focusDown'),
       -- Scratchpad
       ((modm .|. controlMask, xK_Return), namedScratchpadAction myScratchpads "terminal"),
-      -- Picom on/off
-      ((altMask, xK_F9), spawn "killall picom || picom --experimental-backends -b"),
       -- Easily switch your layouts
       ((altMask, xK_t), sendMessage $ JumpToLayout "tiled"),
       ((altMask, xK_c), sendMessage $ JumpToLayout "center"),
       ((altMask, xK_f), sendMessage $ JumpToLayout "full"),
       -- XPrompt
-      ((modm, xK_p), shellPrompt myXPConfig)
+      ((modm, xK_p), shellPrompt myXPConfig),
+      -- Picom on/off
+      ((altMask, xK_F9), spawn "killall picom || picom --experimental-backends -b"),
+      -- Screenshot shortcuts (Requires: scrot & xclip)
+      ((0, xK_Print), spawn "$HOME/.config/xmonad/scripts/ssclip -f"),
+      ((0 .|. controlMask, xK_Print), spawn "$HOME/.config/xmonad/scripts/ssclip -w"),
+      ((0 .|. shiftMask, xK_Print), spawn "$HOME/.config/xmonad/scripts/ssclip -s")
     ]
       ++
       --
@@ -355,7 +355,7 @@ myLayout =
   where
     -- default tiling algorithm partitions the screen into two panes
     tiled =
-      renamed [Replace "tiled"] $
+      renamed [Replace "Tiled"] $
         lessBorders OnlyScreenFloat $
           windowNavigation $
             addTabs shrinkText myTabConfig $
@@ -364,7 +364,7 @@ myLayout =
                   ResizableTall nmaster delta ratio []
 
     mtiled =
-      renamed [Replace "mtiled"] $
+      renamed [Replace "Mirror Tiled"] $
         lessBorders OnlyScreenFloat $
           windowNavigation $
             addTabs shrinkText myTabConfig $
@@ -373,7 +373,7 @@ myLayout =
                   Mirror tiled
 
     center =
-      renamed [Replace "center"] $
+      renamed [Replace "Centered Master"] $
         lessBorders OnlyScreenFloat $
           windowNavigation $
             addTabs shrinkText myTabConfig $
@@ -382,11 +382,11 @@ myLayout =
                   ThreeColMid nmaster delta ratio
 
     full =
-      renamed [Replace "full"] $
+      renamed [Replace "Monocle"] $
         lessBorders Screen Full
 
     tabs =
-      renamed [Replace "tabs"] $
+      renamed [Replace "Tabs"] $
         lessBorders OnlyScreenFloat $
           tabbed shrinkText myTabConfig
 
@@ -493,12 +493,12 @@ myLogHook xmproc =
             . xmobarAction "xdotool key Super+space" "1"
             . xmobarAction "xdotool key Super+shift+space" "3"
             . ( \case
-                  "tiled" -> "[]="
-                  "mtiled" -> "TTT"
-                  "center" -> "|M|"
-                  "full" -> "[ ]"
-                  "tabs" -> "[T]"
-                  --    "float" -> "><>"
+                  "Tiled" -> "[]="
+                  "Mirror Tiled" -> "TTT"
+                  "Centered Master" -> "|M|"
+                  "Monocle" -> "[ ]"
+                  "Tabs" -> "[T]"
+                  --    "Float" -> "><>"
                   _ -> "?"
               ),
         -- ppVisible = xmobarColor "#b48ead" "#434c5e" . wrap " " " " . clickable,  -- Visible but not current workspace (other monitor)
@@ -520,7 +520,7 @@ myLogHook xmproc =
 myStartupHook = do
   setDefaultCursor xC_left_ptr
   spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 1 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 &"
-  spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0143.jpg"
+  spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0016.jpg"
   spawnOnce "nm-applet &"
   spawnOnce "picom --experimental-backends -b"
   spawnOnce "dunst &"
