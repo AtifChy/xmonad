@@ -4,7 +4,7 @@ Config
     -- borderColor = "#646464",
     -- border = BottomB,
     bgColor = "#282c34",
-    fgColor = "#d8dee9",
+    fgColor = "#51afef",
     alpha = 255,
     position = Top, -- Static {xpos = 0, ypos = 0, width = 1920, height = 24},
     textOffset = 16,

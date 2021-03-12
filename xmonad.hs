@@ -203,9 +203,9 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
       -- Scratchpad
       ((modm .|. controlMask, xK_Return), namedScratchpadAction myScratchpads "terminal"),
       -- Easily switch your layouts
-      ((altMask, xK_t), sendMessage $ JumpToLayout "tiled"),
-      ((altMask, xK_c), sendMessage $ JumpToLayout "center"),
-      ((altMask, xK_f), sendMessage $ JumpToLayout "full"),
+      ((altMask, xK_t), sendMessage $ JumpToLayout "Tiled"),
+      ((altMask, xK_c), sendMessage $ JumpToLayout "Centered Master"),
+      ((altMask, xK_f), sendMessage $ JumpToLayout "Monocle"),
       -- XPrompt
       ((modm, xK_p), shellPrompt myXPConfig),
       -- Picom on/off
@@ -365,12 +365,10 @@ myLayout =
 
     mtiled =
       renamed [Replace "Mirror Tiled"] $
-        lessBorders OnlyScreenFloat $
-          windowNavigation $
-            addTabs shrinkText myTabConfig $
-              subLayout [] (Simplest ||| Accordion) $
-                mySpacing 5 $
-                  Mirror tiled
+        windowNavigation $
+          addTabs shrinkText myTabConfig $
+            subLayout [] (Simplest ||| Accordion) $
+              Mirror tiled
 
     center =
       renamed [Replace "Centered Master"] $
