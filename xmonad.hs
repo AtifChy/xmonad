@@ -45,8 +45,6 @@ import XMonad.Util.NamedScratchpad (NamedScratchpad (NS), customFloating, namedS
 import XMonad.Util.Run (hPutStrLn, safeSpawn, spawnPipe)
 import XMonad.Util.SpawnOnce (spawnOnce)
 
---import XMonad.Util.EZConfig (additionalKeys)
-
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
@@ -352,7 +350,7 @@ myLayout =
     tiled
       ||| mtiled
       ||| center
-      --    ||| full
+      ||| full
       ||| tabs
   where
     -- default tiling algorithm partitions the screen into two panes
@@ -383,9 +381,9 @@ myLayout =
                 mySpacing 5 $
                   ThreeColMid nmaster delta ratio
 
-    -- full =
-    --   renamed [Replace "full"] $
-    --     lessBorders Screen Full
+    full =
+      renamed [Replace "full"] $
+        lessBorders Screen Full
 
     tabs =
       renamed [Replace "tabs"] $
@@ -498,7 +496,7 @@ myLogHook xmproc =
                   "tiled" -> "[]="
                   "mtiled" -> "TTT"
                   "center" -> "|M|"
-                  --    "full" -> "[ ]"
+                  "full" -> "[ ]"
                   "tabs" -> "[T]"
                   --    "float" -> "><>"
                   _ -> "?"
@@ -579,7 +577,7 @@ help =
       "",
       "-- launching and killing programs",
       "mod-Shift-Enter      Launch terminal",
-      "mod-p                Launch rofi",
+      "mod-p                Launch XPrompt (Xmonad Prompt)",
       "mod-c                Launch greenclip with rofi",
       -- "Alt-p                Launch dmenu",
       -- "Alt-c                Launch greenclip with dmenu",
