@@ -1,12 +1,12 @@
 Config
   { font = "xft:JetBrains Mono:size=10:weight=Bold:antialias=true:hinting=true,Font Awesome 5 Free Solid:size=10,Noto Sans Bengali:size=10:weight=Bold:antialias=true:hinting=true",
     additionalFonts = [],
-    -- borderColor = "#646464",
-    -- border = BottomB,
     bgColor = "#282c34",
     fgColor = "#51afef",
+    borderColor = "#434c5e",
     alpha = 255,
     position = Top, -- Static {xpos = 0, ypos = 0, width = 1920, height = 24},
+    border = FullB,
     textOffset = 16,
     -- iconOffset = -1,
     lowerOnStart = True,
@@ -74,6 +74,12 @@ Config
           ["panel"]
           "trayerpad"
           5
+          -- Run
+          --   Com
+          --   "/home/atif/.config/xmonad/scripts/trayer-padding-icon.sh"
+          --   ["stalonetray"]
+          --   "tray"
+          --   5
       ],
     sepChar = "%",
     alignSep = "}{",

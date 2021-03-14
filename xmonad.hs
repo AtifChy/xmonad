@@ -271,7 +271,7 @@ myXPConfig =
       promptKeymap = myXPKeymap,
       position = Top,
       -- position = CenteredAt {xpCenterY = 0.3, xpWidth = 0.3},
-      height = 22,
+      height = 24,
       historySize = 256,
       historyFilter = id,
       defaultText = [],
@@ -517,7 +517,7 @@ myLogHook xmproc =
 --
 myStartupHook = do
   setDefaultCursor xC_left_ptr
-  spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 1 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 &"
+  spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right &"
   spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0016.jpg"
   spawnOnce "nm-applet &"
   spawnOnce "picom --experimental-backends -b"
