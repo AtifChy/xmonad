@@ -26,9 +26,9 @@ import XMonad.Hooks.EwmhDesktops (ewmh, ewmhDesktopsEventHook, fullscreenEventHo
 import XMonad.Hooks.ManageDocks (ToggleStruts (..), avoidStruts, docks)
 import XMonad.Hooks.ManageHelpers (composeOne, doCenterFloat, doFullFloat, isDialog, isFullscreen, (-?>))
 import XMonad.Layout.Accordion
-import XMonad.Layout.LayoutCombinators
-import XMonad.Layout.NoBorders
-import XMonad.Layout.Renamed
+import XMonad.Layout.LayoutCombinators (JumpToLayout (..), (|||))
+import XMonad.Layout.NoBorders (Ambiguity (OnlyScreenFloat, Screen), lessBorders)
+import XMonad.Layout.Renamed (Rename (Replace), renamed)
 import XMonad.Layout.ResizableTile
 import XMonad.Layout.Simplest
 import XMonad.Layout.Spacing
@@ -104,7 +104,7 @@ windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace
 --
 myNormalBorderColor = "#282c34"
 
-myFocusedBorderColor = "#51afef"
+myFocusedBorderColor = "#41a8f1"
 
 -- Custom font
 myFont = "xft:JetBrains Mono:style=Bold:size=10:antialias=true:hinting=true"
@@ -262,9 +262,9 @@ myMouseBindings XConfig {XMonad.modMask = modm} =
 myXPConfig =
   def
     { font = myFont,
-      bgColor = "#282c34",
+      bgColor = myNormalBorderColor,
       fgColor = "#d8dee9",
-      bgHLight = "#51afef",
+      bgHLight = myFocusedBorderColor,
       fgHLight = "#000000",
       borderColor = "#434c5e",
       promptBorderWidth = 1,
@@ -471,7 +471,7 @@ addEWMHFullscreen = do
 -- return (All True) if the default handler is to be run afterwards. To
 -- combine event hooks use mappend or mconcat from Data.Monoid.
 --
-myEventHook = handleEventHook def <+> fullscreenEventHook
+myHandleEventHook = handleEventHook def <+> fullscreenEventHook
 
 ------------------------------------------------------------------------
 -- Status bars and logging
@@ -561,7 +561,7 @@ main = do
             -- hooks, layouts
             layoutHook = myLayout,
             manageHook = myManageHook,
-            handleEventHook = myEventHook,
+            handleEventHook = myHandleEventHook,
             logHook = myLogHook xmproc,
             startupHook = myStartupHook >> addEWMHFullscreen
           }

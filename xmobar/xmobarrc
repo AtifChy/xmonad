@@ -73,7 +73,7 @@ Config
           "/home/atif/.config/xmonad/scripts/trayer-padding-icon.sh"
           ["panel"]
           "trayerpad"
-          10
+          5
       ],
     sepChar = "%",
     alignSep = "}{",
