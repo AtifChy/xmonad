@@ -85,7 +85,7 @@ Config
     alignSep = "}{",
     template =
       " %UnsafeStdinReader% }{ \
-      \<fc=#88c0d0>\
+      \<fc=#56b6c2>\
       \<action=`st -e htop -s PERCENT_CPU` button=1>%cpu%</action>\
       \</fc> <fc=#434c5e>|</fc> \
       \<fc=#b58fae>\

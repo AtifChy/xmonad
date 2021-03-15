@@ -100,11 +100,31 @@ clickable ws = "<action=xdotool key super+" ++ show i ++ ">" ++ ws ++ "</action>
 --
 windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace . W.current . windowset
 
+-- myColors
+--
+black = "#282c34"
+
+red = "#ff6c6b"
+
+green = "#a3be8c"
+
+yellow = "#ecbe8b"
+
+blue = "#41a8f1"
+
+magenta = "#b48ead"
+
+cyan = "#56b6c2"
+
+white = "#d8dee9"
+
+gray = "#434c5e"
+
 -- Border colors for unfocused and focused windows, respectively.
 --
-myNormalBorderColor = "#282c34"
+myNormalBorderColor = black
 
-myFocusedBorderColor = "#41a8f1"
+myFocusedBorderColor = blue
 
 -- Custom font
 myFont = "xft:JetBrains Mono:style=Bold:size=10:antialias=true:hinting=true"
@@ -262,11 +282,11 @@ myMouseBindings XConfig {XMonad.modMask = modm} =
 myXPConfig =
   def
     { font = myFont,
-      bgColor = myNormalBorderColor,
-      fgColor = "#d8dee9",
-      bgHLight = myFocusedBorderColor,
+      bgColor = black,
+      fgColor = white,
+      bgHLight = blue,
       fgHLight = "#000000",
-      borderColor = "#434c5e",
+      borderColor = gray,
       promptBorderWidth = 1,
       promptKeymap = myXPKeymap,
       position = Top,
@@ -336,12 +356,12 @@ mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 -- Tabbed layout config
 myTabConfig =
   def
-    { activeColor = myFocusedBorderColor,
-      activeBorderColor = myFocusedBorderColor,
-      activeTextColor = "#eceff4",
-      inactiveColor = myNormalBorderColor,
-      inactiveBorderColor = myNormalBorderColor,
-      inactiveTextColor = "#4c566a",
+    { activeColor = blue,
+      activeBorderColor = blue,
+      activeTextColor = white,
+      inactiveColor = black,
+      inactiveBorderColor = black,
+      inactiveTextColor = gray,
       fontName = myFont
     }
 
@@ -485,9 +505,9 @@ myLogHook xmproc =
       { -- Xmobar workspace config
         --
         ppOutput = hPutStrLn xmproc,
-        ppCurrent = xmobarColor "#a3be8c" "" . wrap "[" "]", -- Current workspace
+        ppCurrent = xmobarColor green "" . wrap "[" "]", -- Current workspace
         ppLayout =
-          xmobarColor "#ff6c6b" ""
+          xmobarColor red ""
             . xmobarAction "xdotool key Super+space" "1"
             . xmobarAction "xdotool key Super+shift+space" "3"
             . ( \case
@@ -499,10 +519,10 @@ myLogHook xmproc =
                   --    "Float" -> "><>"
                   _ -> "?"
               ),
-        -- ppVisible = xmobarColor "#b48ead" "#434c5e" . wrap " " " " . clickable,  -- Visible but not current workspace (other monitor)
+        -- ppVisible = xmobarColor magenta gray . wrap " " " " . clickable,  -- Visible but not current workspace (other monitor)
         ppHidden = xmobarColor "#7a869f" "" . wrap "" "" . clickable, -- Hidden workspaces, contain windows
-        -- ppHiddenNoWindows = xmobarColor "#4c566a" "" . clickable,  -- Hidden workspaces, no windows
-        ppTitle = xmobarColor "#b48ead" "" . shorten 50, -- Title of active window
+        -- ppHiddenNoWindows = xmobarColor gray "" . clickable,  -- Hidden workspaces, no windows
+        ppTitle = xmobarColor magenta "" . shorten 50, -- Title of active window
         ppSep = "<fc=#434c5e> | </fc>", -- Separator
         ppExtras = [windowCount], -- Number of windows in current workspace
         ppOrder = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
@@ -517,8 +537,8 @@ myLogHook xmproc =
 --
 myStartupHook = do
   setDefaultCursor xC_left_ptr
-  spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right &"
-  spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0016.jpg"
+  spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0079.jpg"
+  -- spawn "feh --bg-scale --randomize --no-fehbg ~/Pictures/Wallpapers/*"
   spawnOnce "nm-applet &"
   spawnOnce "picom --experimental-backends -b"
   spawnOnce "dunst &"
@@ -529,6 +549,7 @@ myStartupHook = do
   spawnOnce "numlockx &"
   spawnOnce "ibus-daemon -drx"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &"
+  spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right &"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
