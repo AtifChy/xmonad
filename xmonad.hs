@@ -288,7 +288,7 @@ myXPConfig =
       fgHLight = "#000000",
       borderColor = gray,
       promptBorderWidth = 1,
-      promptKeymap = myXPKeymap,
+      promptKeymap = defaultXPKeymap,
       position = Top,
       -- position = CenteredAt {xpCenterY = 0.3, xpWidth = 0.3},
       height = 24,
@@ -304,40 +304,6 @@ myXPConfig =
       alwaysHighlight = True, -- Disables tab cycle
       maxComplRows = Just 10 -- set to 'Just 5' for 5 rows
     }
-
--- XPrompt keymap
---
-myXPKeymap =
-  M.fromList $
-    map
-      (first $ (,) controlMask) -- control + <key>
-      [ (xK_u, killBefore),
-        (xK_k, killAfter),
-        (xK_a, startOfLine),
-        (xK_e, endOfLine),
-        (xK_y, pasteString),
-        (xK_Right, moveWord Next >> moveCursor Next),
-        (xK_Left, moveCursor Prev >> moveWord Prev),
-        (xK_Delete, killWord Next),
-        (xK_BackSpace, killWord Prev),
-        (xK_w, killWord Prev),
-        (xK_g, quit),
-        (xK_bracketleft, quit)
-      ]
-      ++ map
-        (first $ (,) 0)
-        [ (xK_Return, setSuccess True >> setDone True),
-          (xK_KP_Enter, setSuccess True >> setDone True),
-          (xK_BackSpace, deleteString Prev),
-          (xK_Delete, deleteString Next),
-          (xK_Left, moveCursor Prev),
-          (xK_Right, moveCursor Next),
-          (xK_Home, startOfLine),
-          (xK_End, endOfLine),
-          (xK_Down, moveHistory W.focusUp'),
-          (xK_Up, moveHistory W.focusDown'),
-          (xK_Escape, quit)
-        ]
 
 ------------------------------------------------------------------------
 -- Spacing (gaps)
