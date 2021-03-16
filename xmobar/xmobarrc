@@ -74,12 +74,6 @@ Config
           ["panel"]
           "trayerpad"
           5
-          -- Run
-          --   Com
-          --   "/home/atif/.config/xmonad/scripts/trayer-padding-icon.sh"
-          --   ["stalonetray"]
-          --   "tray"
-          --   5
       ],
     sepChar = "%",
     alignSep = "}{",
