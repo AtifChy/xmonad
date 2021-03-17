@@ -1,73 +1,41 @@
-{-# LANGUAGE LambdaCase, MonomorphismRestriction #-}
+{-# LANGUAGE LambdaCase              #-}
+{-# LANGUAGE MonomorphismRestriction #-}
+
 --
 -- Xmonad config file.
 --
 
 -- Imports
 --
-import           Control.Monad                  ( join
-                                                , when
-                                                )
-import qualified Data.Map                      as M
-import           Data.Maybe                     ( fromJust
-                                                , maybeToList
-                                                )
-import           Data.Monoid                    ( All )
-import           System.Exit                    ( exitSuccess )
-
-import           System.IO                      ( Handle
-                                                , hPutStrLn
-                                                )
-import           XMonad                  hiding ( (|||) )
-import           XMonad.Actions.CycleWS         ( WSType(..)
-                                                , moveTo
-                                                , shiftTo
-                                                , toggleWS'
-                                                )
-import           XMonad.Actions.Promote         ( promote )
-import           XMonad.Hooks.DynamicLog        ( PP(..)
-                                                , dynamicLogWithPP
-                                                , shorten
-                                                , wrap
-                                                , xmobarAction
-                                                , xmobarColor
-                                                , xmobarPP
-                                                )
-import           XMonad.Hooks.EwmhDesktops      ( ewmh
-                                                , fullscreenEventHook
-                                                )
-import           XMonad.Hooks.ManageDocks       ( AvoidStruts
-                                                , ToggleStruts(..)
-                                                , avoidStruts
-                                                , docks
-                                                )
-import           XMonad.Hooks.ManageHelpers     ( (-?>)
-                                                , composeOne
-                                                , doCenterFloat
-                                                , doFullFloat
-                                                , isDialog
-                                                , isFullscreen
-                                                )
+import           Control.Monad                   (join, when)
+import qualified Data.Map                        as M
+import           Data.Maybe                      (fromJust, maybeToList)
+import           Data.Monoid                     (All)
+import           System.Exit                     (exitSuccess)
+import           System.IO                       (Handle, hPutStrLn)
+import           XMonad                          hiding ((|||))
+import           XMonad.Actions.CycleWS          (WSType (..), moveTo, shiftTo,
+                                                  toggleWS')
+import           XMonad.Actions.Promote          (promote)
+import           XMonad.Hooks.DynamicLog         (PP (..), dynamicLogWithPP,
+                                                  shorten, wrap, xmobarAction,
+                                                  xmobarColor, xmobarPP)
+import           XMonad.Hooks.EwmhDesktops       (ewmh, fullscreenEventHook)
+import           XMonad.Hooks.ManageDocks        (AvoidStruts,
+                                                  ToggleStruts (..),
+                                                  avoidStruts, docks)
+import           XMonad.Hooks.ManageHelpers      (composeOne, doCenterFloat,
+                                                  doFullFloat, isDialog,
+                                                  isFullscreen, (-?>))
 import           XMonad.Layout.Accordion
-import           XMonad.Layout.Decoration       ( Decoration
-                                                , DefaultShrinker
-                                                )
-import           XMonad.Layout.LayoutCombinators
-                                                ( JumpToLayout(..)
-                                                , NewSelect
-                                                , (|||)
-                                                )
-import           XMonad.Layout.LayoutModifier   ( ModifiedLayout )
-import           XMonad.Layout.NoBorders        ( Ambiguity
-                                                  ( OnlyScreenFloat
-                                                  , Screen
-                                                  )
-                                                , ConfigurableBorder
-                                                , lessBorders
-                                                )
-import           XMonad.Layout.Renamed          ( Rename(Replace)
-                                                , renamed
-                                                )
+import           XMonad.Layout.Decoration        (Decoration, DefaultShrinker)
+import           XMonad.Layout.LayoutCombinators (JumpToLayout (..), NewSelect,
+                                                  (|||))
+import           XMonad.Layout.LayoutModifier    (ModifiedLayout)
+import           XMonad.Layout.NoBorders         (Ambiguity (OnlyScreenFloat, Screen),
+                                                  ConfigurableBorder,
+                                                  lessBorders)
+import           XMonad.Layout.Renamed           (Rename (Replace), renamed)
 import           XMonad.Layout.ResizableTile
 import           XMonad.Layout.Simplest
 import           XMonad.Layout.Spacing
@@ -78,16 +46,15 @@ import           XMonad.Layout.WindowNavigation
 import           XMonad.Prompt
 import           XMonad.Prompt.FuzzyMatch
 import           XMonad.Prompt.Shell
-import qualified XMonad.StackSet               as W
-import           XMonad.Util.Cursor             ( setDefaultCursor )
-import           XMonad.Util.NamedScratchpad    ( NamedScratchpad(NS)
-                                                , customFloating
-                                                , namedScratchpadAction
-                                                , namedScratchpadFilterOutWorkspacePP
-                                                , namedScratchpadManageHook
-                                                )
-import           XMonad.Util.Run                ( spawnPipe )
-import           XMonad.Util.SpawnOnce          ( spawnOnce )
+import qualified XMonad.StackSet                 as W
+import           XMonad.Util.Cursor              (setDefaultCursor)
+import           XMonad.Util.NamedScratchpad     (NamedScratchpad (NS),
+                                                  customFloating,
+                                                  namedScratchpadAction,
+                                                  namedScratchpadFilterOutWorkspacePP,
+                                                  namedScratchpadManageHook)
+import           XMonad.Util.Run                 (spawnPipe)
+import           XMonad.Util.SpawnOnce           (spawnOnce)
 
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
@@ -216,10 +183,10 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
          ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
        -- launch dmenu
-       -- ((altMask, xK_p), spawn "dmenu_run -p 'Run:' -w 1916"),
+       --, ((altMask, xK_p), spawn "dmenu_run -p 'Run:' -w 1916")
 
        -- launch greenclip-dmenu
-       -- ((altMask, xK_c), spawn "greenclip print | sed '/^$/d' | dmenu -s -l 10 -g 2 -w 1916 -p 'Clipboard:' | xargs -r -d'\n' -I '{}' greenclip print '{}'"),
+       --, ((altMask, xK_c), spawn "greenclip print | sed '/^$/d' | dmenu -s -l 10 -g 2 -w 1916 -p 'Clipboard:' | xargs -r -d'\n' -I '{}' greenclip print '{}'")
 
        -- launch rofi
        , ( (altMask, xK_p)
@@ -757,7 +724,6 @@ myLogHook xmproc =
                       "Centered Master" -> "|M|"
                       "Monocle"         -> "[ ]"
                       "Tabs"            -> "[T]"
-                      -- "Float"           -> "><>"
                       _                 -> "?"
                     )
     --, ppVisible = xmobarColor magenta gray . wrap " " " " . clickable         -- Visible but not current workspace (other monitor)
@@ -793,7 +759,7 @@ myStartupHook = do
   spawnOnce "emacs --daemon"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &"
   spawnOnce
-    "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right &"
+    "trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right &"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
