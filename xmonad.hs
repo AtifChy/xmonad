@@ -1,10 +1,11 @@
-{-# LANGUAGE LambdaCase              #-}
-{-# LANGUAGE MonomorphismRestriction #-}
+{-# LANGUAGE FlexibleContexts          #-}
+-- {-# OPTIONS_GHC -Wno-missing-signatures -Wno-orphans #-}
+{-# LANGUAGE LambdaCase                #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
 
 --
--- Xmonad config file.
+-- XMONAD CONFIG
 --
-
 -- Imports
 --
 import           Control.Monad                   (join, when)
@@ -21,19 +22,15 @@ import           XMonad.Hooks.DynamicLog         (PP (..), dynamicLogWithPP,
                                                   shorten, wrap, xmobarAction,
                                                   xmobarColor, xmobarPP)
 import           XMonad.Hooks.EwmhDesktops       (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks        (AvoidStruts,
-                                                  ToggleStruts (..),
+import           XMonad.Hooks.ManageDocks        (ToggleStruts (..),
                                                   avoidStruts, docks)
 import           XMonad.Hooks.ManageHelpers      (composeOne, doCenterFloat,
                                                   doFullFloat, isDialog,
                                                   isFullscreen, (-?>))
 import           XMonad.Layout.Accordion
-import           XMonad.Layout.Decoration        (Decoration, DefaultShrinker)
-import           XMonad.Layout.LayoutCombinators (JumpToLayout (..), NewSelect,
-                                                  (|||))
+import           XMonad.Layout.LayoutCombinators (JumpToLayout (..), (|||))
 import           XMonad.Layout.LayoutModifier    (ModifiedLayout)
 import           XMonad.Layout.NoBorders         (Ambiguity (OnlyScreenFloat, Screen),
-                                                  ConfigurableBorder,
                                                   lessBorders)
 import           XMonad.Layout.Renamed           (Rename (Replace), renamed)
 import           XMonad.Layout.ResizableTile
@@ -42,10 +39,15 @@ import           XMonad.Layout.Spacing
 import           XMonad.Layout.SubLayouts
 import           XMonad.Layout.Tabbed
 import           XMonad.Layout.ThreeColumns
-import           XMonad.Layout.WindowNavigation
-import           XMonad.Prompt
-import           XMonad.Prompt.FuzzyMatch
-import           XMonad.Prompt.Shell
+import           XMonad.Layout.WindowNavigation  (windowNavigation)
+import           XMonad.Prompt                   (Direction1D (..),
+                                                  XPConfig (..),
+                                                  XPPosition (..),
+                                                  defaultXPKeymap,
+                                                  deleteAllDuplicates)
+import           XMonad.Prompt.ConfirmPrompt     (confirmPrompt)
+import           XMonad.Prompt.FuzzyMatch        (fuzzyMatch, fuzzySort)
+import           XMonad.Prompt.Shell             (shellPrompt)
 import qualified XMonad.StackSet                 as W
 import           XMonad.Util.Cursor              (setDefaultCursor)
 import           XMonad.Util.NamedScratchpad     (NamedScratchpad (NS),
@@ -59,12 +61,12 @@ import           XMonad.Util.SpawnOnce           (spawnOnce)
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
-myTerminal :: [Char]
+myTerminal :: String
 myTerminal = "alacritty"
 
 -- My launcher
 --
-myLauncher :: [Char]
+myLauncher :: String
 myLauncher =
   "rofi -theme ~/.config/rofi/themes/slate.rasi -width 624 -lines 12"
 
@@ -102,7 +104,7 @@ altMask = mod1Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces :: [[Char]]
+myWorkspaces :: [String]
 myWorkspaces =
   [ "1:term"
   , "2:web"
@@ -117,10 +119,10 @@ myWorkspaces =
 
 -- Enable clickable workspaces
 --
-myWorkspaceIndices :: M.Map [Char] Integer
+myWorkspaceIndices :: M.Map String Integer
 myWorkspaceIndices = M.fromList $ zip myWorkspaces [1 ..]
 
-clickable :: [Char] -> [Char]
+clickable :: String -> String
 clickable ws =
   "<action=xdotool key super+" ++ show i ++ ">" ++ ws ++ "</action>"
   where i = fromJust $ M.lookup ws myWorkspaceIndices
@@ -141,35 +143,35 @@ windowCount =
 
 -- myColors
 --
-black :: [Char]
+black :: String
 black = "#282c34"
-red :: [Char]
+red :: String
 red = "#ff6c6b"
-green :: [Char]
+green :: String
 green = "#a3be8c"
-yellow :: [Char]
+yellow :: String
 yellow = "#ecbe8b"
-blue :: [Char]
+blue :: String
 blue = "#41a8f1"
-magenta :: [Char]
+magenta :: String
 magenta = "#b48ead"
-cyan :: [Char]
+cyan :: String
 cyan = "#56b6c2"
-white :: [Char]
+white :: String
 white = "#d8dee9"
-gray :: [Char]
+gray :: String
 gray = "#434c5e"
 
 -- Border colors for unfocused and focused windows, respectively.
 --
-myNormalBorderColor :: [Char]
+myNormalBorderColor :: String
 myNormalBorderColor = black
 
-myFocusedBorderColor :: [Char]
+myFocusedBorderColor :: String
 myFocusedBorderColor = blue
 
 -- Custom font
-myFont :: [Char]
+myFont :: String
 myFont = "xft:JetBrains Mono:style=Bold:size=10:antialias=true:hinting=true"
 
 ------------------------------------------------------------------------
@@ -268,13 +270,15 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm, xK_b)                  , sendMessage ToggleStruts)
 
        -- Quit xmonad
-       , ((modm .|. shiftMask, xK_q)    , io exitSuccess)
+       , ( (modm .|. shiftMask, xK_q)
+         , confirmPrompt myXPConfig "Quit" $ io exitSuccess
+         )
 
        -- Restart xmonad
        , ((modm, xK_q), spawn "xmonad --recompile; xmonad --restart")
 
        -- Moves the focused window to the master pane
-       , ((modm, xK_Return)             , promote)
+       , ((modm, xK_Return), promote)
 
        -- Run xmessage with a summary of the default keybindings (useful for beginners)
        , ( (modm .|. shiftMask, xK_slash)
@@ -394,18 +398,18 @@ myXPConfig = def { font                = myFont
                  , promptBorderWidth   = 1
                  , promptKeymap        = defaultXPKeymap
                  , position            = Top
-                 -- position = CenteredAt {xpCenterY = 0.3, xpWidth = 0.3},
+                 -- , position            = CenteredAt {xpCenterY = 0.3, xpWidth = 0.3}
                  , height              = 24
-                 , historySize         = 256
-                 , historyFilter       = id
+                 , historySize         = 50
+                 , historyFilter       = deleteAllDuplicates
                  , defaultText         = []
-                 -- autoComplete = Just 100000,         -- set Just 100000 for .1 sec
+                 --, autoComplete         = Just 100000,   -- set Just 100000 for .1 sec
                  , showCompletionOnTab = False          -- False means auto completion
-                 -- searchPredicate = isPrefixOf,
-                 , searchPredicate     = fuzzyMatch
-                 , sorter              = fuzzySort
                  , alwaysHighlight     = True           -- Disables tab cycle
                  , maxComplRows        = Just 10        -- set to 'Just 5' for 5 rows
+                 -- , searchPredicate     = isPrefixOf
+                 , searchPredicate     = fuzzyMatch
+                 , sorter              = fuzzySort
                  }
 
 ------------------------------------------------------------------------
@@ -435,143 +439,6 @@ myTabConfig = def { activeColor         = blue
                   , fontName            = myFont
                   }
 
-myLayout
-  :: ModifiedLayout
-       XMonad.Hooks.ManageDocks.AvoidStruts
-       ( XMonad.Layout.LayoutCombinators.NewSelect
-           ( ModifiedLayout
-               Rename
-               ( ModifiedLayout
-                   (XMonad.Layout.NoBorders.ConfigurableBorder Ambiguity)
-                   ( ModifiedLayout
-                       WindowNavigation
-                       ( ModifiedLayout
-                           ( XMonad.Layout.Decoration.Decoration
-                               TabbedDecoration
-                               XMonad.Layout.Decoration.DefaultShrinker
-                           )
-                           ( ModifiedLayout
-                               ( Sublayout
-                                   ( XMonad.Layout.LayoutCombinators.NewSelect
-                                       Simplest
-                                       Accordion
-                                   )
-                               )
-                               (ModifiedLayout Spacing ResizableTall)
-                           )
-                       )
-                   )
-               )
-           )
-           ( XMonad.Layout.LayoutCombinators.NewSelect
-               ( ModifiedLayout
-                   Rename
-                   ( ModifiedLayout
-                       WindowNavigation
-                       ( ModifiedLayout
-                           ( XMonad.Layout.Decoration.Decoration
-                               TabbedDecoration
-                               XMonad.Layout.Decoration.DefaultShrinker
-                           )
-                           ( ModifiedLayout
-                               ( Sublayout
-                                   ( XMonad.Layout.LayoutCombinators.NewSelect
-                                       Simplest
-                                       Accordion
-                                   )
-                               )
-                               ( Mirror
-                                   ( ModifiedLayout
-                                       Rename
-                                       ( ModifiedLayout
-                                           ( XMonad.Layout.NoBorders.ConfigurableBorder
-                                               Ambiguity
-                                           )
-                                           ( ModifiedLayout
-                                               WindowNavigation
-                                               ( ModifiedLayout
-                                                   ( XMonad.Layout.Decoration.Decoration
-                                                       TabbedDecoration
-                                                       XMonad.Layout.Decoration.DefaultShrinker
-                                                   )
-                                                   ( ModifiedLayout
-                                                       ( Sublayout
-                                                           ( XMonad.Layout.LayoutCombinators.NewSelect
-                                                               Simplest
-                                                               Accordion
-                                                           )
-                                                       )
-                                                       ( ModifiedLayout
-                                                           Spacing
-                                                           ResizableTall
-                                                       )
-                                                   )
-                                               )
-                                           )
-                                       )
-                                   )
-                               )
-                           )
-                       )
-                   )
-               )
-               ( XMonad.Layout.LayoutCombinators.NewSelect
-                   ( ModifiedLayout
-                       Rename
-                       ( ModifiedLayout
-                           ( XMonad.Layout.NoBorders.ConfigurableBorder
-                               Ambiguity
-                           )
-                           ( ModifiedLayout
-                               WindowNavigation
-                               ( ModifiedLayout
-                                   ( XMonad.Layout.Decoration.Decoration
-                                       TabbedDecoration
-                                       XMonad.Layout.Decoration.DefaultShrinker
-                                   )
-                                   ( ModifiedLayout
-                                       ( Sublayout
-                                           ( XMonad.Layout.LayoutCombinators.NewSelect
-                                               Simplest
-                                               Accordion
-                                           )
-                                       )
-                                       (ModifiedLayout Spacing ThreeCol)
-                                   )
-                               )
-                           )
-                       )
-                   )
-                   ( XMonad.Layout.LayoutCombinators.NewSelect
-                       ( ModifiedLayout
-                           Rename
-                           ( ModifiedLayout
-                               ( XMonad.Layout.NoBorders.ConfigurableBorder
-                                   Ambiguity
-                               )
-                               Full
-                           )
-                       )
-                       ( ModifiedLayout
-                           Rename
-                           ( ModifiedLayout
-                               ( XMonad.Layout.NoBorders.ConfigurableBorder
-                                   Ambiguity
-                               )
-                               ( ModifiedLayout
-                                   ( XMonad.Layout.Decoration.Decoration
-                                       TabbedDecoration
-                                       XMonad.Layout.Decoration.DefaultShrinker
-                                   )
-                                   Simplest
-                               )
-                           )
-                       )
-                   )
-               )
-           )
-       )
-       Window
 myLayout = avoidStruts $ tiled ||| mtiled ||| center ||| full ||| tabs
  where
   -- default tiling algorithm partitions the screen into two panes
@@ -726,9 +593,9 @@ myLogHook xmproc =
                       "Tabs"            -> "[T]"
                       _                 -> "?"
                     )
-    --, ppVisible = xmobarColor magenta gray . wrap " " " " . clickable         -- Visible but not current workspace (other monitor)
+    -- , ppVisible = xmobarColor magenta gray . wrap " " " " . clickable           -- Visible but not current workspace (other monitor)
     , ppHidden  = xmobarColor "#7a869f" "" . wrap "" "" . clickable             -- Hidden workspaces, contain windows
-    --, ppHiddenNoWindows = xmobarColor gray "" . clickable                     -- Hidden workspaces, no windows
+    -- , ppHiddenNoWindows = xmobarColor gray "" . clickable                       -- Hidden workspaces, no windows
     , ppTitle   = xmobarColor magenta "" . shorten 50                           -- Title of active window
     , ppSep     = "<fc=#434c5e> | </fc>"                                        -- Separator
     , ppExtras  = [windowCount]                                                 -- Number of windows in current workspace
@@ -896,3 +763,5 @@ help = unlines
   , "-- Application"
   , "Alt-F9               Turn on/off picom"
   ]
+
+-- vim:ft=haskell:expandtab
