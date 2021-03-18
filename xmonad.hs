@@ -1,5 +1,4 @@
 {-# LANGUAGE FlexibleContexts          #-}
--- {-# OPTIONS_GHC -Wno-missing-signatures -Wno-orphans #-}
 {-# LANGUAGE LambdaCase                #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
 
@@ -13,7 +12,7 @@ import qualified Data.Map                        as M
 import           Data.Maybe                      (fromJust, maybeToList)
 import           Data.Monoid                     (All)
 import           System.Exit                     (exitSuccess)
-import           System.IO                       (Handle, hPutStrLn)
+import           System.IO                       (Handle)
 import           XMonad                          hiding ((|||))
 import           XMonad.Actions.CycleWS          (WSType (..), moveTo, shiftTo,
                                                   toggleWS')
@@ -56,8 +55,9 @@ import           XMonad.Util.NamedScratchpad     (NamedScratchpad (NS),
                                                   namedScratchpadAction,
                                                   namedScratchpadFilterOutWorkspacePP,
                                                   namedScratchpadManageHook)
-import           XMonad.Util.Run                 (spawnPipe)
+import           XMonad.Util.Run                 (hPutStrLn, spawnPipe)
 import           XMonad.Util.SpawnOnce           (spawnOnce)
+
 
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
@@ -404,7 +404,7 @@ myXPConfig = def { font                = myFont
                  , historySize         = 50
                  , historyFilter       = deleteAllDuplicates
                  , defaultText         = []
-                 --, autoComplete         = Just 100000,   -- set Just 100000 for .1 sec
+                 -- , autoComplete        = Just 100000,   -- set Just 100000 for .1 sec
                  , showCompletionOnTab = False          -- False means auto completion
                  , alwaysHighlight     = True           -- Disables tab cycle
                  , maxComplRows        = Just 10        -- set to 'Just 5' for 5 rows
@@ -521,8 +521,10 @@ myManageHook =
       , resource =? "kdesktop" -?> doIgnore
       , resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat
       , resource =? "redshift-gtk" -?> doCenterFloat
-      , isFullscreen -?> doFullFloat
       , className =? "ibus-ui-gtk3" -?> doIgnore
+      , isFullscreen -?> doFullFloat
+      , transience
+      , isDialog -?> doCenterFloat
       , className =? "firefox" -?> doShift (myWorkspaces !! 1)
       , className =? "discord" -?> doShift (myWorkspaces !! 2)
       , className =? "code-oss" -?> doShift (myWorkspaces !! 3)
@@ -532,8 +534,6 @@ myManageHook =
       <||> className
       =?   "gnome-boxes"
       -?>  doShift (myWorkspaces !! 6)
-      , transience
-      , isDialog -?> doCenterFloat
       ]
     <+> namedScratchpadManageHook myScratchpads
 
@@ -580,10 +580,10 @@ myHandleEventHook = handleEventHook def <+> fullscreenEventHook
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
 myLogHook :: Handle -> X ()
-myLogHook xmproc =
+myLogHook h =
   dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
     -- Xmobar workspace config
-    { ppOutput  = hPutStrLn xmproc
+    { ppOutput  = hPutStrLn h
     , ppCurrent = xmobarColor green "" . wrap "[" "]"                           -- Current workspace
     , ppLayout  = xmobarColor red ""
                   . xmobarAction "xdotool key Super+space"       "1"
@@ -638,7 +638,7 @@ myStartupHook = do
 --
 main :: IO ()
 main = do
-  xmproc <- spawnPipe "xmobar ~/.config/xmonad/xmobar/xmobarrc"
+  h <- spawnPipe "xmobar ~/.config/xmonad/xmobar/xmobarrc"
 
   xmonad $ ewmh $ docks $ def
                               -- A structure containing your configuration settings, overriding
@@ -664,7 +664,7 @@ main = do
                               , layoutHook         = myLayout
                               , manageHook         = myManageHook
                               , handleEventHook    = myHandleEventHook
-                              , logHook            = myLogHook xmproc
+                              , logHook            = myLogHook h
                               , startupHook = myStartupHook >> addEWMHFullscreen
                               }
 
