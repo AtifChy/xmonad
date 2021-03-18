@@ -26,7 +26,8 @@ import           XMonad.Hooks.ManageDocks        (ToggleStruts (..),
                                                   avoidStruts, docks)
 import           XMonad.Hooks.ManageHelpers      (composeOne, doCenterFloat,
                                                   doFullFloat, isDialog,
-                                                  isFullscreen, (-?>))
+                                                  isFullscreen, transience,
+                                                  (-?>))
 import           XMonad.Layout.Accordion
 import           XMonad.Layout.LayoutCombinators (JumpToLayout (..), (|||))
 import           XMonad.Layout.LayoutModifier    (ModifiedLayout)
@@ -511,6 +512,7 @@ myScratchpads = [
 --
 -- workspace number starts from 0
 --
+
 myManageHook :: ManageHook
 myManageHook =
   composeOne
@@ -520,7 +522,6 @@ myManageHook =
       , resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat
       , resource =? "redshift-gtk" -?> doCenterFloat
       , isFullscreen -?> doFullFloat
-      , isDialog -?> doCenterFloat
       , className =? "ibus-ui-gtk3" -?> doIgnore
       , className =? "firefox" -?> doShift (myWorkspaces !! 1)
       , className =? "discord" -?> doShift (myWorkspaces !! 2)
@@ -531,6 +532,8 @@ myManageHook =
       <||> className
       =?   "gnome-boxes"
       -?>  doShift (myWorkspaces !! 6)
+      , transience
+      , isDialog -?> doCenterFloat
       ]
     <+> namedScratchpadManageHook myScratchpads
 
