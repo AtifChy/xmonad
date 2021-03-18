@@ -7,7 +7,7 @@
 --
 -- Imports
 --
-import           Control.Monad                   (join, when)
+import           Control.Monad                   (join, liftM2, when)
 import qualified Data.Map                        as M
 import           Data.Maybe                      (fromJust, maybeToList)
 import           Data.Monoid                     (All)
@@ -47,6 +47,7 @@ import           XMonad.Prompt                   (Direction1D (..),
                                                   deleteAllDuplicates)
 import           XMonad.Prompt.ConfirmPrompt     (confirmPrompt)
 import           XMonad.Prompt.FuzzyMatch        (fuzzyMatch, fuzzySort)
+import           XMonad.Prompt.Man               (manPrompt)
 import           XMonad.Prompt.Shell             (shellPrompt)
 import qualified XMonad.StackSet                 as W
 import           XMonad.Util.Cursor              (setDefaultCursor)
@@ -235,7 +236,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm, xK_m)                  , windows W.focusMaster)
 
        -- Swap the focused window and the master window
-       , ((modm, xK_Return)             , windows W.swapMaster)
+       -- , ((modm, xK_Return)             , windows W.swapMaster)
 
        -- Swap the focused window with the next window
        , ((modm .|. shiftMask, xK_j)    , windows W.swapDown)
@@ -326,12 +327,13 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
          )
 
        -- Easily switch your layouts
-       , ((altMask, xK_t), sendMessage $ JumpToLayout "Tiled")
+       , ((altMask, xK_t)             , sendMessage $ JumpToLayout "Tiled")
        , ((altMask, xK_c), sendMessage $ JumpToLayout "Centered Master")
-       , ((altMask, xK_f), sendMessage $ JumpToLayout "Monocle")
+       , ((altMask, xK_f)             , sendMessage $ JumpToLayout "Monocle")
 
        -- XPrompt
-       , ((modm, xK_p)   , shellPrompt myXPConfig)
+       , ((modm, xK_p)                , shellPrompt myXPConfig)
+       , ((modm, xK_F1)               , manPrompt myXPConfig)
 
        -- Picom on/off
        , ( (altMask, xK_F9)
@@ -354,7 +356,11 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        --
        [ ((m .|. modm, k), windows $ f i)
        | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
-       , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
+       , (f, m) <-
+         [ (W.greedyView                   , 0)
+         , (W.shift                        , shiftMask)
+         , (liftM2 (.) W.greedyView W.shift, controlMask)
+         ]
        ]
     ++
        --
@@ -580,30 +586,29 @@ myHandleEventHook = handleEventHook def <+> fullscreenEventHook
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
 myLogHook :: Handle -> X ()
-myLogHook h =
-  dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
+myLogHook h = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
     -- Xmobar workspace config
-    { ppOutput  = hPutStrLn h
-    , ppCurrent = xmobarColor green "" . wrap "[" "]"                           -- Current workspace
-    , ppLayout  = xmobarColor red ""
-                  . xmobarAction "xdotool key Super+space"       "1"
-                  . xmobarAction "xdotool key Super+shift+space" "3"
-                  . (\case
-                      "Tiled"           -> "[]="
-                      "Mirror Tiled"    -> "TTT"
-                      "Centered Master" -> "|M|"
-                      "Monocle"         -> "[ ]"
-                      "Tabs"            -> "[T]"
-                      _                 -> "?"
-                    )
-    -- , ppVisible = xmobarColor magenta gray . wrap " " " " . clickable           -- Visible but not current workspace (other monitor)
-    , ppHidden  = xmobarColor "#7a869f" "" . wrap "" "" . clickable             -- Hidden workspaces, contain windows
-    -- , ppHiddenNoWindows = xmobarColor gray "" . clickable                       -- Hidden workspaces, no windows
-    , ppTitle   = xmobarColor magenta "" . shorten 50                           -- Title of active window
-    , ppSep     = "<fc=#434c5e> | </fc>"                                        -- Separator
-    , ppExtras  = [windowCount]                                                 -- Number of windows in current workspace
-    , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
-    }
+  { ppOutput  = hPutStrLn h
+  , ppCurrent = xmobarColor green "" . wrap "[" "]"                           -- Current workspace
+  , ppLayout  = xmobarColor red ""
+                . xmobarAction "xdotool key Super+space"       "1"
+                . xmobarAction "xdotool key Super+shift+space" "3"
+                . (\case
+                    "Tiled"           -> "[]="
+                    "Mirror Tiled"    -> "TTT"
+                    "Centered Master" -> "|M|"
+                    "Monocle"         -> "[ ]"
+                    "Tabs"            -> "[T]"
+                    _                 -> "?"
+                  )
+  -- , ppVisible = xmobarColor magenta gray . wrap " " " " . clickable           -- Visible but not current workspace (other monitor)
+  , ppHidden  = xmobarColor "#7a869f" "" . wrap "" "" . clickable             -- Hidden workspaces, contain windows
+  -- , ppHiddenNoWindows = xmobarColor gray "" . clickable                       -- Hidden workspaces, no windows
+  , ppTitle   = xmobarColor magenta "" . shorten 50                           -- Title of active window
+  , ppSep     = "<fc=#434c5e> | </fc>"                                        -- Separator
+  , ppExtras  = [windowCount]                                                 -- Number of windows in current workspace
+  , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
+  }
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -617,19 +622,19 @@ myStartupHook = do
   setDefaultCursor xC_left_ptr
   spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0079.jpg"
   -- spawn "feh --bg-scale --randomize --no-fehbg ~/Pictures/Wallpapers/*"
-  spawnOnce "nm-applet &"
+  spawnOnce "nm-applet"
   spawnOnce "picom --experimental-backends -b"
-  spawnOnce "dunst &"
-  spawnOnce "greenclip daemon &"
-  spawnOnce "redshift-gtk &"
+  spawnOnce "dunst"
+  spawnOnce "greenclip daemon"
+  spawnOnce "redshift-gtk"
   -- spawn "systemctl --user restart redshift-gtk.service"
   -- spawnOnce "volumeicon &"
-  spawnOnce "numlockx &"
+  spawnOnce "numlockx"
   spawnOnce "ibus-daemon -drx"
   spawnOnce "emacs --daemon"
-  spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &"
+  spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce
-    "trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right &"
+    "trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
@@ -695,7 +700,7 @@ help = unlines
   , "mod-m                Move focus to the master window"
   , ""
   , "-- modifying the window order"
-  , "mod-Return           Swap the focused window and the master window"
+  , "mod-Return           Move the focused window to the master pane."
   , "mod-Shift-j          Swap the focused window with the next window"
   , "mod-Shift-k          Swap the focused window with the previous window"
   , ""
@@ -727,15 +732,16 @@ help = unlines
   , ""
   , "-- Workspaces & screens"
   , "mod-[1..9]           Switch to workSpace N"
+  , "mod-Shift-[1..9]     Move client to workspace N"
+  , "mod-Control-[1..9]   Move client and switch to workspace N"
+  , "mod-{w,e,r}          Switch to physical/Xinerama screens 1, 2, or 3"
+  , "mod-Shift-{w,e,r}    Move client to screen 1, 2, or 3"
   , "mod-Right            Switch to next workSpace"
   , "mod-Left             Switch to previous workSpace"
   , "mod-Shift-Right      Move client to next workSpace"
   , "mod-Shift-Left       Move client to previous workSpace"
   , "mod-f                Switch to a free workSpace"
   , "mod-z                Switch between previously used workSpace"
-  , "mod-Shift-[1..9]     Move client to workspace N"
-  , "mod-{w,e,r}          Switch to physical/Xinerama screens 1, 2, or 3"
-  , "mod-Shift-{w,e,r}    Move client to screen 1, 2, or 3"
   , ""
   , "-- Mouse bindings: default actions bound to mouse events"
   , "mod-button1          Set the window to floating mode and move by dragging"
