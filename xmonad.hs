@@ -7,57 +7,70 @@
 --
 -- Imports
 --
-import           Control.Monad                   (join, liftM2, when)
-import qualified Data.Map                        as M
-import           Data.Maybe                      (fromJust, maybeToList)
-import           Data.Monoid                     (All)
-import           System.Exit                     (exitSuccess)
-import           System.IO                       (Handle)
-import           XMonad                          hiding ((|||))
-import           XMonad.Actions.CycleWS          (WSType (..), moveTo, shiftTo,
-                                                  toggleWS')
-import           XMonad.Actions.Promote          (promote)
-import           XMonad.Hooks.DynamicLog         (PP (..), dynamicLogWithPP,
-                                                  shorten, wrap, xmobarAction,
-                                                  xmobarColor, xmobarPP)
-import           XMonad.Hooks.EwmhDesktops       (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks        (ToggleStruts (..),
-                                                  avoidStruts, docks)
-import           XMonad.Hooks.ManageHelpers      (composeOne, doCenterFloat,
-                                                  doFullFloat, isDialog,
-                                                  isFullscreen, transience,
-                                                  (-?>))
+import           Control.Monad                    (join, liftM2, when)
+import qualified Data.Map                         as M
+import           Data.Maybe                       (fromJust, maybeToList)
+import           Data.Monoid                      (All)
+import           System.Exit                      (exitSuccess)
+import           System.IO                        (Handle)
+import           XMonad                           hiding ((|||))
+import           XMonad.Actions.CycleWS           (WSType (..), moveTo, shiftTo,
+                                                   toggleWS')
+import           XMonad.Actions.Promote           (promote)
+import           XMonad.Hooks.DynamicLog          (PP (..), dynamicLogWithPP,
+                                                   shorten, wrap, xmobarAction,
+                                                   xmobarColor, xmobarPP)
+import           XMonad.Hooks.EwmhDesktops        (ewmh, fullscreenEventHook)
+import           XMonad.Hooks.ManageDocks         (ToggleStruts (..),
+                                                   avoidStruts, docks)
+import           XMonad.Hooks.ManageHelpers       (composeOne, doCenterFloat,
+                                                   doFullFloat, isDialog,
+                                                   isFullscreen, transience,
+                                                   (-?>))
 import           XMonad.Layout.Accordion
-import           XMonad.Layout.LayoutCombinators (JumpToLayout (..), (|||))
-import           XMonad.Layout.LayoutModifier    (ModifiedLayout)
-import           XMonad.Layout.NoBorders         (Ambiguity (OnlyScreenFloat, Screen),
-                                                  lessBorders)
-import           XMonad.Layout.Renamed           (Rename (Replace), renamed)
+import           XMonad.Layout.LayoutCombinators  (JumpToLayout (..), (|||))
+import           XMonad.Layout.LayoutModifier     (ModifiedLayout)
+import           XMonad.Layout.NoBorders          (Ambiguity (OnlyScreenFloat, Screen),
+                                                   lessBorders)
+import           XMonad.Layout.NoFrillsDecoration (Theme (..), noFrillsDeco,
+                                                   shrinkText)
+import           XMonad.Layout.Renamed            (Rename (Replace), renamed)
 import           XMonad.Layout.ResizableTile
 import           XMonad.Layout.Simplest
-import           XMonad.Layout.Spacing
-import           XMonad.Layout.SubLayouts
-import           XMonad.Layout.Tabbed
-import           XMonad.Layout.ThreeColumns
-import           XMonad.Layout.WindowNavigation  (windowNavigation)
-import           XMonad.Prompt                   (Direction1D (..),
-                                                  XPConfig (..),
-                                                  XPPosition (..),
-                                                  defaultXPKeymap,
-                                                  deleteAllDuplicates)
-import           XMonad.Prompt.ConfirmPrompt     (confirmPrompt)
-import           XMonad.Prompt.FuzzyMatch        (fuzzyMatch, fuzzySort)
-import           XMonad.Prompt.Man               (manPrompt)
-import           XMonad.Prompt.Shell             (shellPrompt)
-import qualified XMonad.StackSet                 as W
-import           XMonad.Util.Cursor              (setDefaultCursor)
-import           XMonad.Util.NamedScratchpad     (NamedScratchpad (NS),
-                                                  customFloating,
-                                                  namedScratchpadAction,
-                                                  namedScratchpadFilterOutWorkspacePP,
-                                                  namedScratchpadManageHook)
-import           XMonad.Util.Run                 (hPutStrLn, spawnPipe)
-import           XMonad.Util.SpawnOnce           (spawnOnce)
+import           XMonad.Layout.SimplestFloat
+import           XMonad.Layout.Spacing            (Border (..), Spacing,
+                                                   decScreenSpacing,
+                                                   decScreenWindowSpacing,
+                                                   decWindowSpacing,
+                                                   incScreenSpacing,
+                                                   incScreenWindowSpacing,
+                                                   incWindowSpacing, spacingRaw,
+                                                   toggleScreenSpacingEnabled,
+                                                   toggleWindowSpacingEnabled)
+import           XMonad.Layout.SubLayouts         (GroupMsg (..), onGroup,
+                                                   pullGroup, subLayout, toSubl)
+import           XMonad.Layout.Tabbed             (addTabs)
+import           XMonad.Layout.ThreeColumns       (ThreeCol (ThreeColMid))
+import           XMonad.Layout.WindowNavigation   (Direction2D (..),
+                                                   windowNavigation)
+import           XMonad.Prompt                    (Direction1D (..),
+                                                   XPConfig (..),
+                                                   XPPosition (..),
+                                                   defaultXPKeymap,
+                                                   deleteAllDuplicates)
+import           XMonad.Prompt.ConfirmPrompt      (confirmPrompt)
+import           XMonad.Prompt.FuzzyMatch         (fuzzyMatch, fuzzySort)
+import           XMonad.Prompt.Man                (manPrompt)
+import           XMonad.Prompt.Shell              (shellPrompt)
+import qualified XMonad.StackSet                  as W
+import           XMonad.Util.Cursor               (setDefaultCursor)
+import           XMonad.Util.NamedScratchpad      (NamedScratchpad (NS),
+                                                   customFloating,
+                                                   namedScratchpadAction,
+                                                   namedScratchpadFilterOutWorkspacePP,
+                                                   namedScratchpadManageHook)
+import           XMonad.Util.Run                  (hPutStrLn, spawnPipe)
+import           XMonad.Util.SpawnOnce            (spawnOnce)
 
 
 -- The preferred terminal program, which is used in a binding below and by
@@ -146,19 +159,19 @@ windowCount =
 -- myColors
 --
 black :: String
-black = "#282c34"
+black = "#1E2127"
 red :: String
 red = "#ff6c6b"
 green :: String
-green = "#a3be8c"
+green = "#c3e88d"
 yellow :: String
-yellow = "#ecbe8b"
+yellow = "#ffcb6b"
 blue :: String
-blue = "#41a8f1"
+blue = "#1083d5"
 magenta :: String
 magenta = "#b48ead"
 cyan :: String
-cyan = "#56b6c2"
+cyan = "#89ddff"
 white :: String
 white = "#d8dee9"
 gray :: String
@@ -327,13 +340,13 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
          )
 
        -- Easily switch your layouts
-       , ((altMask, xK_t)             , sendMessage $ JumpToLayout "Tiled")
+       , ((altMask, xK_t), sendMessage $ JumpToLayout "Tiled")
        , ((altMask, xK_c), sendMessage $ JumpToLayout "Centered Master")
-       , ((altMask, xK_f)             , sendMessage $ JumpToLayout "Monocle")
+       , ((altMask, xK_f), sendMessage $ JumpToLayout "Monocle")
 
        -- XPrompt
-       , ((modm, xK_p)                , shellPrompt myXPConfig)
-       , ((modm, xK_F1)               , manPrompt myXPConfig)
+       , ((modm, xK_p)   , shellPrompt myXPConfig)
+       , ((modm, xK_F1)  , manPrompt myXPConfig)
 
        -- Picom on/off
        , ( (altMask, xK_F9)
@@ -381,15 +394,18 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
   [ ( (modm, button1)
     , \w -> focus w >> mouseMoveWindow w >> windows W.shiftMaster
     )
-  ,
+
     -- mod-button2, Raise the window to the top of the stack
-    ((modm, button2), \w -> focus w >> windows W.shiftMaster)
-  ,
+  , ((modm, button2), \w -> focus w >> windows W.shiftMaster)
+
     -- mod-button3, Set the window to floating mode and resize by dragging
-    ( (modm, button3)
+  , ( (modm, button3)
     , \w -> focus w >> mouseResizeWindow w >> windows W.shiftMaster
     )
+
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
+  , ((modm, button4), \w -> focus w >> moveTo Prev NonEmptyWS)
+  , ((modm, button5), \w -> focus w >> moveTo Next NonEmptyWS)
   ]
 
 ------------------------------------------------------------------------
@@ -425,6 +441,31 @@ mySpacing
   :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a
 mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 
+-- Tab theme
+myTabConfig :: Theme
+myTabConfig = def { activeColor         = blue
+                  , activeBorderColor   = blue
+                  , activeTextColor     = white
+                  , inactiveColor       = black
+                  , inactiveBorderColor = black
+                  , inactiveTextColor   = gray
+                  , fontName            = myFont
+                  }
+-- Title Bar theme
+myTitleTheme :: Theme
+myTitleTheme = def { fontName            = myFont
+                   , inactiveBorderColor = black
+                   , inactiveColor       = black
+                   , inactiveTextColor   = gray
+                   , activeBorderColor   = blue
+                   , activeColor         = blue
+                   , activeTextColor     = white
+                   , decoHeight          = 20
+                   }
+
+-- Title Bar options
+addTitleBar = noFrillsDeco shrinkText myTitleTheme
+
 -- Layouts:
 
 -- You can specify and transform your layouts by modifying these values.
@@ -435,18 +476,9 @@ mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
--- Tabbed layout config
-myTabConfig :: Theme
-myTabConfig = def { activeColor         = blue
-                  , activeBorderColor   = blue
-                  , activeTextColor     = white
-                  , inactiveColor       = black
-                  , inactiveBorderColor = black
-                  , inactiveTextColor   = gray
-                  , fontName            = myFont
-                  }
 
-myLayout = avoidStruts $ tiled ||| mtiled ||| center ||| full ||| tabs
+myLayout =
+  avoidStruts $ tiled ||| mtiled ||| center ||| full ||| tabs ||| floats
  where
   -- default tiling algorithm partitions the screen into two panes
   tiled =
@@ -476,9 +508,13 @@ myLayout = avoidStruts $ tiled ||| mtiled ||| center ||| full ||| tabs
 
   full = renamed [Replace "Monocle"] $ lessBorders Screen Full
 
-  tabs = renamed [Replace "Tabs"] $ lessBorders OnlyScreenFloat $ tabbed
-    shrinkText
-    myTabConfig
+  tabs =
+    renamed [Replace "Tabs"]
+      $ lessBorders OnlyScreenFloat
+      $ addTabs shrinkText myTabConfig
+      $ mySpacing 5 Simplest
+
+  floats  = renamed [Replace "Float"] $ addTitleBar simplestFloat
 
   -- The default number of windows in the master pane
   nmaster = 1
@@ -599,6 +635,7 @@ myLogHook h = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
                     "Centered Master" -> "|M|"
                     "Monocle"         -> "[ ]"
                     "Tabs"            -> "[T]"
+                    "Float"           -> "><>"
                     _                 -> "?"
                   )
   -- , ppVisible = xmobarColor magenta gray . wrap " " " " . clickable           -- Visible but not current workspace (other monitor)
@@ -620,7 +657,7 @@ myLogHook h = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
 myStartupHook :: X ()
 myStartupHook = do
   setDefaultCursor xC_left_ptr
-  spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0079.jpg"
+  spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/xmonad.png"
   -- spawn "feh --bg-scale --randomize --no-fehbg ~/Pictures/Wallpapers/*"
   spawnOnce "nm-applet"
   spawnOnce "picom --experimental-backends -b"
@@ -634,7 +671,7 @@ myStartupHook = do
   spawnOnce "emacs --daemon"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce
-    "trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x282c34  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right"
+    "trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1E2127  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
@@ -645,7 +682,7 @@ main :: IO ()
 main = do
   h <- spawnPipe "xmobar ~/.config/xmonad/xmobar/xmobarrc"
 
-  xmonad $ ewmh $ docks $ def
+  xmonad . ewmh . docks $ def
                               -- A structure containing your configuration settings, overriding
                               -- fields in the default config. Any you don't override, will
                               -- use the defaults defined in xmonad/XMonad/Config.hs

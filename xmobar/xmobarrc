@@ -1,7 +1,7 @@
 Config
   { font = "xft:JetBrains Mono:size=10:weight=Bold:antialias=true:hinting=true,Font Awesome 5 Free Solid:size=10,Noto Sans Bengali:size=10:weight=Bold:antialias=true:hinting=true",
     additionalFonts = [],
-    bgColor = "#282c34",
+    bgColor = "#1E2127",
     fgColor = "#51afef",
     borderColor = "#434c5e",
     alpha = 255,
