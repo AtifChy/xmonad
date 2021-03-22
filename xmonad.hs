@@ -7,70 +7,68 @@
 --
 -- Imports
 --
-import           Control.Monad                    (join, liftM2, when)
-import qualified Data.Map                         as M
-import           Data.Maybe                       (fromJust, maybeToList)
-import           Data.Monoid                      (All)
-import           System.Exit                      (exitSuccess)
-import           System.IO                        (Handle)
-import           XMonad                           hiding ((|||))
-import           XMonad.Actions.CycleWS           (WSType (..), moveTo, shiftTo,
-                                                   toggleWS')
-import           XMonad.Actions.Promote           (promote)
-import           XMonad.Hooks.DynamicLog          (PP (..), dynamicLogWithPP,
-                                                   shorten, wrap, xmobarAction,
-                                                   xmobarColor, xmobarPP)
-import           XMonad.Hooks.EwmhDesktops        (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks         (ToggleStruts (..),
-                                                   avoidStruts, docks)
-import           XMonad.Hooks.ManageHelpers       (composeOne, doCenterFloat,
-                                                   doFullFloat, isDialog,
-                                                   isFullscreen, transience,
-                                                   (-?>))
+import           Control.Monad                   (join, liftM2, when)
+import qualified Data.Map                        as M
+import           Data.Maybe                      (fromJust, maybeToList)
+import           Data.Monoid                     (All)
+import           System.Exit                     (exitSuccess)
+import           System.IO                       (Handle)
+import           XMonad                          hiding ((|||))
+import           XMonad.Actions.CycleWS          (WSType (..), moveTo, shiftTo,
+                                                  toggleWS')
+import           XMonad.Actions.Promote          (promote)
+import           XMonad.Hooks.DynamicLog         (PP (..), dynamicLogWithPP,
+                                                  shorten, wrap, xmobarAction,
+                                                  xmobarColor, xmobarPP)
+import           XMonad.Hooks.EwmhDesktops       (ewmh, fullscreenEventHook)
+import           XMonad.Hooks.ManageDocks        (ToggleStruts (..),
+                                                  avoidStruts, docks)
+import           XMonad.Hooks.ManageHelpers      (composeOne, doCenterFloat,
+                                                  doFullFloat, isDialog,
+                                                  isFullscreen, transience,
+                                                  (-?>))
 import           XMonad.Layout.Accordion
-import           XMonad.Layout.LayoutCombinators  (JumpToLayout (..), (|||))
-import           XMonad.Layout.LayoutModifier     (ModifiedLayout)
-import           XMonad.Layout.NoBorders          (Ambiguity (OnlyScreenFloat, Screen),
-                                                   lessBorders)
-import           XMonad.Layout.NoFrillsDecoration (Theme (..), noFrillsDeco,
-                                                   shrinkText)
-import           XMonad.Layout.Renamed            (Rename (Replace), renamed)
+import           XMonad.Layout.LayoutCombinators (JumpToLayout (..), (|||))
+import           XMonad.Layout.LayoutModifier    (ModifiedLayout)
+import           XMonad.Layout.NoBorders         (Ambiguity (OnlyScreenFloat, Screen),
+                                                  lessBorders)
+import           XMonad.Layout.Renamed           (Rename (Replace), renamed)
 import           XMonad.Layout.ResizableTile
 import           XMonad.Layout.Simplest
-import           XMonad.Layout.SimplestFloat
-import           XMonad.Layout.Spacing            (Border (..), Spacing,
-                                                   decScreenSpacing,
-                                                   decScreenWindowSpacing,
-                                                   decWindowSpacing,
-                                                   incScreenSpacing,
-                                                   incScreenWindowSpacing,
-                                                   incWindowSpacing, spacingRaw,
-                                                   toggleScreenSpacingEnabled,
-                                                   toggleWindowSpacingEnabled)
-import           XMonad.Layout.SubLayouts         (GroupMsg (..), onGroup,
-                                                   pullGroup, subLayout, toSubl)
-import           XMonad.Layout.Tabbed             (addTabs)
-import           XMonad.Layout.ThreeColumns       (ThreeCol (ThreeColMid))
-import           XMonad.Layout.WindowNavigation   (Direction2D (..),
-                                                   windowNavigation)
-import           XMonad.Prompt                    (Direction1D (..),
-                                                   XPConfig (..),
-                                                   XPPosition (..),
-                                                   defaultXPKeymap,
-                                                   deleteAllDuplicates)
-import           XMonad.Prompt.ConfirmPrompt      (confirmPrompt)
-import           XMonad.Prompt.FuzzyMatch         (fuzzyMatch, fuzzySort)
-import           XMonad.Prompt.Man                (manPrompt)
-import           XMonad.Prompt.Shell              (shellPrompt)
-import qualified XMonad.StackSet                  as W
-import           XMonad.Util.Cursor               (setDefaultCursor)
-import           XMonad.Util.NamedScratchpad      (NamedScratchpad (NS),
-                                                   customFloating,
-                                                   namedScratchpadAction,
-                                                   namedScratchpadFilterOutWorkspacePP,
-                                                   namedScratchpadManageHook)
-import           XMonad.Util.Run                  (hPutStrLn, spawnPipe)
-import           XMonad.Util.SpawnOnce            (spawnOnce)
+import           XMonad.Layout.Spacing           (Border (..), Spacing,
+                                                  decScreenSpacing,
+                                                  decScreenWindowSpacing,
+                                                  decWindowSpacing,
+                                                  incScreenSpacing,
+                                                  incScreenWindowSpacing,
+                                                  incWindowSpacing, spacingRaw,
+                                                  toggleScreenSpacingEnabled,
+                                                  toggleWindowSpacingEnabled)
+import           XMonad.Layout.SubLayouts        (GroupMsg (..), onGroup,
+                                                  pullGroup, subLayout, toSubl)
+import           XMonad.Layout.Tabbed            (Theme (..), addTabs,
+                                                  shrinkText)
+import           XMonad.Layout.ThreeColumns      (ThreeCol (ThreeColMid))
+import           XMonad.Layout.WindowNavigation  (Direction2D (..),
+                                                  windowNavigation)
+import           XMonad.Prompt                   (Direction1D (..),
+                                                  XPConfig (..),
+                                                  XPPosition (..),
+                                                  defaultXPKeymap,
+                                                  deleteAllDuplicates)
+import           XMonad.Prompt.ConfirmPrompt     (confirmPrompt)
+import           XMonad.Prompt.FuzzyMatch        (fuzzyMatch, fuzzySort)
+import           XMonad.Prompt.Man               (manPrompt)
+import           XMonad.Prompt.Shell             (shellPrompt)
+import qualified XMonad.StackSet                 as W
+import           XMonad.Util.Cursor              (setDefaultCursor)
+import           XMonad.Util.NamedScratchpad     (NamedScratchpad (NS),
+                                                  customFloating,
+                                                  namedScratchpadAction,
+                                                  namedScratchpadFilterOutWorkspacePP,
+                                                  namedScratchpadManageHook)
+import           XMonad.Util.Run                 (hPutStrLn, spawnPipe)
+import           XMonad.Util.SpawnOnce           (spawnOnce)
 
 
 -- The preferred terminal program, which is used in a binding below and by
@@ -83,7 +81,7 @@ myTerminal = "alacritty"
 --
 myLauncher :: String
 myLauncher =
-  "rofi -theme ~/.config/rofi/themes/slate.rasi -width 624 -lines 12"
+  "rofi -theme $HOME/.config/rofi/themes/slate.rasi -width 624 -lines 12"
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
@@ -164,14 +162,14 @@ red :: String
 red = "#ff6c6b"
 green :: String
 green = "#c3e88d"
-yellow :: String
-yellow = "#ffcb6b"
+-- yellow :: String
+-- yellow = "#ffcb6b"
 blue :: String
-blue = "#1083d5"
+blue = "#41a8f1"
 magenta :: String
 magenta = "#b48ead"
-cyan :: String
-cyan = "#89ddff"
+-- cyan :: String
+-- cyan = "#89ddff"
 white :: String
 white = "#d8dee9"
 gray :: String
@@ -348,13 +346,14 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm, xK_p)   , shellPrompt myXPConfig)
        , ((modm, xK_F1)  , manPrompt myXPConfig)
 
-       -- Picom on/off
+       -- Open apps
        , ( (altMask, xK_F9)
          , spawn "killall picom || picom --experimental-backends -b"
          )
+       , ((altMask, xK_e), spawn "emacsclient -nc")
 
        -- Screenshot shortcuts (Requires: scrot & xclip)
-       , ((0, xK_Print), spawn "$HOME/.config/xmonad/scripts/ssclip -f")
+       , ((0, xK_Print)  , spawn "$HOME/.config/xmonad/scripts/ssclip -f")
        , ( (0 .|. controlMask, xK_Print)
          , spawn "$HOME/.config/xmonad/scripts/ssclip -w"
          )
@@ -451,20 +450,6 @@ myTabConfig = def { activeColor         = blue
                   , inactiveTextColor   = gray
                   , fontName            = myFont
                   }
--- Title Bar theme
-myTitleTheme :: Theme
-myTitleTheme = def { fontName            = myFont
-                   , inactiveBorderColor = black
-                   , inactiveColor       = black
-                   , inactiveTextColor   = gray
-                   , activeBorderColor   = blue
-                   , activeColor         = blue
-                   , activeTextColor     = white
-                   , decoHeight          = 20
-                   }
-
--- Title Bar options
-addTitleBar = noFrillsDeco shrinkText myTitleTheme
 
 -- Layouts:
 
@@ -477,8 +462,7 @@ addTitleBar = noFrillsDeco shrinkText myTitleTheme
 -- which denotes layout choice.
 --
 
-myLayout =
-  avoidStruts $ tiled ||| mtiled ||| center ||| full ||| tabs ||| floats
+myLayout = avoidStruts $ tiled ||| mtiled ||| center ||| full ||| tabs
  where
   -- default tiling algorithm partitions the screen into two panes
   tiled =
@@ -513,8 +497,6 @@ myLayout =
       $ lessBorders OnlyScreenFloat
       $ addTabs shrinkText myTabConfig
       $ mySpacing 5 Simplest
-
-  floats  = renamed [Replace "Float"] $ addTitleBar simplestFloat
 
   -- The default number of windows in the master pane
   nmaster = 1
@@ -619,13 +601,15 @@ myHandleEventHook = handleEventHook def <+> fullscreenEventHook
 -- Status bars and logging
 
 -- Perform an arbitrary action on each internal state change or X event.
--- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
 myLogHook :: Handle -> X ()
 myLogHook h = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
     -- Xmobar workspace config
   { ppOutput  = hPutStrLn h
-  , ppCurrent = xmobarColor green "" . wrap "[" "]"                           -- Current workspace
+  , ppCurrent = xmobarColor green ""
+                . xmobarAction "xdotool key Super+Right" "5"
+                . xmobarAction "xdotool key Super+Left"  "4"
+                . wrap "[" "]"                                                -- Current workspace
   , ppLayout  = xmobarColor red ""
                 . xmobarAction "xdotool key Super+space"       "1"
                 . xmobarAction "xdotool key Super+shift+space" "3"
@@ -635,13 +619,18 @@ myLogHook h = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
                     "Centered Master" -> "|M|"
                     "Monocle"         -> "[ ]"
                     "Tabs"            -> "[T]"
-                    "Float"           -> "><>"
                     _                 -> "?"
                   )
   -- , ppVisible = xmobarColor magenta gray . wrap " " " " . clickable           -- Visible but not current workspace (other monitor)
-  , ppHidden  = xmobarColor "#7a869f" "" . wrap "" "" . clickable             -- Hidden workspaces, contain windows
+  , ppHidden  = xmobarColor "#7a869f" ""
+                . xmobarAction "xdotool key Super+Right" "5"
+                . xmobarAction "xdotool key Super+Left"  "4"
+                . wrap "" ""
+                . clickable                                                   -- Hidden workspaces, contain windows
   -- , ppHiddenNoWindows = xmobarColor gray "" . clickable                       -- Hidden workspaces, no windows
-  , ppTitle   = xmobarColor magenta "" . shorten 50                           -- Title of active window
+  , ppTitle   = xmobarColor magenta ""
+                . xmobarAction "xdotool key Super+shift+c" "2"
+                . shorten 50                                                  -- Title of active window
   , ppSep     = "<fc=#434c5e> | </fc>"                                        -- Separator
   , ppExtras  = [windowCount]                                                 -- Number of windows in current workspace
   , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
@@ -657,8 +646,8 @@ myLogHook h = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
 myStartupHook :: X ()
 myStartupHook = do
   setDefaultCursor xC_left_ptr
-  spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/xmonad.png"
-  -- spawn "feh --bg-scale --randomize --no-fehbg ~/Pictures/Wallpapers/*"
+  spawnOnce "feh --no-fehbg --bg-scale $HOME/Pictures/Wallpapers/0057.jpg"
+  -- spawn "feh --bg-scale --randomize --no-fehbg $HOME/Pictures/Wallpapers/*"
   spawnOnce "nm-applet"
   spawnOnce "picom --experimental-backends -b"
   spawnOnce "dunst"
@@ -680,7 +669,7 @@ myStartupHook = do
 --
 main :: IO ()
 main = do
-  h <- spawnPipe "xmobar ~/.config/xmonad/xmobar/xmobarrc"
+  h <- spawnPipe "xmobar $HOME/.config/xmonad/xmobar/xmobarrc"
 
   xmonad . ewmh . docks $ def
                               -- A structure containing your configuration settings, overriding
