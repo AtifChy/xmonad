@@ -75,13 +75,13 @@ import           XMonad.Util.SpawnOnce           (spawnOnce)
 -- certain contrib modules.
 --
 myTerminal :: String
-myTerminal = "alacritty"
+myTerminal = "st"
 
 -- My launcher
 --
 myLauncher :: String
 myLauncher =
-  "rofi -theme $HOME/.config/rofi/themes/slate.rasi -width 624 -lines 12"
+  "rofi -theme ~/.config/rofi/themes/slate.rasi -width 624 -lines 12"
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
@@ -95,6 +95,9 @@ myClickJustFocuses = False
 --
 myBorderWidth :: Dimension
 myBorderWidth = 2
+
+myGaps :: Num p => p
+myGaps = 4
 
 -- modMask lets you specify which modkey you want to use. The default
 -- is mod1Mask ("left alt").  You may also consider using mod3Mask
@@ -165,7 +168,7 @@ green = "#c3e88d"
 -- yellow :: String
 -- yellow = "#ffcb6b"
 blue :: String
-blue = "#41a8f1"
+blue = "#4280bd"
 magenta :: String
 magenta = "#b48ead"
 -- cyan :: String
@@ -298,7 +301,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
          , spawn ("echo \"" ++ help ++ "\" | xmessage -file -")
          )
 
-       -- A basic CycleWS setup
+       -- CycleWS setup
        , ((modm, xK_Right), moveTo Next (WSIs $ return ((/= "NSP") . W.tag)))
        , ((modm, xK_Left) , moveTo Prev (WSIs $ return ((/= "NSP") . W.tag)))
        , ( (modm .|. shiftMask, xK_Right)
@@ -307,8 +310,10 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ( (modm .|. shiftMask, xK_Left)
          , shiftTo Prev (WSIs $ return ((/= "NSP") . W.tag))
          )
-       , ((modm, xK_z), toggleWS' ["NSP"])
-       , ((modm, xK_f), moveTo Next EmptyWS)                                    -- find a free workspace
+       , ((modm .|. controlMask, xK_Right), moveTo Next NonEmptyWS)
+       , ((modm .|. controlMask, xK_Left) , moveTo Prev NonEmptyWS)
+       , ((modm, xK_z)                    , toggleWS' ["NSP"])
+       , ((modm, xK_f)                    , moveTo Next EmptyWS)                                    -- find a free workspace
 
        -- Increase/Decrease spacing (gaps)
        , ( (modm, xK_g)
@@ -350,16 +355,12 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ( (altMask, xK_F9)
          , spawn "killall picom || picom --experimental-backends -b"
          )
-       , ((altMask, xK_e), spawn "emacsclient -nc")
+       , ((altMask, xK_e)              , spawn "emacsclient -nc")
 
        -- Screenshot shortcuts (Requires: scrot & xclip)
-       , ((0, xK_Print)  , spawn "$HOME/.config/xmonad/scripts/ssclip -f")
-       , ( (0 .|. controlMask, xK_Print)
-         , spawn "$HOME/.config/xmonad/scripts/ssclip -w"
-         )
-       , ( (0 .|. shiftMask, xK_Print)
-         , spawn "$HOME/.config/xmonad/scripts/ssclip -s"
-         )
+       , ((0, xK_Print)                , spawn "ssclip -f")
+       , ((0 .|. controlMask, xK_Print), spawn "ssclip -w")
+       , ((0 .|. shiftMask, xK_Print)  , spawn "ssclip -s")
        ]
     ++
        --
@@ -471,7 +472,7 @@ myLayout = avoidStruts $ tiled ||| mtiled ||| center ||| full ||| tabs
       $ windowNavigation
       $ addTabs shrinkText myTabConfig
       $ subLayout [] (Simplest ||| Accordion)
-      $ mySpacing 5
+      $ mySpacing myGaps
       $ ResizableTall nmaster delta ratio []
 
   mtiled =
@@ -487,7 +488,7 @@ myLayout = avoidStruts $ tiled ||| mtiled ||| center ||| full ||| tabs
       $ windowNavigation
       $ addTabs shrinkText myTabConfig
       $ subLayout [] (Simplest ||| Accordion)
-      $ mySpacing 5
+      $ mySpacing myGaps
       $ ThreeColMid nmaster delta ratio
 
   full = renamed [Replace "Monocle"] $ lessBorders Screen Full
@@ -496,7 +497,7 @@ myLayout = avoidStruts $ tiled ||| mtiled ||| center ||| full ||| tabs
     renamed [Replace "Tabs"]
       $ lessBorders OnlyScreenFloat
       $ addTabs shrinkText myTabConfig
-      $ mySpacing 5 Simplest
+      $ mySpacing myGaps Simplest
 
   -- The default number of windows in the master pane
   nmaster = 1
@@ -515,8 +516,8 @@ myScratchpads = [
                  -- run a terminal inside scratchpad
                  NS "terminal" spawnTerm findTerm manageTerm]
  where
-  spawnTerm  = myTerminal ++ " --class scratchpad"
-  findTerm   = resource =? "scratchpad"
+  spawnTerm  = myTerminal ++ " -c scratchpad"
+  findTerm   = className =? "scratchpad"
   manageTerm = customFloating $ W.RationalRect (1 / 6) (1 / 8) (2 / 3) (3 / 4)
 
 ------------------------------------------------------------------------
@@ -546,6 +547,7 @@ myManageHook =
       , resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat
       , resource =? "redshift-gtk" -?> doCenterFloat
       , className =? "ibus-ui-gtk3" -?> doIgnore
+      , resource =? "gcr-prompter" -?> doCenterFloat
       , isFullscreen -?> doFullFloat
       , transience
       , isDialog -?> doCenterFloat
@@ -646,21 +648,22 @@ myLogHook h = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
 myStartupHook :: X ()
 myStartupHook = do
   setDefaultCursor xC_left_ptr
-  spawnOnce "feh --no-fehbg --bg-scale $HOME/Pictures/Wallpapers/0057.jpg"
-  -- spawn "feh --bg-scale --randomize --no-fehbg $HOME/Pictures/Wallpapers/*"
-  spawnOnce "nm-applet"
+  spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0057.jpg"
+  -- spawn "feh --bg-scale --randomize --no-fehbg ~/Pictures/Wallpapers/*"
   spawnOnce "picom --experimental-backends -b"
   spawnOnce "dunst"
   spawnOnce "greenclip daemon"
-  spawnOnce "redshift-gtk"
-  -- spawn "systemctl --user restart redshift-gtk.service"
-  -- spawnOnce "volumeicon &"
   spawnOnce "numlockx"
-  spawnOnce "ibus-daemon -drx"
   spawnOnce "emacs --daemon"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+  spawnOnce "nm-applet"
+  spawnOnce "redshift-gtk"
+  spawnOnce "ibus-daemon -drx"
+  -- spawn "systemctl --user restart redshift-gtk.service"
+  -- spawnOnce "volumeicon"
   spawnOnce
-    "trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1E2127  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right"
+    "sleep 3s; trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1E2127  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right"
+
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
@@ -669,14 +672,8 @@ myStartupHook = do
 --
 main :: IO ()
 main = do
-  h <- spawnPipe "xmobar $HOME/.config/xmonad/xmobar/xmobarrc"
-
-  xmonad . ewmh . docks $ def
-                              -- A structure containing your configuration settings, overriding
-                              -- fields in the default config. Any you don't override, will
-                              -- use the defaults defined in xmonad/XMonad/Config.hs
-                              --
-                              {
+  h <- spawnPipe "xmobar ~/.config/xmonad/xmobar/xmobarrc"
+  xmonad . ewmh . docks $ def {
                               -- simple stuff
                                 terminal           = myTerminal
                               , focusFollowsMouse  = myFocusFollowsMouse
@@ -796,6 +793,7 @@ help = unlines
   , "Ctrl-Print           Take screenshot of focused window"
   , ""
   , "-- Application"
+  , "All-e                Open emacs-client"
   , "Alt-F9               Turn on/off picom"
   ]
 

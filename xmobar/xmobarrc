@@ -1,57 +1,59 @@
 Config
-  { font = "xft:JetBrains Mono:size=10:weight=Bold:antialias=true:hinting=true,Font Awesome 5 Free Solid:size=10,Noto Sans Bengali:size=10:weight=Bold:antialias=true:hinting=true",
-    additionalFonts = [],
-    bgColor = "#1E2127",
-    fgColor = "#51afef",
-    borderColor = "#434c5e",
-    alpha = 255,
-    position = Top,                -- Static {xpos = 10, ypos = 10, width = 1900, height = 24},
-    border = FullB,
-    textOffset = 16,
-    -- iconOffset = -1,
-    lowerOnStart = True,
-    -- pickBroadest = False,
-    persistent = True,
-    -- hideOnStart = False,
-    -- iconRoot = ".",
-    -- allDesktops = True,
-    -- overrideRedirect = True,
-    commands = [
-        Run Cpu
-          [ "-t", "\61704 <total>%",
-            "-L", "50",
-            "-H", "85",
-            "--low", "#98be65",
-            "--normal", "#ecbe8b",
-            "--high", "#ff6c6b"
-          ]
-          20,
-        Run Memory
-          [ "-t", "\62776 <usedratio>%",
-            "-L", "50",
-            "-H", "85",
-            "--low", "#98be65",
-            "--normal", "#ecbe8b",
-            "--high", "#ff6c6b"
-          ]
-          30,
-        Run DynNetwork
-          [ "-t", "\61611 <rx>KB  \61610 <tx>KB",
-            "-L", "10000",
-            "-H", "130000",
-            "--low", "#ff6c6b",
-            "--normal", "#ecbe8b",
-            "--high", "#98be65"
-          ] 20,
-        Run Date "\61555 %a %b %d, \61463 %l:%M %p" "date" 300,
-        Run UnsafeStdinReader,
-
-        -- trayer padding icon
-        Run Com "/home/atif/.config/xmonad/scripts/trayer-padding-icon.sh" ["panel"] "trayerpad" 5
-      ],
-    sepChar = "%",
-    alignSep = "}{",
-    template =
+  { font = "xft:JetBrains Mono:size=10:weight=Bold:antialias=true:hinting=true,
+                Font Awesome 5 Free Solid:size=10,
+                Noto Sans Bengali:size=10:weight=Bold:antialias=true:hinting=true,
+                Noto Color Emoji:size=10:style=Regular"
+  , additionalFonts = []
+  , bgColor = "#1E2127"
+  , fgColor = "#51afef"
+  , borderColor = "#434c5e"
+  , alpha = 255
+  , position = Static {xpos = 0, ypos = 0, width = 1920, height = 24}
+  , border = FullB
+  , textOffset = 16
+  --, iconOffset = -1
+  , lowerOnStart = True
+  --, pickBroadest = False
+  , persistent = True
+  --, hideOnStart = False
+  --, iconRoot = "."
+  --, allDesktops = True
+  --, overrideRedirect = True
+  , commands =
+        [ Run Cpu
+           [ "-t", "\xf108 <total>%",
+             "-L", "50",
+             "-H", "85",
+             "--low", "#98be65",
+             "--normal", "#ecbe8b",
+             "--high", "#ff6c6b"
+           ] 20
+        , Run Memory
+           [ "-t", "\xf538 <usedratio>%",
+             "-L", "50",
+             "-H", "85",
+             "--low", "#98be65",
+             "--normal", "#ecbe8b",
+             "--high", "#ff6c6b"
+           ] 30
+        , Run DynNetwork
+           [ "-t", "\xf0ab <rx>KB  \xf0aa <tx>KB",
+             "-L", "10000",
+             "-H", "130000",
+             "--low", "#ff6c6b",
+             "--normal", "#ecbe8b",
+             "--high", "#98be65"
+           ] 20
+        , Run Date "\xf073 %a %b %d, \xf017 %l:%M %p" "date" 300
+        , Run UnsafeStdinReader
+        , Run Com
+                "/home/atif/.config/xmonad/scripts/trayer-padding-icon.sh"
+                ["panel"]
+                "trayerpad" 5
+        ]
+  , sepChar = "%"
+  , alignSep = "}{"
+  , template =
       " %UnsafeStdinReader% }{ \
       \<fc=#56b6c2>\
       \<action=`st -e htop -s PERCENT_CPU` button=1>%cpu%</action>\
