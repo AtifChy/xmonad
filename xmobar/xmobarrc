@@ -42,14 +42,20 @@ Config
              "-H", "130000",
              "--low", "#ff6c6b",
              "--normal", "#ecbe8b",
-             "--high", "#98be65"
+             "--high", "#98be65",
+             "--",
+             "--devices",
+             "wlp0s20u3,enp3s0"
            ] 20
         , Run Date "\xf073 %a %b %d, \xf017 %l:%M %p" "date" 300
         , Run UnsafeStdinReader
-        , Run Com
-                "/home/atif/.config/xmonad/scripts/trayer-padding-icon.sh"
-                ["panel"]
-                "trayerpad" 5
+        , Run Com "/home/atif/.config/xmonad/scripts/tray-padding-icon.sh"
+                ["stalonetray"]
+                "tray" 5
+        -- , Run Com
+        --         "/home/atif/.config/xmonad/scripts/trayer-padding-icon.sh"
+        --         ["panel"]
+        --         "trayerpad" 5
         ]
   , sepChar = "%"
   , alignSep = "}{"
@@ -62,7 +68,7 @@ Config
       \<action=`st -e htop -s PERCENT_MEM` button=1>%memory%</action>\
       \</fc><fc=#434c5e> | </fc>\
       \<fc=#51afef>%dynnetwork%</fc><fc=#434c5e> | </fc>\
-      \<fc=#c678dd>%date%</fc><fc=#434c5e> |</fc>%trayerpad%"
+      \<fc=#c678dd>%date%</fc><fc=#434c5e> | </fc>%tray%"
   }
 
 -- vim:ft=haskell:expandtab

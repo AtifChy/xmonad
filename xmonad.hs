@@ -659,11 +659,11 @@ myStartupHook = do
   spawnOnce "nm-applet"
   spawnOnce "redshift-gtk"
   spawnOnce "ibus-daemon -drx"
+  spawnOnce "stalonetray --geometry 1x1-4+2 --max-geometry 10x1-4+2 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NE --icon-size 20 --sticky --window-type dock --skip-taskbar"
   -- spawn "systemctl --user restart redshift-gtk.service"
   -- spawnOnce "volumeicon"
-  spawnOnce
-    "sleep 3s; trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1E2127  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right"
-
+  -- spawnOnce
+  --   "trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1E2127  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
