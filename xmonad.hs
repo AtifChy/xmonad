@@ -319,12 +319,12 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ( (modm, xK_g)
          , sequence_ [toggleScreenSpacingEnabled, toggleWindowSpacingEnabled]
          )
-       , ((modm, xK_i)                     , incScreenWindowSpacing 4)
-       , ((modm, xK_d)                     , decScreenWindowSpacing 4)
-       , ((altMask, xK_i)                  , incScreenSpacing 4)
-       , ((altMask, xK_d)                  , decScreenSpacing 4)
-       , ((altMask .|. shiftMask, xK_i)    , incWindowSpacing 4)
-       , ((altMask .|. shiftMask, xK_d)    , decWindowSpacing 4)
+       , ((modm, xK_i)                     , incScreenWindowSpacing 2)
+       , ((modm, xK_d)                     , decScreenWindowSpacing 2)
+       , ((altMask, xK_i)                  , incScreenSpacing 2)
+       , ((altMask, xK_d)                  , decScreenSpacing 2)
+       , ((altMask .|. shiftMask, xK_i)    , incWindowSpacing 2)
+       , ((altMask .|. shiftMask, xK_d)    , decWindowSpacing 2)
 
        -- SubLayouts
        , ((modm .|. controlMask, xK_h)     , sendMessage $ pullGroup L)
@@ -353,7 +353,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- Open apps
        , ( (altMask, xK_F9)
-         , spawn "killall picom || picom --experimental-backends -b"
+         , spawn "killall picom || picom -b"
          )
        , ((altMask, xK_e)              , spawn "emacsclient -nc")
 
@@ -650,7 +650,7 @@ myStartupHook = do
   setDefaultCursor xC_left_ptr
   spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0057.jpg"
   -- spawn "feh --bg-scale --randomize --no-fehbg ~/Pictures/Wallpapers/*"
-  spawnOnce "picom --experimental-backends -b"
+  spawnOnce "picom"
   spawnOnce "dunst"
   spawnOnce "greenclip daemon"
   spawnOnce "numlockx"

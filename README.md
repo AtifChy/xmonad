@@ -1,5 +1,14 @@
 # xmonad
-my Xmonad configuration
+my [xmonad](https://github.com/xmonad/xmonad) configuration
+
+### Preview
+![xmonad 1](./preview/02-04-2021_01-52.png)
+![xmonad 2](./preview/2021-04-02_02-02.png)
+
+### Installation
+```
+sudo pacman -Syu xmonad xmonad-contrib xmobar stalonetray nm-applet feh
+```
 
 ### Auto recompile xmonad on update
 The xmonad executable is located in `~/.local/share/xmonad`. After upgrading xmonad, an old executable might persist and need in that case be removed for xmonad to compile a new executable. Alternatively use `xmonad --recompile`.

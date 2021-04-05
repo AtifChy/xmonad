@@ -4,21 +4,21 @@
 
 case $1 in
 -f | full)
-	scrot -z '%d-%m-%Y_%H-%M.png' \
+	scrot -z '%Y-%m-%d_%H-%M.png' \
 		-e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures' &&
 		notify-send --icon=gnome-screenshot \
 			'Scrot' 'Fullscreen screenshot saved'
 	;;
 
 -w | window)
-	scrot -uzb '%d-%m-%Y_%H-%M.png' \
+	scrot -uzb '%Y-%m-%d_%H-%M.png' \
 		-e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures' &&
 		notify-send --icon=gnome-screenshot \
 			'Scrot' 'Screenshot of focused window saved'
 	;;
 
 -s | selection)
-	scrot -l mode=edge -szb '%d-%m-%Y_%H-%M.png' \
+	scrot -l mode=edge -szb '%Y-%m-%d_%H-%M.png' \
 		-e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures' &&
 		notify-send --icon=gnome-screenshot \
 			'Scrot' 'Screenshot of focused window saved' ||
@@ -27,7 +27,7 @@ case $1 in
 	;;
 
 ## Alternative way for taking screenshots of selected window. Requires 'slop'.
-#    -s|selection)   scrot -a $(slop -f '%x,%y,%w,%h') '%d-%m-%Y_%H-%M.png' \
+#    -s|selection)   scrot -a $(slop -f '%x,%y,%w,%h') '%Y-%m-%d_%H-%M.png' \
 #                    -e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures' && \
 #                    notify-send --icon=gnome-screenshot \
 #                    'Scrot' 'Screenshot of selected screen saved' || \
