@@ -353,7 +353,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- Open apps
        , ( (altMask, xK_F9)
-         , spawn "killall picom || picom -b"
+         , spawn "killall picom || picom"
          )
        , ((altMask, xK_e)              , spawn "emacsclient -nc")
 
@@ -548,8 +548,8 @@ myManageHook =
       , resource =? "redshift-gtk" -?> doCenterFloat
       , className =? "ibus-ui-gtk3" -?> doIgnore
       , resource =? "gcr-prompter" -?> doCenterFloat
-      , isFullscreen -?> doFullFloat
       , transience
+      , isFullscreen -?> doFullFloat
       , isDialog -?> doCenterFloat
       , className =? "firefox" -?> doShift (myWorkspaces !! 1)
       , className =? "discord" -?> doShift (myWorkspaces !! 2)
@@ -652,14 +652,15 @@ myStartupHook = do
   -- spawn "feh --bg-scale --randomize --no-fehbg ~/Pictures/Wallpapers/*"
   spawnOnce "picom"
   spawnOnce "dunst"
+  spawnOnce "nm-applet"
+  spawnOnce "redshift-gtk"
   spawnOnce "greenclip daemon"
   spawnOnce "numlockx"
   spawnOnce "emacs --daemon"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-  spawnOnce "nm-applet"
-  spawnOnce "redshift-gtk"
   spawnOnce "ibus-daemon -drx"
-  spawnOnce "stalonetray --geometry 1x1-4+2 --max-geometry 10x1-4+2 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NE --icon-size 20 --sticky --window-type dock --skip-taskbar"
+  spawnOnce "pasystray -t"
+  spawnOnce "stalonetray --geometry 1x1-4+2 --max-geometry 10x1-4+2 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
   -- spawn "systemctl --user restart redshift-gtk.service"
   -- spawnOnce "volumeicon"
   -- spawnOnce
@@ -672,7 +673,7 @@ myStartupHook = do
 --
 main :: IO ()
 main = do
-  h <- spawnPipe "xmobar ~/.config/xmonad/xmobar/xmobarrc"
+  h <- spawnPipe "xmobar -x 0 ~/.config/xmonad/xmobar/xmobarrc"
   xmonad . ewmh . docks $ def {
                               -- simple stuff
                                 terminal           = myTerminal
@@ -693,7 +694,7 @@ main = do
                               , manageHook         = myManageHook
                               , handleEventHook    = myHandleEventHook
                               , logHook            = myLogHook h
-                              , startupHook = myStartupHook >> addEWMHFullscreen
+                              , startupHook        = myStartupHook >> addEWMHFullscreen
                               }
 
 ------------------------------------------------------------------------
