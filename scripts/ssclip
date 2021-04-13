@@ -4,27 +4,27 @@
 
 case $1 in
 -f | full)
-	scrot -z '%Y-%m-%d_%H-%M.png' \
-		-e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures' &&
-		notify-send --icon=gnome-screenshot \
-			'Scrot' 'Fullscreen screenshot saved'
-	;;
+        scrot -z '%Y-%m-%d_%H-%M.png' \
+                -e 'xclip -selection clipboard -target image/png -i $f ;
+			dunstify -I $f "Scrot" "Fullscreen screenshot saved" ;
+			mv $f ~/Pictures'
+        ;;
 
 -w | window)
-	scrot -uzb '%Y-%m-%d_%H-%M.png' \
-		-e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures' &&
-		notify-send --icon=gnome-screenshot \
-			'Scrot' 'Screenshot of focused window saved'
-	;;
+        scrot -uzb '%Y-%m-%d_%H-%M.png' \
+                -e 'xclip -selection clipboard -target image/png -i $f ;
+			dunstify -I $f "Scrot" "Screenshot of focused window saved" ;
+			mv $f ~/Pictures'
+        ;;
 
 -s | selection)
-	scrot -l mode=edge -szb '%Y-%m-%d_%H-%M.png' \
-		-e 'xclip -selection clipboard -target image/png -i $f ; mv $f ~/Pictures' &&
-		notify-send --icon=gnome-screenshot \
-			'Scrot' 'Screenshot of focused window saved' ||
-		notify-send --icon=gnome-screenshot \
-			'Scrot' 'Failed to take screenshot'
-	;;
+        scrot -l mode=edge -szb '%Y-%m-%d_%H-%M.png' \
+                -e 'xclip -selection clipboard -target image/png -i $f ;
+			dunstify -I $f "Scrot" "Screenshot of focused window saved" ;
+			mv $f ~/Pictures' ||
+                notify-send --icon=gnome-screenshot \
+                        'Scrot' 'Failed to take screenshot'
+        ;;
 
 ## Alternative way for taking screenshots of selected window. Requires 'slop'.
 #    -s|selection)   scrot -a $(slop -f '%x,%y,%w,%h') '%Y-%m-%d_%H-%M.png' \
@@ -36,12 +36,12 @@ case $1 in
 #                   ;;
 
 *)
-	echo "Take screenshots with scrot"
-	echo "---------------------------"
-	echo "options:"
-	echo " -f, full         Take fullscreen screenshot"
-	echo " -w, window       Take screenshot of focused window"
-	echo " -s, selection    Take screenshot of interactively chosen window or rectangle"
-	echo " -h, help         Display all available options"
-	;;
+        echo "Take screenshots with scrot"
+        echo "---------------------------"
+        echo "options:"
+        echo " -f, full         Take fullscreen screenshot"
+        echo " -w, window       Take screenshot of focused window"
+        echo " -s, selection    Take screenshot of interactively chosen window or rectangle"
+        echo " -h, help         Display all available options"
+        ;;
 esac

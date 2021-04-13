@@ -9,14 +9,18 @@
 --
 import           Control.Monad                   (join, liftM2, when)
 import qualified Data.Map                        as M
-import           Data.Maybe                      (fromJust, maybeToList)
+import           Data.Maybe                      (isJust, maybeToList)
 import           Data.Monoid                     (All)
 import           System.Exit                     (exitSuccess)
 import           System.IO                       (Handle)
 import           XMonad                          hiding ((|||))
+import           XMonad.Actions.CopyWindow       (copyToAll, kill1,
+                                                  killAllOtherCopies,
+                                                  wsContainingCopies)
 import           XMonad.Actions.CycleWS          (WSType (..), moveTo, shiftTo,
                                                   toggleWS')
 import           XMonad.Actions.Promote          (promote)
+import           XMonad.Actions.WithAll          (killAll, sinkAll)
 import           XMonad.Hooks.DynamicLog         (PP (..), dynamicLogWithPP,
                                                   shorten, wrap, xmobarAction,
                                                   xmobarColor, xmobarPP)
@@ -120,28 +124,31 @@ altMask = mod1Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
+xmobarEscape :: Foldable t => t Char -> String
+xmobarEscape = concatMap doubleLts
+ where
+  doubleLts '<' = "<<"
+  doubleLts x   = [x]
+
 myWorkspaces :: [String]
 myWorkspaces =
-  [ "1:term"
-  , "2:web"
-  , "3:chat"
-  , "4:code"
-  , "5:movie"
-  , "6:game"
-  , "7:vbox"
-  , "8:tor"
-  , "9:misc"
-  ]
-
--- Enable clickable workspaces
---
-myWorkspaceIndices :: M.Map String Integer
-myWorkspaceIndices = M.fromList $ zip myWorkspaces [1 ..]
-
-clickable :: String -> String
-clickable ws =
-  "<action=xdotool key super+" ++ show i ++ ">" ++ ws ++ "</action>"
-  where i = fromJust $ M.lookup ws myWorkspaceIndices
+  clickable
+    . map xmobarEscape
+    $ [ "1:term"
+      , "2:web"
+      , "3:chat"
+      , "4:code"
+      , "5:movie"
+      , "6:game"
+      , "7:vbox"
+      , "8:tor"
+      , "9:misc"
+      ]
+ where
+  clickable l =
+    [ "<action=xdotool key super+" ++ show i ++ ">" ++ ws ++ "</action>"
+    | (i, ws) <- zip [1 .. 9] l
+    ]
 
 -- Get count of available windows on a workspace
 --
@@ -165,8 +172,8 @@ red :: String
 red = "#ff6c6b"
 green :: String
 green = "#c3e88d"
--- yellow :: String
--- yellow = "#ffcb6b"
+yellow :: String
+yellow = "#ffcb6b"
 blue :: String
 blue = "#4280bd"
 magenta :: String
@@ -226,7 +233,10 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        --, ((modm .|. shiftMask, xK_p ), spawn "gmrun")
 
        -- close focused window
-       , ((modm .|. shiftMask, xK_c)    , kill)
+       , ((modm .|. shiftMask, xK_c)    , kill1)
+
+       -- close all windows on the current workspace
+       , ((modm .|. controlMask, xK_c)  , killAll)
 
        -- Rotate through the available layout algorithms
        , ((modm, xK_space)              , sendMessage NextLayout)
@@ -273,6 +283,9 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        -- Push window back into tiling
        , ((modm, xK_t)                  , withFocused $ windows . W.sink)
 
+       -- Push all windows on the current workspace into tiling
+       , ((modm .|. shiftMask, xK_t)    , sinkAll)
+
        -- Increment the number of windows in the master area
        , ((modm, xK_comma)              , sendMessage (IncMasterN 1))
 
@@ -298,22 +311,20 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- Run xmessage with a summary of the default keybindings (useful for beginners)
        , ( (modm .|. shiftMask, xK_slash)
-         , spawn ("echo \"" ++ help ++ "\" | xmessage -file -")
+         , spawn (myTerminal ++ " -e sh -c 'echo \"" ++ help ++ "\" | less'")
          )
 
        -- CycleWS setup
-       , ((modm, xK_Right), moveTo Next (WSIs $ return ((/= "NSP") . W.tag)))
-       , ((modm, xK_Left) , moveTo Prev (WSIs $ return ((/= "NSP") . W.tag)))
-       , ( (modm .|. shiftMask, xK_Right)
-         , shiftTo Next (WSIs $ return ((/= "NSP") . W.tag))
-         )
-       , ( (modm .|. shiftMask, xK_Left)
-         , shiftTo Prev (WSIs $ return ((/= "NSP") . W.tag))
-         )
-       , ((modm .|. controlMask, xK_Right), moveTo Next NonEmptyWS)
-       , ((modm .|. controlMask, xK_Left) , moveTo Prev NonEmptyWS)
-       , ((modm, xK_z)                    , toggleWS' ["NSP"])
-       , ((modm, xK_f)                    , moveTo Next EmptyWS)                                    -- find a free workspace
+       , ((modm, xK_Right)                 , moveTo Next nonNSP)
+       , ((modm, xK_Left)                  , moveTo Prev nonNSP)
+       , ((modm .|. shiftMask, xK_Right)   , shiftTo Next nonNSP)
+       , ((modm .|. shiftMask, xK_Left)    , shiftTo Prev nonNSP)
+       , ((altMask, xK_Right)              , moveTo Next nonEmptyNSP)
+       , ((altMask, xK_Left)               , moveTo Prev nonEmptyNSP)
+       , ((altMask .|. shiftMask, xK_Right), shiftTo Next nonEmptyNSP)
+       , ((altMask .|. shiftMask, xK_Left) , shiftTo Prev nonEmptyNSP)
+       , ((modm, xK_z)                     , toggleWS' ["NSP"])
+       , ((modm, xK_f)                     , moveTo Next EmptyWS)
 
        -- Increase/Decrease spacing (gaps)
        , ( (modm, xK_g)
@@ -337,6 +348,10 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm .|. controlMask, xK_comma) , onGroup W.focusUp')
        , ((modm .|. controlMask, xK_period), onGroup W.focusDown')
 
+       -- Copy window
+       , ((modm, xK_v)                     , windows copyToAll)
+       , ((modm .|. shiftMask, xK_v)       , killAllOtherCopies)
+
        -- Scratchpad
        , ( (modm .|. controlMask, xK_Return)
          , namedScratchpadAction myScratchpads "terminal"
@@ -353,7 +368,8 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- Open apps
        , ( (altMask, xK_F9)
-         , spawn "killall picom || picom"
+         , spawn
+           "$(killall picom && notify-send -i picom 'System' 'Killed Picom') || $(picom & notify-send -i picom 'System' 'Picom running...')"
          )
        , ((altMask, xK_e)              , spawn "emacsclient -nc")
 
@@ -384,6 +400,9 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        | (key, sc) <- zip [xK_w, xK_e, xK_r] [0 ..]
        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
        ]
+ where
+  nonNSP      = WSIs (return (\ws -> W.tag ws /= "NSP"))
+  nonEmptyNSP = WSIs (return (\ws -> isJust (W.stack ws) && W.tag ws /= "NSP"))
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
@@ -404,9 +423,11 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
     )
 
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
-  , ((modm, button4), \w -> focus w >> moveTo Prev NonEmptyWS)
-  , ((modm, button5), \w -> focus w >> moveTo Next NonEmptyWS)
+  , ((modm, button4), \w -> focus w >> moveTo Prev nonEmptyNSP)
+  , ((modm, button5), \w -> focus w >> moveTo Next nonEmptyNSP)
   ]
+ where
+  nonEmptyNSP = WSIs (return (\ws -> isJust (W.stack ws) && W.tag ws /= "NSP"))
 
 ------------------------------------------------------------------------
 -- XPrompt
@@ -605,38 +626,44 @@ myHandleEventHook = handleEventHook def <+> fullscreenEventHook
 -- Perform an arbitrary action on each internal state change or X event.
 --
 myLogHook :: Handle -> X ()
-myLogHook h = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
-    -- Xmobar workspace config
-  { ppOutput  = hPutStrLn h
-  , ppCurrent = xmobarColor green ""
-                . xmobarAction "xdotool key Super+Right" "5"
-                . xmobarAction "xdotool key Super+Left"  "4"
-                . wrap "[" "]"                                                -- Current workspace
-  , ppLayout  = xmobarColor red ""
-                . xmobarAction "xdotool key Super+space"       "1"
-                . xmobarAction "xdotool key Super+shift+space" "3"
-                . (\case
-                    "Tiled"           -> "[]="
-                    "Mirror Tiled"    -> "TTT"
-                    "Centered Master" -> "|M|"
-                    "Monocle"         -> "[ ]"
-                    "Tabs"            -> "[T]"
-                    _                 -> "?"
-                  )
-  -- , ppVisible = xmobarColor magenta gray . wrap " " " " . clickable           -- Visible but not current workspace (other monitor)
-  , ppHidden  = xmobarColor "#7a869f" ""
-                . xmobarAction "xdotool key Super+Right" "5"
-                . xmobarAction "xdotool key Super+Left"  "4"
-                . wrap "" ""
-                . clickable                                                   -- Hidden workspaces, contain windows
-  -- , ppHiddenNoWindows = xmobarColor gray "" . clickable                       -- Hidden workspaces, no windows
-  , ppTitle   = xmobarColor magenta ""
-                . xmobarAction "xdotool key Super+shift+c" "2"
-                . shorten 50                                                  -- Title of active window
-  , ppSep     = "<fc=#434c5e> | </fc>"                                        -- Separator
-  , ppExtras  = [windowCount]                                                 -- Number of windows in current workspace
-  , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
-  }
+myLogHook h = do
+  copies <- wsContainingCopies
+  let check ws | ws `elem` copies = xmobarColor yellow "" . wrap "*" "" $ ws
+               | otherwise        = ws
+
+  dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
+    { ppCurrent = xmobarColor green ""
+                  . wrap "[" "]"
+                  . xmobarAction "xdotool key Super+Right" "5"
+                  . xmobarAction "xdotool key Super+Left"  "4"
+    , ppTitle   = xmobarColor magenta ""
+                  . xmobarAction "xdotool key Super+shift+c" "2"
+                  . shorten 50
+    -- , ppVisible             = xmobarColor base0  "" . wrap "(" ")"
+    -- , ppUrgent              = xmobarColor red    "" . wrap " " " "
+    , ppHidden  = xmobarColor "#7a869f" ""
+                  . wrap "" ""
+                  . xmobarAction "xdotool key Super+Right" "5"
+                  . xmobarAction "xdotool key Super+Left"  "4"
+                  . check
+    -- , ppHiddenNoWindows = const ""
+    , ppSep     = xmobarColor gray "" " | "
+    -- , ppWsSep   = ""
+    , ppLayout  = xmobarColor red ""
+                  . xmobarAction "xdotool key Super+space"       "1"
+                  . xmobarAction "xdotool key Super+shift+space" "3"
+                  . (\case
+                      "Tiled"           -> "[]="
+                      "Mirror Tiled"    -> "TTT"
+                      "Centered Master" -> "|M|"
+                      "Monocle"         -> "[ ]"
+                      "Tabs"            -> "[T]"
+                      _                 -> "?"
+                    )
+    , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
+    , ppOutput  = hPutStrLn h
+    , ppExtras  = [windowCount]
+    }
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -660,11 +687,9 @@ myStartupHook = do
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce "ibus-daemon -drx"
   spawnOnce "pasystray -t"
-  spawnOnce "stalonetray --geometry 1x1-4+2 --max-geometry 10x1-4+2 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
+  spawnOnce
+    "stalonetray --geometry 1x1-4+2 --max-geometry 10x1-4+2 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
   -- spawn "systemctl --user restart redshift-gtk.service"
-  -- spawnOnce "volumeicon"
-  -- spawnOnce
-  --   "trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1E2127  --height 22 --iconspacing 5 --distance 1,1 --distancefrom top,right"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
@@ -694,7 +719,7 @@ main = do
                               , manageHook         = myManageHook
                               , handleEventHook    = myHandleEventHook
                               , logHook            = myLogHook h
-                              , startupHook        = myStartupHook >> addEWMHFullscreen
+                              , startupHook = myStartupHook >> addEWMHFullscreen
                               }
 
 ------------------------------------------------------------------------

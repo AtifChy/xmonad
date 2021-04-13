@@ -1,0 +1,3 @@
+#!/bin/sh
+xcolor -P 70 | xclip -selection clipboard && \
+	notify-send 'xcolor' "$(xclip -selection clipboard -out)"

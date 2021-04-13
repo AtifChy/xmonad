@@ -4,7 +4,7 @@ Config
                 Noto Sans Bengali:size=10:weight=Bold:antialias=true:hinting=true,
                 Noto Color Emoji:size=10:style=Regular"
   , additionalFonts = []
-  , bgColor = "#1E2127"
+  , bgColor = "#1e2127"
   , fgColor = "#51afef"
   , borderColor = "#434c5e"
   , alpha = 255
@@ -52,10 +52,6 @@ Config
         , Run Com "/home/atif/.config/xmonad/scripts/tray-padding-icon.sh"
                 ["stalonetray"]
                 "tray" 5
-        -- , Run Com
-        --         "/home/atif/.config/xmonad/scripts/trayer-padding-icon.sh"
-        --         ["panel"]
-        --         "trayerpad" 5
         ]
   , sepChar = "%"
   , alignSep = "}{"
