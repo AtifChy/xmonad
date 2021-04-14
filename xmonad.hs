@@ -686,7 +686,7 @@ myStartupHook = do
   spawnOnce "emacs --daemon"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce "ibus-daemon -drx"
-  spawnOnce "pasystray -t"
+  spawnOnce "pasystray -t --notify=systray_action"
   spawnOnce
     "stalonetray --geometry 1x1-4+2 --max-geometry 10x1-4+2 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
   -- spawn "systemctl --user restart redshift-gtk.service"
