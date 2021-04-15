@@ -1,7 +1,7 @@
 Config
-  { font = "xft:JetBrains Mono:size=10:weight=Bold:antialias=true:hinting=true,
+  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=true,
                 Font Awesome 5 Free Solid:size=10,
-                Noto Sans Bengali:size=10:weight=Bold:antialias=true:hinting=true,
+                Noto Sans Bengali:size=10:style=Bold:antialias=true:hinting=true,
                 Noto Color Emoji:size=10:style=Regular"
   , additionalFonts = []
   , bgColor = "#1e2127"
