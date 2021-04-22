@@ -152,17 +152,17 @@ myWorkspaces =
 
 -- Get count of available windows on a workspace
 --
-windowCount :: X (Maybe String)
-windowCount =
-  gets
-    $ Just
-    . show
-    . length
-    . W.integrate'
-    . W.stack
-    . W.workspace
-    . W.current
-    . windowset
+-- windowCount :: X (Maybe String)
+-- windowCount =
+--   gets
+--     $ Just
+--     . show
+--     . length
+--     . W.integrate'
+--     . W.stack
+--     . W.workspace
+--     . W.current
+--     . windowset
 
 -- myColors
 --
@@ -173,7 +173,7 @@ red = "#ff6c6b"
 green :: String
 green = "#c3e88d"
 yellow :: String
-yellow = "#ffcb6b"
+yellow = "#ecbe8b"
 blue :: String
 blue = "#4280bd"
 magenta :: String
@@ -443,7 +443,7 @@ myXPConfig = def { font                = myFont
                  , promptKeymap        = defaultXPKeymap
                  , position            = Top
                  -- , position            = CenteredAt {xpCenterY = 0.3, xpWidth = 0.3}
-                 , height              = 24
+                 , height              = 26
                  , historySize         = 50
                  , historyFilter       = deleteAllDuplicates
                  , defaultText         = []
@@ -628,7 +628,7 @@ myHandleEventHook = handleEventHook def <+> fullscreenEventHook
 myLogHook :: Handle -> X ()
 myLogHook h = do
   copies <- wsContainingCopies
-  let check ws | ws `elem` copies = xmobarColor yellow "" . wrap "*" "" $ ws
+  let check ws | ws `elem` copies = xmobarColor yellow "" . wrap "" "" $ ws
                | otherwise        = ws
 
   dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
@@ -660,9 +660,9 @@ myLogHook h = do
                       "Tabs"            -> "[T]"
                       _                 -> "?"
                     )
-    , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
+    -- , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
     , ppOutput  = hPutStrLn h
-    , ppExtras  = [windowCount]
+    -- , ppExtras  = [windowCount]
     }
 
 ------------------------------------------------------------------------
@@ -686,7 +686,7 @@ myStartupHook = do
   spawnOnce "numlockx"
   spawnOnce "emacs --daemon"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-  spawnOnce "pasystray -t --notify=systray_action"
+  -- spawnOnce "pasystray -t --notify=systray_action"
   spawnOnce "ibus-daemon -drx"
   spawnOnce
     "stalonetray --geometry 1x1-4+2 --max-geometry 10x1-4+2 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"

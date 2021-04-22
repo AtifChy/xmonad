@@ -1,27 +1,26 @@
 Config
   { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=true,
-                Font Awesome 5 Free Solid:size=10,
                 Noto Sans Bengali:size=10:style=Bold:antialias=true:hinting=true,
                 Noto Color Emoji:size=10:style=Regular"
-  , additionalFonts = []
+  , additionalFonts = [ "xft:Font Awesome 5 Free Solid:size=10",
+                        "xft:Symbols Nerd Font:size=14" ]
   , bgColor = "#1e2127"
   , fgColor = "#51afef"
   , borderColor = "#434c5e"
   , alpha = 255
-  , position = Static {xpos = 0, ypos = 0, width = 1920, height = 24}
+  , position = Static {xpos = 0, ypos = 0, width = 1920, height = 26}
   , border = FullB
-  , textOffset = 16
-  --, iconOffset = -1
+  , textOffset = 17
+  , textOffsets = [ 17, 19 ]
   , lowerOnStart = True
   --, pickBroadest = False
   , persistent = True
   --, hideOnStart = False
-  --, iconRoot = "."
   --, allDesktops = True
   --, overrideRedirect = True
   , commands =
         [ Run Cpu
-           [ "-t", "\xf108 <total>%",
+           [ "-t", "<fn=1>\xf108</fn> <total>%",
              "-L", "50",
              "-H", "85",
              "--low", "#98be65",
@@ -29,7 +28,7 @@ Config
              "--high", "#ff6c6b"
            ] 20
         , Run Memory
-           [ "-t", "\xf538 <usedratio>%",
+           [ "-t", "<fn=1>\xf538</fn> <usedratio>%",
              "-L", "50",
              "-H", "85",
              "--low", "#98be65",
@@ -37,7 +36,7 @@ Config
              "--high", "#ff6c6b"
            ] 30
         , Run DynNetwork
-           [ "-t", "\xf0ab <rx>KB  \xf0aa <tx>KB",
+           [ "-t", "<fn=1>\xf0ab</fn> <rx>KB  <fn=1>\xf0aa</fn> <tx>KB",
              "-L", "10000",
              "-H", "130000",
              "--low", "#ff6c6b",
@@ -47,7 +46,7 @@ Config
              "--devices",
              "wlp0s20u3,enp3s0"
            ] 20
-        , Run Date "\xf073 %a %b %d, \xf017 %l:%M %p" "date" 300
+        , Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300
         , Run UnsafeStdinReader
         , Run Com "/home/atif/.config/xmonad/scripts/tray-padding-icon.sh"
                 ["stalonetray"]
@@ -56,7 +55,8 @@ Config
   , sepChar = "%"
   , alignSep = "}{"
   , template =
-      " %UnsafeStdinReader% }{ \
+      " <fc=#7b6f9c><fn=2></fn></fc><fc=#434c5e> | </fc>\
+      \%UnsafeStdinReader% }{ \
       \<fc=#56b6c2>\
       \<action=`st -e htop -s PERCENT_CPU` button=1>%cpu%</action>\
       \</fc><fc=#434c5e> | </fc>\
