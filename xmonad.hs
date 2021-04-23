@@ -311,7 +311,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- Run xmessage with a summary of the default keybindings (useful for beginners)
        , ( (modm .|. shiftMask, xK_slash)
-         , spawn (myTerminal ++ " -e sh -c 'echo \"" ++ help ++ "\" | less'")
+         , spawn (" -e sh -c 'echo \"" ++ help ++ "\" | less'")
          )
 
        -- CycleWS setup
@@ -689,7 +689,7 @@ myStartupHook = do
   -- spawnOnce "pasystray -t --notify=systray_action"
   spawnOnce "ibus-daemon -drx"
   spawnOnce
-    "stalonetray --geometry 1x1-4+2 --max-geometry 10x1-4+2 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
+    "stalonetray --geometry 1x1-6+3 --max-geometry 10x1-6+3 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
   -- spawn "systemctl --user restart redshift-gtk.service"
 
 ------------------------------------------------------------------------
