@@ -7,7 +7,7 @@ Config
   , additionalFonts = [ "xft:Font Awesome 5 Free Solid:size=10",
                         "xft:Symbols Nerd Font:size=14" ]
   , bgColor = "#1e2127"
-  , fgColor = "#d8dee9"
+  , fgColor = "#51afef"
   , borderColor = "#434c5e"
   , alpha = 255
   , position = Static {xpos = 0, ypos = 0, width = 1920, height = 26}
@@ -85,10 +85,11 @@ Config
       \<fc=#51afef>%dynnetwork%</fc>\
       \<fc=#434c5e> | </fc>\
       \<action=`volctl -t` button=1>\
+      \<action=`st -e alsamixer` button=3>\
       \<action=`volctl -i` button=4>\
       \<action=`volctl -d` button=5>\
       \<fc=#7a869f>%alsa:default:Master%</fc>\
-      \</action></action></action>\
+      \</action></action></action></action>\
       \<fc=#434c5e> | </fc>\
       \<fc=#c678dd>%date%</fc>\
       \<fc=#434c5e> | </fc>\

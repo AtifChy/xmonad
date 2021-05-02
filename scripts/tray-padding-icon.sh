@@ -23,9 +23,9 @@ create_xpm_icon() {
 /* XPM *
 static char * trayer_pad_xpm[] = {
 /* This XPM icon is used for padding in xmobar to */
-/* leave room for trayer-srg. It is dynamically   */
-/* updated by by trayer-pad-icon.sh which is run  */
-/* by xmobar.                                     */
+/* leave room for stalonetray. It is dynamically  */
+/* updated by by tray-pad-icon.sh which is run by */
+/* xmobar.                                        */
 /* Created: ${timestamp} */
 /* <w/cols>  <h/rows>  <colors>  <chars per pixel> */
 "$1 1 1 1",

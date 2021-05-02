@@ -152,17 +152,17 @@ myWorkspaces =
 
 -- Get count of available windows on a workspace
 --
--- windowCount :: X (Maybe String)
--- windowCount =
---   gets
---     $ Just
---     . show
---     . length
---     . W.integrate'
---     . W.stack
---     . W.workspace
---     . W.current
---     . windowset
+windowCount :: X (Maybe String)
+windowCount =
+  gets
+    $ Just
+    . show
+    . length
+    . W.integrate'
+    . W.stack
+    . W.workspace
+    . W.current
+    . windowset
 
 -- myColors
 --
@@ -374,9 +374,9 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((altMask, xK_e)              , spawn "emacsclient -nc")
 
        -- Screenshot shortcuts (Requires: scrot & xclip)
-       , ((0, xK_Print)                , spawn "ssclip -f")
-       , ((0 .|. controlMask, xK_Print), spawn "ssclip -w")
-       , ((0 .|. shiftMask, xK_Print)  , spawn "ssclip -s")
+       , ((0, xK_Print)                , spawn "shotclip -f")
+       , ((0 .|. controlMask, xK_Print), spawn "shotclip -w")
+       , ((0 .|. shiftMask, xK_Print)  , spawn "shotclip -s")
        ]
     ++
        --
@@ -660,9 +660,9 @@ myLogHook h = do
                       "Tabs"            -> "[T]"
                       _                 -> "?"
                     )
-    -- , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
+    , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
     , ppOutput  = hPutStrLn h
-    -- , ppExtras  = [windowCount]
+    , ppExtras  = [windowCount]
     }
 
 ------------------------------------------------------------------------
@@ -688,8 +688,8 @@ myStartupHook = do
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   -- spawnOnce "pasystray -t --notify=systray_action"
   spawnOnce "ibus-daemon -drx"
-  spawnOnce
-    "stalonetray --geometry 1x1-6+3 --max-geometry 10x1-6+3 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
+  spawnOnce "stalonetray --geometry 1x1-6+3 --max-geometry 10x1-6+3 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
+  -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1e2127  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"
   -- spawn "systemctl --user restart redshift-gtk.service"
 
 ------------------------------------------------------------------------
