@@ -7,30 +7,27 @@
 --
 -- Imports
 --
-import           Control.Monad                   (join, liftM2, when)
+import           Control.Monad                   (liftM2)
 import qualified Data.Map                        as M
-import           Data.Maybe                      (isJust, maybeToList)
+import           Data.Maybe                      (isJust)
 import           Data.Monoid                     (All)
 import           System.Exit                     (exitSuccess)
-import           System.IO                       (Handle)
 import           XMonad                          hiding ((|||))
 import           XMonad.Actions.CopyWindow       (copyToAll, kill1,
-                                                  killAllOtherCopies,
-                                                  wsContainingCopies)
+                                                  killAllOtherCopies)
 import           XMonad.Actions.CycleWS          (WSType (..), moveTo, shiftTo,
                                                   toggleWS')
 import           XMonad.Actions.Promote          (promote)
 import           XMonad.Actions.WithAll          (killAll, sinkAll)
-import           XMonad.Hooks.DynamicLog         (PP (..), dynamicLogWithPP,
-                                                  shorten, wrap, xmobarAction,
-                                                  xmobarColor, xmobarPP)
-import           XMonad.Hooks.EwmhDesktops       (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks        (ToggleStruts (..),
-                                                  avoidStruts, docks)
+import           XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.EwmhDesktops
+import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers      (composeOne, doCenterFloat,
                                                   doFullFloat, isDialog,
                                                   isFullscreen, transience,
                                                   (-?>))
+import           XMonad.Hooks.StatusBar
+import           XMonad.Hooks.WindowSwallowing
 import           XMonad.Layout.Accordion
 import           XMonad.Layout.LayoutCombinators (JumpToLayout (..), (|||))
 import           XMonad.Layout.LayoutModifier    (ModifiedLayout)
@@ -53,25 +50,20 @@ import           XMonad.Layout.SubLayouts        (GroupMsg (..), onGroup,
 import           XMonad.Layout.Tabbed            (Theme (..), addTabs,
                                                   shrinkText)
 import           XMonad.Layout.ThreeColumns      (ThreeCol (ThreeColMid))
-import           XMonad.Layout.WindowNavigation  (Direction2D (..),
-                                                  windowNavigation)
-import           XMonad.Prompt                   (Direction1D (..),
-                                                  XPConfig (..),
-                                                  XPPosition (..),
-                                                  defaultXPKeymap,
-                                                  deleteAllDuplicates)
-import           XMonad.Prompt.ConfirmPrompt     (confirmPrompt)
-import           XMonad.Prompt.FuzzyMatch        (fuzzyMatch, fuzzySort)
-import           XMonad.Prompt.Man               (manPrompt)
-import           XMonad.Prompt.Shell             (shellPrompt)
+import           XMonad.Layout.WindowNavigation  (windowNavigation)
+import           XMonad.Prompt
+import           XMonad.Prompt.ConfirmPrompt
+import           XMonad.Prompt.FuzzyMatch
+import           XMonad.Prompt.Man
+import           XMonad.Prompt.Shell
 import qualified XMonad.StackSet                 as W
+import           XMonad.Util.ClickableWorkspaces
 import           XMonad.Util.Cursor              (setDefaultCursor)
 import           XMonad.Util.NamedScratchpad     (NamedScratchpad (NS),
                                                   customFloating,
                                                   namedScratchpadAction,
-                                                  namedScratchpadFilterOutWorkspacePP,
-                                                  namedScratchpadManageHook)
-import           XMonad.Util.Run                 (hPutStrLn, spawnPipe)
+                                                  namedScratchpadManageHook,
+                                                  scratchpadWorkspaceTag)
 import           XMonad.Util.SpawnOnce           (spawnOnce)
 
 
@@ -124,74 +116,26 @@ altMask = mod1Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-xmobarEscape :: Foldable t => t Char -> String
-xmobarEscape = concatMap doubleLts
- where
-  doubleLts '<' = "<<"
-  doubleLts x   = [x]
-
 myWorkspaces :: [String]
 myWorkspaces =
-  clickable
-    . map xmobarEscape
-    $ [ "1:term"
-      , "2:web"
-      , "3:chat"
-      , "4:code"
-      , "5:movie"
-      , "6:game"
-      , "7:vbox"
-      , "8:tor"
-      , "9:misc"
-      ]
- where
-  clickable l =
-    [ "<action=xdotool key super+" ++ show i ++ ">" ++ ws ++ "</action>"
-    | (i, ws) <- zip [1 .. 9] l
-    ]
-
--- Get count of available windows on a workspace
---
-windowCount :: X (Maybe String)
-windowCount =
-  gets
-    $ Just
-    . show
-    . length
-    . W.integrate'
-    . W.stack
-    . W.workspace
-    . W.current
-    . windowset
-
--- myColors
---
-black :: String
-black = "#1E2127"
-red :: String
-red = "#ff6c6b"
-green :: String
-green = "#c3e88d"
-yellow :: String
-yellow = "#ecbe8b"
-blue :: String
-blue = "#4280bd"
-magenta :: String
-magenta = "#b48ead"
--- cyan :: String
--- cyan = "#89ddff"
-white :: String
-white = "#d8dee9"
-gray :: String
-gray = "#434c5e"
+  [ "1:term"
+  , "2:web"
+  , "3:chat"
+  , "4:code"
+  , "5:movie"
+  , "6:game"
+  , "7:vbox"
+  , "8:tor"
+  , "9:misc"
+  ]
 
 -- Border colors for unfocused and focused windows, respectively.
 --
 myNormalBorderColor :: String
-myNormalBorderColor = black
+myNormalBorderColor = "#1e2127"
 
 myFocusedBorderColor :: String
-myFocusedBorderColor = blue
+myFocusedBorderColor = "#4280bd"
 
 -- Custom font
 myFont :: String
@@ -434,11 +378,11 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
 --
 myXPConfig :: XPConfig
 myXPConfig = def { font                = myFont
-                 , bgColor             = black
-                 , fgColor             = white
-                 , bgHLight            = blue
+                 , bgColor             = "#1e2127"
+                 , fgColor             = "#d8dee9"
+                 , bgHLight            = "#4280bd"
                  , fgHLight            = "#000000"
-                 , borderColor         = gray
+                 , borderColor         = "#434c5e"
                  , promptBorderWidth   = 1
                  , promptKeymap        = defaultXPKeymap
                  , position            = Top
@@ -464,12 +408,12 @@ mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 
 -- Tab theme
 myTabConfig :: Theme
-myTabConfig = def { activeColor         = blue
-                  , activeBorderColor   = blue
-                  , activeTextColor     = white
-                  , inactiveColor       = black
-                  , inactiveBorderColor = black
-                  , inactiveTextColor   = gray
+myTabConfig = def { activeColor         = "#4280bd"
+                  , activeBorderColor   = "#434c5e"
+                  , activeTextColor     = "#d8dee9"
+                  , inactiveColor       = "#1e2127"
+                  , inactiveBorderColor = "#1e2127"
+                  , inactiveTextColor   = "#434c5e"
                   , fontName            = myFont
                   }
 
@@ -484,7 +428,7 @@ myTabConfig = def { activeColor         = blue
 -- which denotes layout choice.
 --
 
-myLayout = avoidStruts $ tiled ||| mtiled ||| center ||| full ||| tabs
+myLayout = tiled ||| mtiled ||| center ||| full ||| tabs
  where
   -- default tiling algorithm partitions the screen into two panes
   tiled =
@@ -584,29 +528,6 @@ myManageHook =
       ]
     <+> namedScratchpadManageHook myScratchpads
 
--- Fix for firefox fullscreen
---
--- from https://github.com/evanjs/gentoo-dotfiles/commit/cbf78364ea60e62466594340090d8e99200e8e08
-addNETSupported :: Integral a => a -> X ()
-addNETSupported x = withDisplay $ \dpy -> do
-  r               <- asks theRoot
-  a_NET_SUPPORTED <- getAtom "_NET_SUPPORTED"
-  a               <- getAtom "ATOM"
-  liftIO $ do
-    sup <- join . maybeToList <$> getWindowProperty32 dpy a_NET_SUPPORTED r
-    when (fromIntegral x `notElem` sup) $ changeProperty32 dpy
-                                                           r
-                                                           a_NET_SUPPORTED
-                                                           a
-                                                           propModeAppend
-                                                           [fromIntegral x]
-
-addEWMHFullscreen :: X ()
-addEWMHFullscreen = do
-  wms <- getAtom "_NET_WM_STATE"
-  wfs <- getAtom "_NET_WM_STATE_FULLSCREEN"
-  mapM_ addNETSupported [wms, wfs]
-
 ------------------------------------------------------------------------
 -- Event handling
 
@@ -618,52 +539,97 @@ addEWMHFullscreen = do
 -- combine event hooks use mappend or mconcat from Data.Monoid.
 --
 myHandleEventHook :: Event -> X All
-myHandleEventHook = handleEventHook def <+> fullscreenEventHook
+myHandleEventHook = handleEventHook def <+> swallowEventHook
+  (className =? "Alacritty" <||> className =? "st")
+  (return True)
 
 ------------------------------------------------------------------------
 -- Status bars and logging
 
 -- Perform an arbitrary action on each internal state change or X event.
 --
-myLogHook :: Handle -> X ()
-myLogHook h = do
-  copies <- wsContainingCopies
-  let check ws | ws `elem` copies = xmobarColor yellow "" . wrap "" "" $ ws
-               | otherwise        = ws
+-- myLogHook :: X ()
+-- myLogHook = dynamicLogWithPP . filterOutWsPP [scratchpadWorkspaceTag] $ def
+--   copies <- wsContainingCopies
+--   let check ws | ws `elem` copies = xmobarColor yellow "" . wrap "" "" $ ws
+--                | otherwise        = ws
+--
+--   dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
+--     { ppCurrent = xmobarColor green ""
+--                   . wrap "[" "]"
+--                   . xmobarAction "xdotool key Super+Right" "5"
+--                   . xmobarAction "xdotool key Super+Left"  "4"
+--     , ppTitle   = xmobarColor magenta ""
+--                   . xmobarAction "xdotool key Super+shift+c" "2"
+--                   . shorten 50
+--     -- , ppVisible             = xmobarColor base0  "" . wrap "(" ")"
+--     -- , ppUrgent              = xmobarColor red    "" . wrap " " " "
+--     , ppHidden  = xmobarColor "#7a869f" ""
+--                   . wrap "" ""
+--                   . xmobarAction "xdotool key Super+Right" "5"
+--                   . xmobarAction "xdotool key Super+Left"  "4"
+--                   . check
+--     -- , ppHiddenNoWindows = const ""
+--     , ppSep     = xmobarColor gray "" " | "
+--     -- , ppWsSep   = ""
+--     , ppLayout  = xmobarColor red ""
+--                   . xmobarAction "xdotool key Super+space"       "1"
+--                   . xmobarAction "xdotool key Super+shift+space" "3"
+--                   . (\case
+--                       "Tiled"           -> "[]="
+--                       "Mirror Tiled"    -> "TTT"
+--                       "Centered Master" -> "|M|"
+--                       "Monocle"         -> "[ ]"
+--                       "Tabs"            -> "[T]"
+--                       _                 -> "?"
+--                     )
+--     , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
+--     , ppOutput  = hPutStrLn h
+--     , ppExtras  = [windowCount]
+--     }
 
-  dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
-    { ppCurrent = xmobarColor green ""
-                  . wrap "[" "]"
-                  . xmobarAction "xdotool key Super+Right" "5"
-                  . xmobarAction "xdotool key Super+Left"  "4"
-    , ppTitle   = xmobarColor magenta ""
-                  . xmobarAction "xdotool key Super+shift+c" "2"
-                  . shorten 50
-    -- , ppVisible             = xmobarColor base0  "" . wrap "(" ")"
-    -- , ppUrgent              = xmobarColor red    "" . wrap " " " "
-    , ppHidden  = xmobarColor "#7a869f" ""
-                  . wrap "" ""
-                  . xmobarAction "xdotool key Super+Right" "5"
-                  . xmobarAction "xdotool key Super+Left"  "4"
-                  . check
-    -- , ppHiddenNoWindows = const ""
-    , ppSep     = xmobarColor gray "" " | "
-    -- , ppWsSep   = ""
-    , ppLayout  = xmobarColor red ""
-                  . xmobarAction "xdotool key Super+space"       "1"
-                  . xmobarAction "xdotool key Super+shift+space" "3"
-                  . (\case
-                      "Tiled"           -> "[]="
-                      "Mirror Tiled"    -> "TTT"
-                      "Centered Master" -> "|M|"
-                      "Monocle"         -> "[ ]"
-                      "Tabs"            -> "[T]"
-                      _                 -> "?"
-                    )
-    , ppOrder   = \(ws : l : t : ex) -> [ws, l] ++ ex ++ [t]
-    , ppOutput  = hPutStrLn h
-    , ppExtras  = [windowCount]
-    }
+myXmobarPP :: PP
+myXmobarPP = def
+  { ppSep            = gray " | "
+  , ppTitle          = wrap (white "[") (white "]") . magenta . ppWindow
+  , ppTitleUnfocused = wrap (lowWhite "[") (lowWhite "]") . blue . ppWindow
+  , ppTitleSanitize  = xmobarStrip
+  , ppCurrent        = wrap (lowBlue "[") (lowBlue "]")
+  , ppHidden         = lowWhite . wrap " " " "
+  -- , ppHiddenNoWindows = lowWhite . wrap " " ""
+  , ppWsSep          = ""
+  , ppLayout         = red
+                       . xmobarAction "xdotool key Super+space"       "1"
+                       . xmobarAction "xdotool key Super+shift+space" "3"
+                       . (\case
+                           "Tiled"           -> "[]="
+                           "Mirror Tiled"    -> "TTT"
+                           "Centered Master" -> "|M|"
+                           "Monocle"         -> "[ ]"
+                           "Tabs"            -> "[T]"
+                           _                 -> "?"
+                         )
+  }
+ where
+    -- | Windows should have *some* title, which should not not exceed a
+    -- sane length.
+  ppWindow :: String -> String
+  ppWindow = xmobarRaw . (\w -> if null w then "untitled" else w) . shorten 30
+
+  blue, lowWhite, magenta, red, white, yellow :: String -> String
+  magenta  = xmobarColor "#ff79c6" ""
+  blue     = xmobarColor "#bd93f9" ""
+  lowBlue  = xmobarColor "#8be9fd" ""
+  white    = xmobarColor "#f8f8f2" ""
+  yellow   = xmobarColor "#f1fa8c" ""
+  red      = xmobarColor "#ff5555" ""
+  lowWhite = xmobarColor "#bbbbbb" ""
+  gray     = xmobarColor "#434c5e" ""
+
+mySB :: StatusBarConfig
+mySB = statusBarProp
+  "xmobar ~/.config/xmonad/xmobar/xmobarrc"
+  (clickablePP $ filterOutWsPP [scratchpadWorkspaceTag] $ myXmobarPP)
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -688,7 +654,8 @@ myStartupHook = do
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   -- spawnOnce "pasystray -t --notify=systray_action"
   spawnOnce "ibus-daemon -drx"
-  spawnOnce "stalonetray --geometry 1x1-6+3 --max-geometry 10x1-6+3 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
+  spawnOnce
+    "stalonetray --geometry 1x1-6+3 --max-geometry 10x1-6+3 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
   -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1e2127  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"
   -- spawn "systemctl --user restart redshift-gtk.service"
 
@@ -698,30 +665,30 @@ myStartupHook = do
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main :: IO ()
-main = do
-  h <- spawnPipe "xmobar -x 0 ~/.config/xmonad/xmobar/xmobarrc"
-  xmonad . ewmh . docks $ def {
-                              -- simple stuff
-                                terminal           = myTerminal
-                              , focusFollowsMouse  = myFocusFollowsMouse
-                              , clickJustFocuses   = myClickJustFocuses
-                              , borderWidth        = myBorderWidth
-                              , modMask            = myModMask
-                              , workspaces         = myWorkspaces
-                              , normalBorderColor  = myNormalBorderColor
-                              , focusedBorderColor = myFocusedBorderColor
+main =
+  xmonad . ewmhFullscreen . ewmh . withEasySB mySB defToggleStrutsKey $ def
+    {
+      -- simple stuff
+      terminal           = myTerminal
+    , focusFollowsMouse  = myFocusFollowsMouse
+    , clickJustFocuses   = myClickJustFocuses
+    , borderWidth        = myBorderWidth
+    , modMask            = myModMask
+    , workspaces         = myWorkspaces
+    , normalBorderColor  = myNormalBorderColor
+    , focusedBorderColor = myFocusedBorderColor
 
-                              -- key bindings
-                              , keys               = myKeys
-                              , mouseBindings      = myMouseBindings
+      -- key bindings
+    , keys               = myKeys
+    , mouseBindings      = myMouseBindings
 
-                              -- hooks, layouts
-                              , layoutHook         = myLayout
-                              , manageHook         = myManageHook
-                              , handleEventHook    = myHandleEventHook
-                              , logHook            = myLogHook h
-                              , startupHook = myStartupHook >> addEWMHFullscreen
-                              }
+      -- hooks, layouts
+    , layoutHook         = myLayout
+    , manageHook         = myManageHook
+    , handleEventHook    = myHandleEventHook
+    -- , logHook            = myLogHook
+    , startupHook        = myStartupHook
+    }
 
 ------------------------------------------------------------------------
 

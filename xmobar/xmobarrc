@@ -60,7 +60,7 @@ Config
                 , "-h", "<fn=1>\xf028</fn>"
                 ]
         , Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300
-        , Run UnsafeStdinReader
+        , Run UnsafeXMonadLog
         , Run Com "/home/atif/.config/xmonad/scripts/tray-padding-icon.sh"
                 ["stalonetray"]
                 "tray" 5
@@ -73,7 +73,7 @@ Config
       \<fc=#7b6f9c><fn=2></fn></fc>\
       \</action>\
       \<fc=#434c5e> | </fc>\
-      \%UnsafeStdinReader% }{ \
+      \%UnsafeXMonadLog% }{ \
       \<action=`st -e htop -s PERCENT_CPU` button=1>\
       \<fc=#56b6c2>%cpu%</fc>\
       \</action>\
