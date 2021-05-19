@@ -6,7 +6,7 @@ file="$HOME/Pictures/Screenshots/$img"
 
 case $1 in
 -s | selection)
-        grab=$(slop -f "%g") || exit 1
+	grab=$(slop -f "%g") || exit 1
         shotgun -g "$grab" "$file"
         ;;
 

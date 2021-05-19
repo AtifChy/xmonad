@@ -7,7 +7,7 @@ Config
   , additionalFonts = [ "xft:Font Awesome 5 Free Solid:size=10",
                         "xft:Symbols Nerd Font:size=14" ]
   , bgColor = "#1e2127"
-  , fgColor = "#51afef"
+  , fgColor = "#d8dee9"
   , borderColor = "#434c5e"
   , alpha = 255
   , position = Static {xpos = 0, ypos = 0, width = 1920, height = 26}
