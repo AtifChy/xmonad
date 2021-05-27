@@ -1,99 +1,89 @@
-Config
-  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=true,
-                Noto Sans Bengali:size=10:style=Bold:antialias=true:hinting=true,
-                Noto Color Emoji:size=10:style=Regular,
-                Noto Sans CJK JP:size=10:style=Bold,
-                Noto Sans CJK KR:size=10:style=Bold"
-  , additionalFonts = [ "xft:Font Awesome 5 Free Solid:size=10",
-                        "xft:Symbols Nerd Font:size=14" ]
-  , bgColor = "#1e2127"
-  , fgColor = "#d8dee9"
-  , borderColor = "#434c5e"
-  , alpha = 255
-  , position = Static {xpos = 0, ypos = 0, width = 1920, height = 26}
-  , border = FullB
-  , textOffset = 17
-  , textOffsets = [ 17, 19 ]
-  , lowerOnStart = True
-  --, pickBroadest = False
-  , persistent = True
-  --, hideOnStart = False
-  --, allDesktops = True
-  --, overrideRedirect = True
-  , commands =
-        [ Run Cpu
-                [ "-t", "<fn=1>\xf108</fn> <total>%"
-                , "-L", "50"
-                , "-H", "85"
-                , "--low", "#98be65"
-                , "--normal", "#ecbe8b"
-                , "--high", "#ff6c6b"
-                ] 20
-        , Run Memory
-                [ "-t", "<fn=1>\xf538</fn> <usedratio>%"
-                , "-L", "50"
-                , "-H", "85"
-                , "--low", "#98be65"
-                , "--normal", "#ecbe8b"
-                , "--high", "#ff6c6b"
-                ] 30
-        , Run DynNetwork
-                [ "-t", "<fn=1>\xf0ab</fn> <rx>KB  <fn=1>\xf0aa</fn> <tx>KB"
-                , "-L", "10000"
-                , "-H", "130000"
-                , "--low", "#ff6c6b"
-                , "--normal", "#ecbe8b"
-                , "--high", "#98be65"
-                , "--"
-                , "--devices"
-                , "wlp0s20u3,enp3s0"
-                ] 20
-        , Run Alsa "default" "Master"
-                [ "-t", "<status> <volume>%"
-                , "--"
-                , "-C", "#98be65"
-                , "-c", "#ff6c6b"
-                , "-O", ""
-                , "-o", "<fn=1>\xf6a9</fn>"
-                , "-l", "<fn=1>\xf026</fn>"
-                , "-m", "<fn=1>\xf027</fn>"
-                , "-h", "<fn=1>\xf028</fn>"
-                ]
-        , Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300
-        , Run UnsafeXMonadLog
-        , Run Com "/home/atif/.config/xmonad/scripts/tray-padding-icon.sh"
-                ["stalonetray"]
-                "tray" 5
-        ]
-  , sepChar = "%"
-  , alignSep = "}{"
-  , template =
-      " \
-      \<action=`xdotool key super+p` button=1>\
-      \<fc=#7b6f9c><fn=2></fn></fc>\
-      \</action>\
-      \<fc=#434c5e> | </fc>\
-      \%UnsafeXMonadLog% }{ \
-      \<action=`st -e htop -s PERCENT_CPU` button=1>\
-      \<fc=#56b6c2>%cpu%</fc>\
-      \</action>\
-      \<fc=#434c5e> | </fc>\
-      \<action=`st -e htop -s PERCENT_MEM` button=1>\
-      \<fc=#b58fae>%memory%</fc>\
-      \</action>\
-      \<fc=#434c5e> | </fc>\
-      \<fc=#51afef>%dynnetwork%</fc>\
-      \<fc=#434c5e> | </fc>\
-      \<action=`volctl -t` button=1>\
-      \<action=`st -e alsamixer` button=3>\
-      \<action=`volctl -i` button=4>\
-      \<action=`volctl -d` button=5>\
-      \<fc=#7a869f>%alsa:default:Master%</fc>\
-      \</action></action></action></action>\
-      \<fc=#434c5e> | </fc>\
-      \<fc=#c678dd>%date%</fc>\
-      \<fc=#434c5e> | </fc>\
-      \%tray%"
-  }
+Config  { font = "xft:Iosevka Custom:pixelsize=14:style=Bold:antialias=true:hinting=true,
+                     Noto Sans:size=10:style=Bold:antialias=true:hinting=true,
+                     Noto Sans Bengali:size=10:style=Bold:antialias=true:hinting=true,
+                     Noto Sans Arabic:size=10:style=Bold:antialias=true:hinting=true,
+                     Noto Color Emoji:size=10:style=Regular,
+                     Noto Sans CJK JP:size=10:style=Bold,
+                     Noto Sans CJK KR:size=10:style=Bold"
+        , additionalFonts = [ "xft:Font Awesome 5 Free Solid:size=10",
+                              "xft:Symbols Nerd Font:size=14" ]
+        , bgColor = "#1e2127"
+        , fgColor = "#d8dee9"
+        , borderColor = "#434c5e"
+        , alpha = 255
+        , position = Static {xpos = 0, ypos = 0, width = 1920, height = 28}
+        , border = FullB
+        , textOffset = 19
+        , textOffsets = [ 19, 20 ]
+        , lowerOnStart = True
+        --, pickBroadest = False
+        , persistent = True
+        --, hideOnStart = False
+        --, allDesktops = True
+        --, overrideRedirect = True
+        , commands =
+              [ Run Cpu
+                      [ "-t", "<fn=1>\xf108</fn> <total>%"
+                      , "-L", "50"
+                      , "-H", "85"
+                      , "--low", "#98be65"
+                      , "--normal", "#ecbe8b"
+                      , "--high", "#ff6c6b"
+                      ] 20
+              , Run Memory
+                      [ "-t", "<fn=1>\xf538</fn> <usedratio>%"
+                      , "-L", "50"
+                      , "-H", "85"
+                      , "--low", "#98be65"
+                      , "--normal", "#ecbe8b"
+                      , "--high", "#ff6c6b"
+                      ] 30
+              , Run DynNetwork
+                      [ "-t", "<fn=1>\xf0ab</fn> <rx>KB  <fn=1>\xf0aa</fn> <tx>KB"
+                      , "-L", "10000"
+                      , "-H", "130000"
+                      , "--low", "#ff6c6b"
+                      , "--normal", "#ecbe8b"
+                      , "--high", "#98be65"
+                      , "--"
+                      , "--devices"
+                      , "wlp0s20u3,enp3s0"
+                      ] 20
+              , Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300
+              , Run UnsafeXMonadLog
+              , Run Com "/home/atif/.config/xmonad/scripts/tray-padding-icon.sh"
+                      ["stalonetray"]
+                      "tray" 5
+              , Run PipeReader " :/tmp/xmobar_volume" "pulse"
+              ]
+        , sepChar = "%"
+        , alignSep = "}{"
+        , template =
+            " \
+            \<action=`xdotool key super+p` button=1>\
+            \<fc=#7b6f9c><fn=2></fn></fc>\
+            \</action>\
+            \<fc=#434c5e> │ </fc>\
+            \%UnsafeXMonadLog% }{ \
+            \<action=`st -e btm` button=1>\
+            \<fc=#56b6c2>%cpu%</fc>\
+            \</action>\
+            \<fc=#434c5e> │ </fc>\
+            \<action=`st -e htop -s PERCENT_MEM` button=1>\
+            \<fc=#b58fae>%memory%</fc>\
+            \</action>\
+            \<fc=#434c5e> │ </fc>\
+            \<fc=#51afef>%dynnetwork%</fc>\
+            \<fc=#434c5e> │ </fc>\
+            \<action=`pulsepipe -t` button=1>\
+            \<action=`pulsepipe -i` button=4>\
+            \<action=`pulsepipe -d` button=5>\
+            \<fc=#7a869f>%pulse%</fc>\
+            \</action></action></action>\
+            \<fc=#434c5e> │ </fc>\
+            \<fc=#c678dd>%date%</fc>\
+            \<fc=#434c5e> │ </fc>\
+            \%tray%"
+        }
 
 -- vim:ft=haskell:expandtab

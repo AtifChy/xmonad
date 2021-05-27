@@ -1,3 +1,7 @@
 #!/bin/sh
-xcolor -P 70 | xclip -selection clipboard && \
-	notify-send 'xcolor' "$(xclip -selection clipboard -out)"
+
+ICON=/tmp/colorclip.png
+xcolor -P 70 | xclip -selection clipboard
+COLOR=$(xclip -selection clipboard -out)
+convert -size 100x100 xc:"$COLOR" "$ICON"
+notify-send -i "$ICON" 'xcolor' "$COLOR"

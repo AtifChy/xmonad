@@ -18,7 +18,7 @@
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
 resolver:
-  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/12.yaml
+  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/13.yaml
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -30,8 +30,8 @@ resolver:
 #   - auto-update
 #   - wai
 packages:
-- xmonad
-- xmonad-contrib
+  - xmonad
+  - xmonad-contrib
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
 # forks / in-progress versions pinned to a git hash. For example:
@@ -58,11 +58,11 @@ packages:
 #
 # Override the architecture used by stack, especially useful on Windows
 # arch: i386
-# arch: x86_64
+arch: x86_64
 #
 # Extra directories used by stack for building
 # extra-include-dirs: [/path/to/dir]
 # extra-lib-dirs: [/path/to/dir]
 #
 # Allow a newer minor version of GHC than the snapshot specifies
-# compiler-check: newer-minor
+compiler-check: newer-minor
