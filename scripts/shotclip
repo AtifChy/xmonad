@@ -6,7 +6,7 @@ file="$HOME/Pictures/Screenshots/$img"
 
 case $1 in
 -s | selection)
-	grab=$(slop -f "%g") || exit 1
+        grab=$(slop -f "%g") || exit 1
         shotgun -g "$grab" "$file"
         ;;
 
@@ -38,4 +38,4 @@ case $2 in
 esac
 
 xclip -selection clipboard -target image/png -i "$file"
-notify-send -i "$file" "Shotgun" "Screenshot saved!"
+notify-send -u low -i "$file" "Shotgun" "Screenshot saved!"

@@ -3,8 +3,6 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 
 --
--- XMONAD CONFIG
---
 -- Imports
 --
 import           Control.Monad                       (liftM2)
@@ -20,7 +18,7 @@ import           XMonad.Actions.CycleWS              (Direction1D (..),
                                                       shiftTo, toggleWS')
 import qualified XMonad.Actions.FlexibleResize       as Flex
 import           XMonad.Actions.Promote              (promote)
-import           XMonad.Actions.TiledWindowDragging
+import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.WithAll              (killAll, sinkAll)
 import           XMonad.Hooks.EwmhDesktops           (activateLogHook, ewmh,
                                                       ewmhFullscreen)
@@ -38,16 +36,17 @@ import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
                                                       xmobarBorder, xmobarColor,
                                                       xmobarStrip)
 import           XMonad.Hooks.WindowSwallowing       (swallowEventHook)
-import           XMonad.Layout.Accordion
-import           XMonad.Layout.DraggingVisualizer
+import           XMonad.Layout.Accordion             (Accordion (Accordion))
+import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
 import           XMonad.Layout.LayoutCombinators     (JumpToLayout (..), (|||))
 import           XMonad.Layout.LayoutModifier        (ModifiedLayout)
-import           XMonad.Layout.MultiToggle
-import           XMonad.Layout.MultiToggle.Instances
-import           XMonad.Layout.NoBorders             (Ambiguity (OnlyScreenFloat, Screen),
-                                                      lessBorders)
+import           XMonad.Layout.MultiToggle           (EOT (..), Toggle (..),
+                                                      mkToggle, (??))
+import           XMonad.Layout.MultiToggle.Instances (StdTransformers (NBFULL, NOBORDERS))
+import           XMonad.Layout.NoBorders             (smartBorders)
 import           XMonad.Layout.Renamed               (Rename (Replace), renamed)
-import           XMonad.Layout.ResizableTile
+import           XMonad.Layout.ResizableTile         (MirrorResize (..),
+                                                      ResizableTall (..))
 import           XMonad.Layout.Simplest              (Simplest (Simplest))
 import           XMonad.Layout.Spacing               (Border (..), Spacing,
                                                       decScreenSpacing,
@@ -84,7 +83,9 @@ import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       namedScratchpadAction,
                                                       namedScratchpadManageHook,
                                                       scratchpadWorkspaceTag)
+import           XMonad.Util.Run                     (safeSpawn, unsafeSpawn)
 import           XMonad.Util.SpawnOnce               (spawnOnce)
+import           XMonad.Util.Ungrab                  (unGrab)
 
 
 -- The preferred terminal program, which is used in a binding below and by
@@ -120,11 +121,8 @@ myGaps = 6
 -- ("right alt"), which does not conflict with emacs keybindings. The
 -- "windows key" is usually mod4Mask.
 --
-myModMask :: KeyMask
+myModMask, altMask :: KeyMask
 myModMask = mod4Mask
-
--- Alternative modkey
-altMask :: KeyMask
 altMask = mod1Mask
 
 -- The default number of workspaces (virtual screens) and their names.
@@ -136,7 +134,7 @@ altMask = mod1Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces :: [String]
+myWorkspaces :: [WorkspaceId]
 myWorkspaces =
   ["TERM", "WEB", "CHAT", "CODE", "MOVIE", "GAME", "VBOX", "TOR", "MISC"]
 
@@ -156,10 +154,8 @@ windowCount =
 
 -- Border colors for unfocused and focused windows, respectively.
 --
-myNormalBorderColor :: String
+myNormalBorderColor, myFocusedBorderColor :: String
 myNormalBorderColor = "#1e2127"
-
-myFocusedBorderColor :: String
 myFocusedBorderColor = "#4280bd"
 
 -- Custom font
@@ -185,7 +181,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- launch rofi
        , ( (altMask, xK_p)
-         , spawn
+         , unsafeSpawn
            (  myLauncher
            ++ " -show combi -combi-modi window,drun -modi combi -show-icons"
            )
@@ -193,14 +189,14 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- launch rofi-greenclip
        , ( (modm, xK_c)
-         , spawn
+         , unsafeSpawn
            (myLauncher
            ++ " -show Clipboard -modi 'Clipboard:greenclip print' -run-command '{cmd}'"
            )
          )
 
        -- launch gmrun
-       --, ((modm .|. shiftMask, xK_p ), spawn "gmrun")
+       --, ((modm .|. shiftMask, xK_p ), safeSpawn "gmrun" [])
 
        -- close focused window
        , ((modm .|. shiftMask, xK_c)    , kill1)
@@ -216,9 +212,6 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- Resize viewed windows to the correct size
        , ((modm, xK_n)                  , refresh)
-
-       -- Move focus to the next window
-       , ((modm, xK_Tab)                , windows W.focusDown)
 
        -- Move focus to the next window
        , ((modm, xK_j)                  , windows W.focusDown)
@@ -274,17 +267,18 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
          )
 
        -- Restart xmonad
-       , ((modm, xK_q), spawn "xmonad --recompile; xmonad --restart")
+       , ((modm, xK_q), unsafeSpawn "xmonad --recompile; xmonad --restart")
 
        -- Moves the focused window to the master pane
        , ((modm, xK_Return), promote)
 
        -- Run xmessage with a summary of the default keybindings (useful for beginners)
        , ( (modm .|. shiftMask, xK_slash)
-         , spawn
+         , unsafeSpawn
            ("echo \"" ++ help ++ "\" | gxmessage -fn 'JetBrains Mono' -file -")
          )
        , ((modm, xK_b)                     , sendMessage $ Toggle NOBORDERS)
+       , ((modm, xK_f)                     , sendMessage $ Toggle NBFULL)
 
        -- CycleWS setup
        , ((modm, xK_Right)                 , moveTo Next nonNSP)
@@ -295,8 +289,8 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((altMask, xK_Left)               , moveTo Prev nonEmptyNSP)
        , ((altMask .|. shiftMask, xK_Right), shiftTo Next nonEmptyNSP)
        , ((altMask .|. shiftMask, xK_Left) , shiftTo Prev nonEmptyNSP)
-       , ((modm, xK_z)                     , toggleWS' ["NSP"])
-       , ((modm, xK_f)                     , moveTo Next EmptyWS)
+       , ((modm, xK_Tab)                   , toggleWS' ["NSP"])
+       , ((modm .|. shiftMask, xK_f)       , moveTo Next EmptyWS)
 
        -- Increase/Decrease spacing (gaps)
        , ( (modm, xK_g)
@@ -330,9 +324,8 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
          )
 
        -- Easily switch your layouts
-       , ((altMask, xK_t), sendMessage $ JumpToLayout "Tiled")
+       , ((altMask, xK_t), sendMessage $ JumpToLayout "Tall")
        , ((altMask, xK_c), sendMessage $ JumpToLayout "Centered Master")
-       , ((altMask, xK_f), sendMessage $ JumpToLayout "Monocle")
 
        -- XPrompt
        , ((modm, xK_p)   , shellPrompt myXPConfig)
@@ -340,15 +333,21 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- Open apps
        , ( (altMask, xK_F9)
-         , spawn
-           "$(killall picom && notify-send -i picom 'System' 'Killed Picom') || $(picom & notify-send -i picom 'System' 'Picom running...')"
+         , unGrab >> unsafeSpawn
+           "$(killall picom && notify-send -u critical -i picom 'System' 'Killed Picom') || $(picom & notify-send -u critical -i picom 'System' 'Picom running...')"
          )
-       , ((altMask, xK_e)              , spawn "emacsclient -nc")
+       , ((altMask, xK_e), safeSpawn "emacsclient" ["-nc"])
+       , ((altMask, xK_b), safeSpawn "firefox" [])
 
-       -- Screenshot shortcuts (Requires: scrot & xclip)
-       , ((0, xK_Print)                , spawn "shotclip -f")
-       , ((0 .|. controlMask, xK_Print), spawn "shotclip -w")
-       , ((0 .|. shiftMask, xK_Print)  , spawn "shotclip -s")
+       -- lock screen
+       , ( (modm .|. shiftMask, xK_l)
+         , unGrab >> safeSpawn "lock" ["-t", "10", "-l"]
+         )
+
+       -- Screenshot shortcuts (Requires: scrot & xunsafeSlip)
+       , ((0, xK_Print)                , unGrab >> safeSpawn "shotclip" ["-f"])
+       , ((0 .|. controlMask, xK_Print), unGrab >> safeSpawn "shotclip" ["-w"])
+       , ((0 .|. shiftMask, xK_Print)  , unGrab >> safeSpawn "shotclip" ["-s"])
        ]
     ++
        --
@@ -394,7 +393,7 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
     , \w -> focus w >> Flex.mouseResizeWindow w >> windows W.shiftMaster
     )
 
-  -- you may also bind events to the mouse scroll wheel (button4 and button5)
+  -- scroll the mouse wheel (button4 and button5)
   , ((modm, button4)              , \w -> focus w >> moveTo Prev nonEmptyNSP)
   , ((modm, button5)              , \w -> focus w >> moveTo Next nonEmptyNSP)
 
@@ -426,7 +425,6 @@ myXPConfig = def { font                = myFont
                  , showCompletionOnTab = False          -- False means auto completion
                  , alwaysHighlight     = True           -- Disables tab cycle
                  , maxComplRows        = Just 10        -- set to 'Just 5' for 5 rows
-                 -- , searchPredicate     = isPrefixOf
                  , searchPredicate     = fuzzyMatch
                  , sorter              = fuzzySort
                  }
@@ -463,45 +461,37 @@ myTabConfig = def { activeColor         = "#4280bd"
 
 myLayout =
   avoidStruts
-    $ mkToggle (single NOBORDERS)
-    $ (tiled ||| mtiled ||| center ||| full ||| tabs)
+    $ mkToggle (NBFULL ?? NOBORDERS ?? EOT)
+    $ (tall ||| mtall ||| center)
  where
   -- default tiling algorithm partitions the screen into two panes
-  tiled =
-    renamed [Replace "Tiled"]
+  tall =
+    renamed [Replace "Tall"]
+      $ smartBorders
       $ addTabs shrinkText myTabConfig
       $ subLayout [] (Simplest ||| Accordion)
-      $ lessBorders OnlyScreenFloat
       $ windowNavigation
       $ draggingVisualizer
       $ mySpacing myGaps
       $ ResizableTall nmaster delta ratio []
 
-  mtiled =
-    renamed [Replace "Mirror Tiled"]
+  mtall =
+    renamed [Replace "Mirror Tall"]
       $ addTabs shrinkText myTabConfig
       $ subLayout [] (Simplest ||| Accordion)
       $ windowNavigation
       $ draggingVisualizer
-      $ Mirror tiled
+      $ Mirror tall
 
   center =
     renamed [Replace "Centered Master"]
+      $ smartBorders
       $ addTabs shrinkText myTabConfig
       $ subLayout [] (Simplest ||| Accordion)
-      $ lessBorders OnlyScreenFloat
       $ windowNavigation
       $ draggingVisualizer
       $ mySpacing myGaps
       $ ThreeColMid nmaster delta ratio
-
-  full = renamed [Replace "Monocle"] $ lessBorders Screen Full
-
-  tabs =
-    renamed [Replace "Tabs"]
-      $ addTabs shrinkText myTabConfig
-      $ lessBorders OnlyScreenFloat
-      $ mySpacing myGaps Simplest
 
   -- The default number of windows in the master pane
   nmaster = 1
@@ -579,7 +569,7 @@ myManageHook =
 --
 myHandleEventHook :: Event -> X All
 myHandleEventHook = handleEventHook def <+> swallowEventHook
-  (className =? "Alacritty" <||> className =? "St" <||> className =? "Sxiv")
+  (className =? "Alacritty" <||> className =? "St")
   (return True)
 
 ------------------------------------------------------------------------

@@ -3,5 +3,5 @@
 ICON=/tmp/colorclip.png
 xcolor -P 70 | xclip -selection clipboard
 COLOR=$(xclip -selection clipboard -out)
-convert -size 100x100 xc:"$COLOR" "$ICON"
-notify-send -i "$ICON" 'xcolor' "$COLOR"
+convert -size 90x90 xc:"$COLOR" "$ICON"
+notify-send -u low -i "$ICON" 'xcolor' "$COLOR"

@@ -26,9 +26,9 @@ case $1 in
         printf "  -f, full         Take fullscreen screenshot\n"
         printf "  -w, window       Take screenshot of focused window\n"
         printf "  -s, selection    Take screenshot of interactively chosen window or rectangle\n"
-	printf "  -d, shadow       Add background shadow to screenshots\n"
+        printf "  -d, shadow       Add background shadow to screenshots\n"
         printf "  -h, help         Display all available options\n"
-	exit 0
+        exit 0
         ;;
 esac
 
@@ -38,5 +38,5 @@ case $2 in
         ;;
 esac
 
-xclip -selection clipboard -target image/png -i  "$file"
-notify-send -i "$file" 'Scrot' 'Screenshot saved!'
+xclip -selection clipboard -target image/png -i "$file"
+notify-send -u low -i "$file" 'Scrot' 'Screenshot saved!'
