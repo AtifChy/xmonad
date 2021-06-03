@@ -1,4 +1,4 @@
-Config  { font = "xft:Iosevka Custom:pixelsize=14:style=Bold:antialias=true:hinting=true,
+Config  { font = "xft:Iosevka:pixelsize=14:style=Bold:antialias=true:hinting=true,
                      Noto Sans:size=10:style=Bold:antialias=true:hinting=true,
                      Noto Sans Bengali:size=10:style=Bold:antialias=true:hinting=true,
                      Noto Sans Arabic:size=10:style=Bold:antialias=true:hinting=true,

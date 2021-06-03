@@ -77,6 +77,8 @@ import           XMonad.Prompt.Shell                 (shellPrompt)
 import qualified XMonad.StackSet                     as W
 import           XMonad.Util.ClickableWorkspaces     (clickablePP)
 import           XMonad.Util.Cursor                  (setDefaultCursor)
+import           XMonad.Util.DynamicScratchpads      (makeDynamicSP,
+                                                      spawnDynamicSP)
 import           XMonad.Util.Loggers                 (xmobarColorL)
 import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       customFloating,
@@ -160,8 +162,7 @@ myFocusedBorderColor = "#4280bd"
 
 -- Custom font
 myFont :: String
-myFont =
-  "xft:Iosevka Custom:style=Bold:pixelsize=14:antialias=true:hinting=true"
+myFont = "xft:Iosevka:style=Bold:pixelsize=14:antialias=true:hinting=true"
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -323,18 +324,25 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
          , namedScratchpadAction myScratchpads "terminal"
          )
 
+       -- Dynamic scratchpads
+       , ((modm .|. shiftMask, xK_equal), withFocused $ makeDynamicSP "dyn1")
+       , ((modm .|. shiftMask, xK_minus), withFocused $ makeDynamicSP "dyn2")
+       , ((modm, xK_equal)              , spawnDynamicSP "dyn1")
+       , ((modm, xK_minus)              , spawnDynamicSP "dyn2")
+
        -- Easily switch your layouts
-       , ((altMask, xK_t), sendMessage $ JumpToLayout "Tall")
+       , ((altMask, xK_t)               , sendMessage $ JumpToLayout "Tall")
        , ((altMask, xK_c), sendMessage $ JumpToLayout "Centered Master")
 
        -- XPrompt
-       , ((modm, xK_p)   , shellPrompt myXPConfig)
-       , ((modm, xK_F1)  , manPrompt myXPConfig)
+       , ((modm, xK_p)                  , shellPrompt myXPConfig)
+       , ((modm, xK_F1)                 , manPrompt myXPConfig)
 
        -- Open apps
        , ( (altMask, xK_F9)
-         , unGrab >> unsafeSpawn
-           "$(killall picom && notify-send -u critical -i picom 'System' 'Killed Picom') || $(picom & notify-send -u critical -i picom 'System' 'Picom running...')"
+         , unGrab
+           >> unsafeSpawn
+                "$(killall picom && notify-send -u critical -i picom 'System' 'Killed Picom') || $(picom & notify-send -u critical -i picom 'System' 'Picom running...')"
          )
        , ((altMask, xK_e), safeSpawn "emacsclient" ["-nc"])
        , ((altMask, xK_b), safeSpawn "firefox" [])
@@ -344,7 +352,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
          , unGrab >> safeSpawn "lock" ["-t", "10", "-l"]
          )
 
-       -- Screenshot shortcuts (Requires: scrot & xunsafeSlip)
+       -- Screenshot shortcuts (Requires: shotgun, slop, xdotool)
        , ((0, xK_Print)                , unGrab >> safeSpawn "shotclip" ["-f"])
        , ((0 .|. controlMask, xK_Print), unGrab >> safeSpawn "shotclip" ["-w"])
        , ((0 .|. shiftMask, xK_Print)  , unGrab >> safeSpawn "shotclip" ["-s"])
@@ -538,11 +546,13 @@ myManageHook =
       [ className =? "MPlayer" -?> doFloat
       , resource =? "desktop_window" -?> doIgnore
       , resource =? "kdesktop" -?> doIgnore
-      , resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat
       , resource =? "redshift-gtk" -?> doCenterFloat
       , className =? "ibus-ui-gtk3" -?> doIgnore
       , resource =? "gcr-prompter" -?> doCenterFloat
+      , title =? "Picture-in-Picture" -?> doFloat
+      , title =? "Open Folder" -?> doCenterFloat
       , transience
+      , title =? "Save Image" <&&> className =? "Gimp" -?> doCenterFloat
       , isFullscreen -?> doFullFloat
       , isDialog -?> doCenterFloat
       , className =? "firefox" -?> doShift (myWorkspaces !! 1)
@@ -569,7 +579,15 @@ myManageHook =
 --
 myHandleEventHook :: Event -> X All
 myHandleEventHook = handleEventHook def <+> swallowEventHook
-  (className =? "Alacritty" <||> className =? "St")
+  (    className
+  =?   "Alacritty"
+  <||> className
+  =?   "St"
+  <||> className
+  =?   "org.wezfurlong.wezterm"
+  <||> className
+  =?   "kitty"
+  )
   (return True)
 
 ------------------------------------------------------------------------
@@ -634,11 +652,11 @@ myStartupHook = do
   spawnOnce "redshift-gtk"
   spawnOnce "greenclip daemon"
   spawnOnce "numlockx"
-  spawnOnce "emacs --daemon"
+  -- spawnOnce "emacs --daemon"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   -- spawnOnce "pasystray -t --notify=systray_action"
   spawnOnce "ibus-daemon -drx"
-  spawnOnce "xautolock -detectsleep -secure -time 10 -locker 'lock -t 10 -l'"
+  spawnOnce "xss-lock -- lock -t 30 -l"
   spawn "pulsepipe"
   spawnOnce
     "stalonetray --geometry 1x1-6+4 --max-geometry 10x1-6+4 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
