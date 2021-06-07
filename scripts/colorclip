@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 ICON=/tmp/colorclip.png
 xcolor -P 70 | xclip -selection clipboard

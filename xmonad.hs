@@ -349,7 +349,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- lock screen
        , ( (modm .|. shiftMask, xK_l)
-         , unGrab >> safeSpawn "lock" ["-t", "10", "-l"]
+         , unGrab >> safeSpawn "loginctl" ["lock-session"]
          )
 
        -- Screenshot shortcuts (Requires: shotgun, slop, xdotool)
@@ -549,6 +549,7 @@ myManageHook =
       , resource =? "redshift-gtk" -?> doCenterFloat
       , className =? "ibus-ui-gtk3" -?> doIgnore
       , resource =? "gcr-prompter" -?> doCenterFloat
+      , resource =? "Browser" -?> doCenterFloat
       , title =? "Picture-in-Picture" -?> doFloat
       , title =? "Open Folder" -?> doCenterFloat
       , transience
@@ -656,7 +657,7 @@ myStartupHook = do
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   -- spawnOnce "pasystray -t --notify=systray_action"
   spawnOnce "ibus-daemon -drx"
-  spawnOnce "xss-lock -- lock -t 30 -l"
+  spawnOnce "xss-lock -- lockctl -t 30 -l"
   spawn "pulsepipe"
   spawnOnce
     "stalonetray --geometry 1x1-6+4 --max-geometry 10x1-6+4 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"

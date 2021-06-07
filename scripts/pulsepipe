@@ -1,28 +1,28 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 SPEAKER=1
 MICROPHONE=0
 
 case $1 in
--i)
-        DATA=$(pamixer --get-volume)
-        [ "$DATA" -lt '200' ] && pamixer --allow-boost -u -i 5
-        ;;
--d)
-        pamixer --allow-boost -u -d 5
-        ;;
--t)
-        pamixer -t
-        ;;
--mi)
-        pamixer --default-source -u -i 5
-        ;;
--md)
-        pamixer --default-source -u -d 5
-        ;;
--mt)
-        pamixer --default-source -t
-        ;;
+        -i)
+                DATA=$(pamixer --get-volume)
+                [ "$DATA" -lt '200' ] && pamixer --allow-boost -u -i 5
+                ;;
+        -d)
+                pamixer --allow-boost -u -d 5
+                ;;
+        -t)
+                pamixer -t
+                ;;
+        -mi)
+                pamixer --default-source -u -i 5
+                ;;
+        -md)
+                pamixer --default-source -u -d 5
+                ;;
+        -mt)
+                pamixer --default-source -t
+                ;;
 esac
 
 if [ "$SPEAKER" = '1' ]; then
