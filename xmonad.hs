@@ -116,7 +116,7 @@ myBorderWidth :: Dimension
 myBorderWidth = 2
 
 myGaps :: Num p => p
-myGaps = 6
+myGaps = 8
 
 -- modMask lets you specify which modkey you want to use. The default
 -- is mod1Mask ("left alt").  You may also consider using mod3Mask
@@ -644,7 +644,7 @@ mySB = statusBarProp
 myStartupHook :: X ()
 myStartupHook = do
   setDefaultCursor xC_left_ptr
-  spawnOnce "xwallpaper --screen 0 --maximize ~/Pictures/Wallpapers/0057.jpg"
+  spawnOnce "xwallpaper --zoom ~/Pictures/macOS-Big-Sur-night.jpg"
   -- spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0057.jpg"
   -- spawn "feh --bg-scale --randomize --no-fehbg ~/Pictures/Wallpapers/*"
   spawnOnce "picom"
