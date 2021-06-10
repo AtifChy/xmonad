@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
 
-# Only works with pulseaudio and pipewire(haven't tested myself)
-
 insidecolor=00000066
 ringcolor=6b8f3d88
 keyhlcolor=abc982ff

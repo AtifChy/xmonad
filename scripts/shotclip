@@ -7,7 +7,7 @@ img="shot_$(date '+%m-%d_%H-%M-%S').png"
 file="$HOME/Pictures/Screenshots/$img"
 
 sel_fail() {
-        notify-send -u critical -i gnome-screenshot "Shotgun" "Failed to take screenshot"
+        dunstify -u critical -i gnome-screenshot "Shotgun" "Failed to take screenshot"
         exit 1
 }
 
@@ -18,7 +18,7 @@ case $1 in
                 ;;
 
         -w | window)
-                shotgun -i $(xdotool getactivewindow) "$file"
+                shotgun -i "$(xdotool getactivewindow)" "$file"
                 ;;
 
         -f | fullscreen)
@@ -45,4 +45,9 @@ case $2 in
 esac
 
 xclip -selection clipboard -target image/png -i "$file"
-notify-send -u low -i "$file" "Shotgun" "Screenshot saved!"
+
+ACTION=$(dunstify -u low -A "mouse1,Open" -I "$file" "Shotgun" "Screenshot saved!")
+
+case "$ACTION" in
+        "mouse1") mimeopen "$file" ;;
+esac

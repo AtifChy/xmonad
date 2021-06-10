@@ -66,3 +66,8 @@ arch: x86_64
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
+ghc-options:
+  X11: "-j -optc-march=native -opta-march=native"
+  xmonad: "-j -optc-march=native -opta-march=native"
+  xmonad-contrib: "-j -optc-march=native -opta-march=native"

@@ -45,7 +45,7 @@ width=$(xprop -name "$pname" | grep 'program specified minimum size' | cut -d ' 
 
 # Icon file name
 [ ! -d "${XDG_CACHE_HOME:-$HOME/.cache}"/xmobar ] && mkdir "${XDG_CACHE_HOME:-$HOME/.cache}"/xmobar
-iconfile="$XDG_CACHE_HOME/xmobar/$pname-padding-${width:-0}px.xpm"
+iconfile="${XDG_CACHE_HOME:-$HOME/.cache}/xmobar/$pname-padding-${width:-0}px.xpm"
 
 # If the desired icon does not exist create it
 if [ ! -f "$iconfile" ]; then
@@ -53,4 +53,4 @@ if [ ! -f "$iconfile" ]; then
 fi
 
 # Output the icon tag for xmobar
-echo "<icon=${iconfile}/>"
+printf "<icon=${iconfile}/>"
