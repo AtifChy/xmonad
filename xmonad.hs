@@ -552,6 +552,7 @@ myManageHook =
       , resource =? "Browser" -?> doCenterFloat
       , title =? "Picture-in-Picture" -?> doFloat
       , title =? "Open Folder" -?> doCenterFloat
+      , className =? "St-float" -?> doFloat
       , transience
       , title =? "Save Image" <&&> className =? "Gimp" -?> doCenterFloat
       , isFullscreen -?> doFullFloat
