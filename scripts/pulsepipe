@@ -30,6 +30,7 @@ if [ "$SPEAKER" = '1' ]; then
         [ -e "$STATUSPIPE" ] || mkfifo "$STATUSPIPE"
 
         DATA=$(pamixer --get-volume-human)
+
         if [ "$DATA" = 'muted' ]; then
                 printf "<fc=#ff6c6b><fn=1></fn></fc> %s\n" "$DATA" >$STATUSPIPE
                 exit

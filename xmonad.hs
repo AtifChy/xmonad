@@ -13,8 +13,8 @@ import           System.Exit                         (exitSuccess)
 import           XMonad                              hiding ((|||))
 import           XMonad.Actions.CopyWindow           (copyToAll, kill1,
                                                       killAllOtherCopies)
-import           XMonad.Actions.CycleWS              (Direction1D (..),
-                                                      WSType (..), moveTo,
+import           XMonad.Actions.CycleWS              (Direction1D (..), emptyWS,
+                                                      ignoringWSs, moveTo,
                                                       shiftTo, toggleWS')
 import qualified XMonad.Actions.FlexibleResize       as Flex
 import           XMonad.Actions.Promote              (promote)
@@ -282,16 +282,12 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm, xK_f)                     , sendMessage $ Toggle NBFULL)
 
        -- CycleWS setup
-       , ((modm, xK_Right)                 , moveTo Next nonNSP)
-       , ((modm, xK_Left)                  , moveTo Prev nonNSP)
-       , ((modm .|. shiftMask, xK_Right)   , shiftTo Next nonNSP)
-       , ((modm .|. shiftMask, xK_Left)    , shiftTo Prev nonNSP)
-       , ((altMask, xK_Right)              , moveTo Next nonEmptyNSP)
-       , ((altMask, xK_Left)               , moveTo Prev nonEmptyNSP)
-       , ((altMask .|. shiftMask, xK_Right), shiftTo Next nonEmptyNSP)
-       , ((altMask .|. shiftMask, xK_Left) , shiftTo Prev nonEmptyNSP)
+       , ((modm, xK_Right)                 , moveTo Next noNSP)
+       , ((modm, xK_Left)                  , moveTo Prev noNSP)
+       , ((modm .|. shiftMask, xK_Right)   , shiftTo Next noNSP)
+       , ((modm .|. shiftMask, xK_Left)    , shiftTo Prev noNSP)
        , ((modm, xK_Tab)                   , toggleWS' ["NSP"])
-       , ((modm .|. shiftMask, xK_f)       , moveTo Next EmptyWS)
+       , ((modm .|. shiftMask, xK_f)       , moveTo Next emptyWS)
 
        -- Increase/Decrease spacing (gaps)
        , ( (modm, xK_g)
@@ -380,8 +376,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
        ]
  where
-  nonNSP      = WSIs (return (\ws -> W.tag ws /= "NSP"))
-  nonEmptyNSP = WSIs (return (\ws -> isJust (W.stack ws) && W.tag ws /= "NSP"))
+  noNSP = ignoringWSs [scratchpadWorkspaceTag]
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
@@ -402,14 +397,14 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
     )
 
   -- scroll the mouse wheel (button4 and button5)
-  , ((modm, button4)              , \w -> focus w >> moveTo Prev nonEmptyNSP)
-  , ((modm, button5)              , \w -> focus w >> moveTo Next nonEmptyNSP)
+  , ((modm, button4)              , \w -> focus w >> moveTo Prev noNSP)
+  , ((modm, button5)              , \w -> focus w >> moveTo Next noNSP)
 
   -- drag windows
   , ((modm .|. shiftMask, button1), dragWindow)
   ]
  where
-  nonEmptyNSP = WSIs (return (\ws -> isJust (W.stack ws) && W.tag ws /= "NSP"))
+  noNSP = ignoringWSs [scratchpadWorkspaceTag]
 
 ------------------------------------------------------------------------
 -- XPrompt

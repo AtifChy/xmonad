@@ -1,4 +1,4 @@
-Config  { font = "xft:Iosevka:pixelsize=14:style=Bold:antialias=true:hinting=true,
+Config  { font = "xft:Iosevka:size=10.5:style=Bold:antialias=true:hinting=true,
                      Noto Sans:size=10:style=Bold:antialias=true:hinting=true,
                      Noto Sans Bengali:size=10:style=Bold:antialias=true:hinting=true,
                      Noto Sans Arabic:size=10:style=Bold:antialias=true:hinting=true,
@@ -45,9 +45,6 @@ Config  { font = "xft:Iosevka:pixelsize=14:style=Bold:antialias=true:hinting=tru
                       , "--low", "#ff6c6b"
                       , "--normal", "#ecbe8b"
                       , "--high", "#98be65"
-                      , "--"
-                      , "--devices"
-                      , "wlp0s20u3,enp3s0"
                       ] 20
               , Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300
               , Run UnsafeXMonadLog
