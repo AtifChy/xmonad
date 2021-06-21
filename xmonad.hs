@@ -162,7 +162,7 @@ myFocusedBorderColor = "#4280bd"
 
 -- Custom font
 myFont :: String
-myFont = "xft:Iosevka:style=Bold:pixelsize=14:antialias=true:hinting=true"
+myFont = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=true"
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -276,18 +276,18 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        -- Run xmessage with a summary of the default keybindings (useful for beginners)
        , ( (modm .|. shiftMask, xK_slash)
          , unsafeSpawn
-           ("echo \"" ++ help ++ "\" | gxmessage -fn 'JetBrains Mono' -file -")
+           ("printf \"" ++ help ++ "\" | gxmessage -fn 'JetBrains Mono' -file -")
          )
-       , ((modm, xK_b)                     , sendMessage $ Toggle NOBORDERS)
-       , ((modm, xK_f)                     , sendMessage $ Toggle NBFULL)
+       , ((modm, xK_b)                  , sendMessage $ Toggle NOBORDERS)
+       , ((modm, xK_f)                  , sendMessage $ Toggle NBFULL)
 
        -- CycleWS setup
-       , ((modm, xK_Right)                 , moveTo Next noNSP)
-       , ((modm, xK_Left)                  , moveTo Prev noNSP)
-       , ((modm .|. shiftMask, xK_Right)   , shiftTo Next noNSP)
-       , ((modm .|. shiftMask, xK_Left)    , shiftTo Prev noNSP)
-       , ((modm, xK_Tab)                   , toggleWS' ["NSP"])
-       , ((modm .|. shiftMask, xK_f)       , moveTo Next emptyWS)
+       , ((modm, xK_Right)              , moveTo Next noNSP)
+       , ((modm, xK_Left)               , moveTo Prev noNSP)
+       , ((modm .|. shiftMask, xK_Right), shiftTo Next noNSP)
+       , ((modm .|. shiftMask, xK_Left) , shiftTo Prev noNSP)
+       , ((modm, xK_Tab)                , toggleWS' ["NSP"])
+       , ((modm .|. shiftMask, xK_f)    , moveTo Next emptyWS)
 
        -- Increase/Decrease spacing (gaps)
        , ( (modm, xK_g)
@@ -375,8 +375,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        | (key, sc) <- zip [xK_w, xK_e, xK_r] [0 ..]
        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
        ]
- where
-  noNSP = ignoringWSs [scratchpadWorkspaceTag]
+  where noNSP = ignoringWSs [scratchpadWorkspaceTag]
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
@@ -403,8 +402,7 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
   -- drag windows
   , ((modm .|. shiftMask, button1), dragWindow)
   ]
- where
-  noNSP = ignoringWSs [scratchpadWorkspaceTag]
+  where noNSP = ignoringWSs [scratchpadWorkspaceTag]
 
 ------------------------------------------------------------------------
 -- XPrompt
@@ -585,7 +583,18 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
   <||> className
   =?   "kitty"
   )
-  (return True)
+  (    (   not
+       <$> (    className
+           =?   "St-float"
+           <||> className
+           =?   "Dragon"
+           <||> className
+           =?   "noswallow"
+           )
+       )
+  <||> className
+  =?   "re"
+  )
 
 ------------------------------------------------------------------------
 -- Status bars and logging
