@@ -6,6 +6,7 @@
 -- Imports
 --
 import           Control.Monad                       (liftM2)
+import           Data.List                           (isSuffixOf)
 import qualified Data.Map                            as M
 import           Data.Monoid                         (All)
 import           System.Exit                         (exitSuccess)
@@ -19,6 +20,12 @@ import qualified XMonad.Actions.FlexibleResize       as Flex
 import           XMonad.Actions.Promote              (promote)
 import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.WithAll              (killAll, sinkAll)
+import           XMonad.Hooks.DynamicIcons           (IconConfig, appIcon,
+                                                      dynamicIconsPP,
+                                                      iconConfigFmt,
+                                                      iconConfigIcons,
+                                                      iconsFmtReplace,
+                                                      wrapUnwords)
 import           XMonad.Hooks.EwmhDesktops           (activateLogHook, ewmh,
                                                       ewmhFullscreen)
 import           XMonad.Hooks.ManageDocks            (ToggleStruts (..),
@@ -27,11 +34,10 @@ import           XMonad.Hooks.ManageHelpers          (composeOne, doCenterFloat,
                                                       doFullFloat, isDialog,
                                                       isFullscreen, transience,
                                                       (-?>))
-import           XMonad.Hooks.StatusBar              (StatusBarConfig,
-                                                      statusBarProp, withSB)
-import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
-                                                      shorten, wrap,
-                                                      xmobarAction,
+import           XMonad.Hooks.StatusBar              (xmonadPropLog)
+import           XMonad.Hooks.StatusBar.PP           (PP (..), dynamicLogString,
+                                                      filterOutWsPP, shorten,
+                                                      wrap, xmobarAction,
                                                       xmobarBorder, xmobarColor,
                                                       xmobarStrip)
 import           XMonad.Hooks.WindowSwallowing       (swallowEventHook)
@@ -137,7 +143,16 @@ altMask = mod1Mask
 --
 myWorkspaces :: [WorkspaceId]
 myWorkspaces =
-  ["TERM", "WEB", "CHAT", "CODE", "MOVIE", "GAME", "VBOX", "TOR", "MISC"]
+  [ "<fn=2>\xf8a3</fn>"
+  , "<fn=2>\xf8a6</fn>"
+  , "<fn=2>\xf8a9</fn>"
+  , "<fn=2>\xf8ac</fn>"
+  , "<fn=2>\xf8af</fn>"
+  , "<fn=2>\xf8b2</fn>"
+  , "<fn=2>\xf8b5</fn>"
+  , "<fn=2>\xf8b8</fn>"
+  , "<fn=2>\xf8bb</fn>"
+  ]
 
 -- Get count of available windows on a workspace
 --
@@ -582,13 +597,15 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
   <||> className
   =?   "kitty"
   )
-  ((not <$> (    className
-           =?   "St"
+  (    (   not
+       <$> (    className
+           =?   "St-float"
            <||> className
            =?   "Dragon"
            <||> className
            =?   "noswallow"
-           ))
+           )
+       )
   <||> className
   =?   "re"
   )
@@ -598,40 +615,63 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
 
 -- Perform an arbitrary action on each internal state change or X event.
 --
--- myLogHook :: X ()
--- myLogHook = mempty
-
-myXmobarPP :: PP
-myXmobarPP = def
-  { ppSep           = gray " │ "
-  , ppTitleSanitize = xmobarStrip
-  , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 2
-  , ppHidden        = lowWhite . wrap "" ""
-  , ppWsSep         = "  "
-  , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
-  , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
-  , ppExtras        = [xmobarColorL "#ff6c6b" "" $ windowCount]
-  , ppLayout = green . xmobarAction "xdotool key Super+space" "1" . xmobarAction
-                 "xdotool key Super+shift+space"
-                 "3"
-  }
+myLogHook :: X ()
+myLogHook =
+  xmonadPropLog =<< dynamicLogString =<< clickablePP =<< dynamicIconsPP
+    myIconConfig
+    (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP)
  where
-  blue, lowWhite, magenta, green :: String -> String
-  magenta  = xmobarColor "#b48ead" ""
-  blue     = xmobarColor "#51afef" ""
-  -- purple   = xmobarColor "#bd93f9" ""
-  -- lowBlue  = xmobarColor "#8be9fd" ""
-  -- white    = xmobarColor "#f8f8f2" ""
-  -- yellow   = xmobarColor "#f1fa8c" ""
-  -- red      = xmobarColor "#ff6c6b" ""
-  lowWhite = xmobarColor "#a6aebf" ""
-  gray     = xmobarColor "#434c5e" ""
-  green    = xmobarColor "#c3e88d" ""
+  myXmobarPP :: PP
+  myXmobarPP = def
+    { ppSep           = gray " │ "
+    , ppTitleSanitize = xmobarStrip
+    , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 2
+    , ppHidden        = lowWhite . wrap "" ""
+    , ppWsSep         = "  "
+    , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten
+                  40
+    , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
+    , ppExtras        = [xmobarColorL "#ff6c6b" "" $ windowCount]
+    , ppLayout        = green
+                        . xmobarAction "xdotool key Super+space"       "1"
+                        . xmobarAction "xdotool key Super+shift+space" "3"
+    }
+   where
+    blue, lowWhite, magenta, green :: String -> String
+    magenta  = xmobarColor "#b48ead" ""
+    blue     = xmobarColor "#51afef" ""
+    -- purple   = xmobarColor "#bd93f9" ""
+    -- lowBlue  = xmobarColor "#8be9fd" ""
+    -- white    = xmobarColor "#f8f8f2" ""
+    -- yellow   = xmobarColor "#f1fa8c" ""
+    -- red      = xmobarColor "#ff6c6b" ""
+    lowWhite = xmobarColor "#a6aebf" ""
+    gray     = xmobarColor "#434c5e" ""
+    green    = xmobarColor "#c3e88d" ""
 
-mySB :: StatusBarConfig
-mySB = statusBarProp
-  "xmobar ~/.config/xmonad/xmobar/xmobarrc"
-  (clickablePP (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP))
+  myIconConfig :: IconConfig
+  myIconConfig = def { iconConfigIcons = myIcons
+                     , iconConfigFmt   = iconsFmtReplace (wrapUnwords "" "")
+                     }
+   where
+    myIcons :: Query [String]
+    myIcons = composeAll
+      [ className =? "discord" --> appIcon "<fn=3>\xf392</fn>"
+      , className =? "Discord" --> appIcon "<fn=2>\xf268</fn>"
+      , className =? "firefox" --> appIcon "<fn=3>\xf269</fn>"
+      , className =? "St" --> appIcon "<fn=2>\xe795</fn>"
+      , className =? "Emacs" --> appIcon "<fn=4>\xe926</fn>"
+      , className =? "code-oss" --> appIcon "<fn=4>\xe60c</fn>"
+      , className =? "Org.gnome.Nautilus" --> appIcon "<fn=1>\xf07b</fn>"
+      , className =? "Spotify" <||> className =? "spotify" --> appIcon "<fn=2>\xf1bc</fn>"
+      , className =? "mpv" --> appIcon "<fn=1>\xf03d</fn>"
+      , className =? "VirtualBox Manager" --> appIcon "<fn=4>\xea3e</fn>"
+      , className =? "Lutris" --> appIcon "<fn=1>\xf11b</fn>"
+      , className =? "Sxiv" --> appIcon "<fn=1>\xf03e</fn>"
+      , ("NVIM" `isSuffixOf`) <$> title --> appIcon "<fn=4>\xe6c5</fn>"
+      ]
+
+
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -642,6 +682,7 @@ mySB = statusBarProp
 --
 myStartupHook :: X ()
 myStartupHook = do
+  spawnOnce "xmobar ~/.config/xmonad/xmobar/xmobarrc"
   setDefaultCursor xC_left_ptr
   spawnOnce "xwallpaper --zoom ~/Pictures/macOS-Big-Sur-night.jpg"
   -- spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0057.jpg"
@@ -672,7 +713,7 @@ main :: IO ()
 main = do
   let acMh :: ManageHook
       acMh = reader W.focusWindow >>= doF
-  xmonad . withSB mySB . ewmhFullscreen . ewmh . docks $ def
+  xmonad . ewmhFullscreen . ewmh . docks $ def
     {
       -- simple stuff
       terminal           = myTerminal
@@ -692,7 +733,7 @@ main = do
     , layoutHook         = myLayout
     , manageHook         = myManageHook
     , handleEventHook    = myHandleEventHook
-    , logHook            = activateLogHook acMh <+> logHook def
+    , logHook            = activateLogHook acMh <+> myLogHook <+> logHook def
     , startupHook        = myStartupHook
     }
 

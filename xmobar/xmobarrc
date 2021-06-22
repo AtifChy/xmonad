@@ -6,7 +6,9 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
                      Noto Sans CJK JP:size=10:style=Bold,
                      Noto Sans CJK KR:size=10:style=Bold"
         , additionalFonts = [ "xft:Font Awesome 5 Free Solid:size=10",
-                              "xft:Symbols Nerd Font:size=14" ]
+                              "xft:Symbols Nerd Font:size=13",
+                              "xft:Font Awesome 5 Brands:size=10",
+                              "xft:file\-icons:size=10" ]
         , bgColor = "#1e2127"
         , fgColor = "#d8dee9"
         , borderColor = "#434c5e"
@@ -14,7 +16,7 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
         , position = Static {xpos = 0, ypos = 0, width = 1920, height = 28}
         , border = FullB
         , textOffset = 19
-        , textOffsets = [ 19, 20 ]
+        , textOffsets = [ 19, 20, 19, 20 ]
         , lowerOnStart = True
         --, pickBroadest = False
         , persistent = True
