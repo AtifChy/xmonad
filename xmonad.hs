@@ -7,7 +7,6 @@
 --
 import           Control.Monad                       (liftM2)
 import qualified Data.Map                            as M
-import           Data.Maybe                          (isJust)
 import           Data.Monoid                         (All)
 import           System.Exit                         (exitSuccess)
 import           XMonad                              hiding ((|||))
@@ -38,7 +37,7 @@ import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
 import           XMonad.Hooks.WindowSwallowing       (swallowEventHook)
 import           XMonad.Layout.Accordion             (Accordion (Accordion))
 import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
-import           XMonad.Layout.LayoutCombinators     (JumpToLayout (..), (|||))
+import           XMonad.Layout.LayoutCombinators     ((|||))
 import           XMonad.Layout.LayoutModifier        (ModifiedLayout)
 import           XMonad.Layout.MultiToggle           (EOT (..), Toggle (..),
                                                       mkToggle, (??))
@@ -583,15 +582,13 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
   <||> className
   =?   "kitty"
   )
-  (    (   not
-       <$> (    className
+  ((not <$> (    className
            =?   "St"
            <||> className
            =?   "Dragon"
            <||> className
            =?   "noswallow"
-           )
-       )
+           ))
   <||> className
   =?   "re"
   )
@@ -619,15 +616,14 @@ myXmobarPP = def
                  "3"
   }
  where
-  blue, lowWhite, magenta, red, white, yellow, purple, green
-    :: String -> String
+  blue, lowWhite, magenta, green :: String -> String
   magenta  = xmobarColor "#b48ead" ""
   blue     = xmobarColor "#51afef" ""
-  purple   = xmobarColor "#bd93f9" ""
-  lowBlue  = xmobarColor "#8be9fd" ""
-  white    = xmobarColor "#f8f8f2" ""
-  yellow   = xmobarColor "#f1fa8c" ""
-  red      = xmobarColor "#ff6c6b" ""
+  -- purple   = xmobarColor "#bd93f9" ""
+  -- lowBlue  = xmobarColor "#8be9fd" ""
+  -- white    = xmobarColor "#f8f8f2" ""
+  -- yellow   = xmobarColor "#f1fa8c" ""
+  -- red      = xmobarColor "#ff6c6b" ""
   lowWhite = xmobarColor "#a6aebf" ""
   gray     = xmobarColor "#434c5e" ""
   green    = xmobarColor "#c3e88d" ""

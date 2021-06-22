@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+set -e
+
 insidecolor=00000066
 ringcolor=6b8f3d88
 keyhlcolor=abc982ff
