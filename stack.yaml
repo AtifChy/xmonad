@@ -29,9 +29,8 @@ resolver: lts-17.15
 #   - auto-update
 #   - wai
 packages:
-  - X11
-  - xmonad
   - xmonad-contrib
+
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
 # forks / in-progress versions pinned to a git hash. For example:
@@ -41,7 +40,11 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
-# extra-deps: []
+extra-deps:
+  - github: xmonad/x11
+    commit: master@{now}
+  - github: xmonad/xmonad
+    commit: master@{now}
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
@@ -68,6 +71,5 @@ arch: x86_64
 # compiler-check: newer-minor
 
 ghc-options:
-  X11: "-j -optc-march=native -opta-march=native"
-  xmonad: "-j -optc-march=native -opta-march=native"
-  xmonad-contrib: "-j -optc-march=native -opta-march=native"
+  xmonad: "-threaded -j"
+  xmonad-contrib: "-threaded -j"

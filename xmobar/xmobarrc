@@ -38,14 +38,6 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
                       , "--normal", "#ecbe8b"
                       , "--high", "#ff6c6b"
                       ] 30
-              , Run DynNetwork
-                      [ "-t", "<fn=1>\xf0ab</fn> <rx>KB  <fn=1>\xf0aa</fn> <tx>KB"
-                      , "-L", "10000"
-                      , "-H", "130000"
-                      , "--low", "#ff6c6b"
-                      , "--normal", "#ecbe8b"
-                      , "--high", "#98be65"
-                      ] 20
               , Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300
               , Run UnsafeXMonadLog
               , Run Com "/home/atif/.config/xmonad/scripts/tray-padding-icon.sh"
@@ -69,8 +61,6 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
             \<action=`st -e htop -s PERCENT_MEM` button=1>\
             \<fc=#b58fae>%memory%</fc>\
             \</action>\
-            \<fc=#434c5e> │ </fc>\
-            \<fc=#51afef>%dynnetwork%</fc>\
             \<fc=#434c5e> │ </fc>\
             \<action=`pulsepipe -t` button=1>\
             \<action=`pulsepipe -i` button=4>\

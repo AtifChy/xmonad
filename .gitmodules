@@ -1,11 +1,4 @@
-[submodule "xmonad"]
-	path = xmonad
-	branch = master
-	url = https://github.com/xmonad/xmonad.git
 [submodule "xmonad-contrib"]
 	path = xmonad-contrib
 	branch = master
 	url = https://github.com/xmonad/xmonad-contrib.git
-[submodule "X11"]
-	path = X11
-	url = https://github.com/xmonad/X11.git

@@ -585,7 +585,7 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
   )
   (    (   not
        <$> (    className
-           =?   "St-float"
+           =?   "St"
            <||> className
            =?   "Dragon"
            <||> className
@@ -608,12 +608,10 @@ myXmobarPP :: PP
 myXmobarPP = def
   { ppSep           = gray " │ "
   , ppTitleSanitize = xmobarStrip
-  , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 4
+  , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 2
   , ppHidden        = lowWhite . wrap "" ""
-  -- , ppHiddenNoWindows = lowWhite . wrap " " ""
   , ppWsSep         = "  "
-  , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten
-                50
+  , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
   , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
   , ppExtras        = [xmobarColorL "#ff6c6b" "" $ windowCount]
   , ppLayout = green . xmobarAction "xdotool key Super+space" "1" . xmobarAction
