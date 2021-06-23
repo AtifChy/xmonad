@@ -6,7 +6,7 @@
 -- Imports
 --
 import           Control.Monad                       (liftM2)
-import           Data.List                           (isSuffixOf)
+-- import           Data.List                           (isSuffixOf)
 import qualified Data.Map                            as M
 import           Data.Monoid                         (All)
 import           System.Exit                         (exitSuccess)
@@ -34,10 +34,11 @@ import           XMonad.Hooks.ManageHelpers          (composeOne, doCenterFloat,
                                                       doFullFloat, isDialog,
                                                       isFullscreen, transience,
                                                       (-?>))
-import           XMonad.Hooks.StatusBar              (xmonadPropLog)
-import           XMonad.Hooks.StatusBar.PP           (PP (..), dynamicLogString,
-                                                      filterOutWsPP, shorten,
-                                                      wrap, xmobarAction,
+import           XMonad.Hooks.StatusBar              (StatusBarConfig,
+                                                      statusBarProp, withSB)
+import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
+                                                      shorten, wrap,
+                                                      xmobarAction,
                                                       xmobarBorder, xmobarColor,
                                                       xmobarStrip)
 import           XMonad.Hooks.WindowSwallowing       (swallowEventHook)
@@ -93,7 +94,6 @@ import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
 import           XMonad.Util.Run                     (safeSpawn, unsafeSpawn)
 import           XMonad.Util.SpawnOnce               (spawnOnce)
 import           XMonad.Util.Ungrab                  (unGrab)
-
 
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
@@ -474,10 +474,9 @@ myTabConfig = def { activeColor         = "#4280bd"
 -- which denotes layout choice.
 --
 
-myLayout =
-  avoidStruts
-    $ mkToggle (NBFULL ?? NOBORDERS ?? EOT)
-    $ (tall ||| mtall ||| center)
+myLayout = avoidStruts
+  $ mkToggle (NBFULL ?? NOBORDERS ?? EOT)
+  $ tall ||| mtall ||| center
  where
   -- default tiling algorithm partitions the screen into two panes
   tall =
@@ -599,6 +598,8 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
   )
   (    (   not
        <$> (    className
+           =?   "St"
+           <||> className
            =?   "St-float"
            <||> className
            =?   "Dragon"
@@ -615,11 +616,13 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
 
 -- Perform an arbitrary action on each internal state change or X event.
 --
-myLogHook :: X ()
-myLogHook =
-  xmonadPropLog =<< dynamicLogString =<< clickablePP =<< dynamicIconsPP
-    myIconConfig
-    (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP)
+-- myLogHook :: X ()
+-- myLogHook = mempty
+
+mySB :: StatusBarConfig
+mySB = statusBarProp
+    "xmobar ~/.config/xmonad/xmobar/xmobarrc"
+    (clickablePP =<< dynamicIconsPP myIconConfig (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP))
  where
   myXmobarPP :: PP
   myXmobarPP = def
@@ -628,10 +631,9 @@ myLogHook =
     , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 2
     , ppHidden        = lowWhite . wrap "" ""
     , ppWsSep         = "  "
-    , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten
-                  40
+    , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
     , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
-    , ppExtras        = [xmobarColorL "#ff6c6b" "" $ windowCount]
+    , ppExtras        = [xmobarColorL "#ff6c6b" "" windowCount]
     , ppLayout        = green
                         . xmobarAction "xdotool key Super+space"       "1"
                         . xmobarAction "xdotool key Super+shift+space" "3"
@@ -657,21 +659,19 @@ myLogHook =
     myIcons :: Query [String]
     myIcons = composeAll
       [ className =? "discord" --> appIcon "<fn=3>\xf392</fn>"
-      , className =? "Discord" --> appIcon "<fn=2>\xf268</fn>"
+      , className =? "Discord" --> appIcon "<fn=3>\xf268</fn>"
       , className =? "firefox" --> appIcon "<fn=3>\xf269</fn>"
       , className =? "St" --> appIcon "<fn=2>\xe795</fn>"
       , className =? "Emacs" --> appIcon "<fn=4>\xe926</fn>"
       , className =? "code-oss" --> appIcon "<fn=4>\xe60c</fn>"
       , className =? "Org.gnome.Nautilus" --> appIcon "<fn=1>\xf07b</fn>"
-      , className =? "Spotify" <||> className =? "spotify" --> appIcon "<fn=2>\xf1bc</fn>"
+      , className =? "Spotify" --> appIcon "<fn=3>\xf1bc</fn>"
       , className =? "mpv" --> appIcon "<fn=1>\xf03d</fn>"
       , className =? "VirtualBox Manager" --> appIcon "<fn=4>\xea3e</fn>"
       , className =? "Lutris" --> appIcon "<fn=1>\xf11b</fn>"
       , className =? "Sxiv" --> appIcon "<fn=1>\xf03e</fn>"
-      , ("NVIM" `isSuffixOf`) <$> title --> appIcon "<fn=4>\xe6c5</fn>"
+      -- , ("NVIM" `isSuffixOf`) <$> title --> appIcon "<fn=4>\xe6c5</fn>"
       ]
-
-
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -682,7 +682,6 @@ myLogHook =
 --
 myStartupHook :: X ()
 myStartupHook = do
-  spawnOnce "xmobar ~/.config/xmonad/xmobar/xmobarrc"
   setDefaultCursor xC_left_ptr
   spawnOnce "xwallpaper --zoom ~/Pictures/macOS-Big-Sur-night.jpg"
   -- spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0057.jpg"
@@ -702,7 +701,6 @@ myStartupHook = do
   spawnOnce
     "stalonetray --geometry 1x1-6+4 --max-geometry 10x1-6+4 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
   -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1e2127  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"
-  -- spawn "systemctl --user restart redshift-gtk.service"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
@@ -713,7 +711,7 @@ main :: IO ()
 main = do
   let acMh :: ManageHook
       acMh = reader W.focusWindow >>= doF
-  xmonad . ewmhFullscreen . ewmh . docks $ def
+  xmonad . withSB mySB . ewmhFullscreen . ewmh . docks $ def
     {
       -- simple stuff
       terminal           = myTerminal
@@ -733,7 +731,7 @@ main = do
     , layoutHook         = myLayout
     , manageHook         = myManageHook
     , handleEventHook    = myHandleEventHook
-    , logHook            = activateLogHook acMh <+> myLogHook <+> logHook def
+    , logHook            = activateLogHook acMh <+> logHook def
     , startupHook        = myStartupHook
     }
 
@@ -838,4 +836,4 @@ help = unlines
   , "Alt-F9               Turn on/off picom"
   ]
 
--- vim:ft=haskell:expandtab
+--- vim:ft=haskell:expandtab
