@@ -39,7 +39,7 @@ if [ "$SPEAKER" = '1' ]; then
     fi
 
     if [ "$DATA" -gt '100' ]; then
-        printf "<fc=#51aeed>!<fn=1></fn></fc> %s%%\n" "$DATA" >$STATUSPIPE
+        printf "<fc=#51aeed><fn=1></fn>!</fc> %s%%\n" "$DATA" >$STATUSPIPE
     elif [ "$DATA" -ge '60' ]; then
         printf "<fc=#98be65><fn=1></fn></fc> %s%%\n" "$DATA" >$STATUSPIPE
     elif [ "$DATA" -ge '20' ]; then

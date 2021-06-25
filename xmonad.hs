@@ -1,19 +1,16 @@
-{-# LANGUAGE FlexibleContexts          #-}
-{-# LANGUAGE LambdaCase                #-}
-{-# LANGUAGE NoMonomorphismRestriction #-}
-
 --
 -- Imports
 --
 import           Control.Monad                       (liftM2)
--- import           Data.List                           (isSuffixOf)
 import qualified Data.Map                            as M
 import           Data.Monoid                         (All)
 import           System.Exit                         (exitSuccess)
 import           XMonad                              hiding ((|||))
 import           XMonad.Actions.CopyWindow           (copyToAll, kill1,
                                                       killAllOtherCopies)
-import           XMonad.Actions.CycleWS              (Direction1D (..), emptyWS,
+import           XMonad.Actions.CycleWS              (Direction1D (..),
+                                                      WSType (Not, (:&:)),
+                                                      emptyWS, hiddenWS,
                                                       ignoringWSs, moveTo,
                                                       shiftTo, toggleWS')
 import qualified XMonad.Actions.FlexibleResize       as Flex
@@ -296,12 +293,14 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm, xK_f)                  , sendMessage $ Toggle NBFULL)
 
        -- CycleWS setup
-       , ((modm, xK_Right)              , moveTo Next noNSP)
-       , ((modm, xK_Left)               , moveTo Prev noNSP)
-       , ((modm .|. shiftMask, xK_Right), shiftTo Next noNSP)
-       , ((modm .|. shiftMask, xK_Left) , shiftTo Prev noNSP)
-       , ((modm, xK_Tab)                , toggleWS' ["NSP"])
-       , ((modm .|. shiftMask, xK_f)    , moveTo Next emptyWS)
+       , ((modm, xK_Right)                , moveTo Next nonNSP)
+       , ((modm, xK_Left)                 , moveTo Prev nonNSP)
+       , ((modm .|. controlMask, xK_Right), moveTo Next nonEmptyNSP)
+       , ((modm .|. controlMask, xK_Left) , moveTo Prev nonEmptyNSP)
+       , ((modm .|. shiftMask, xK_Right)  , shiftTo Next nonNSP)
+       , ((modm .|. shiftMask, xK_Left)   , shiftTo Prev nonNSP)
+       , ((modm, xK_Tab)                  , toggleWS' [scratchpadWorkspaceTag ])
+       , ((modm .|. shiftMask, xK_f)      , moveTo Next emptyWS)
 
        -- Increase/Decrease spacing (gaps)
        , ( (modm, xK_g)
@@ -320,8 +319,8 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm .|. controlMask, xK_k)     , sendMessage $ pullGroup U)
        , ((modm .|. controlMask, xK_j)     , sendMessage $ pullGroup D)
        , ((modm .|. controlMask, xK_space) , toSubl NextLayout)
-       , ((modm .|. controlMask, xK_m), withFocused (sendMessage . MergeAll))
-       , ((modm .|. controlMask, xK_u), withFocused (sendMessage . UnMerge))
+       , ((modm .|. controlMask, xK_m)     , withFocused (sendMessage . MergeAll))
+       , ((modm .|. controlMask, xK_u)     , withFocused (sendMessage . UnMerge))
        , ((modm .|. controlMask, xK_comma) , onGroup W.focusUp')
        , ((modm .|. controlMask, xK_period), onGroup W.focusDown')
 
@@ -342,7 +341,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- Easily switch your layouts
        , ((altMask, xK_t)               , sendMessage $ JumpToLayout "Tall")
-       , ((altMask, xK_c), sendMessage $ JumpToLayout "Centered Master")
+       , ((altMask, xK_c)               , sendMessage $ JumpToLayout "Centered Master")
 
        -- XPrompt
        , ((modm, xK_p)                  , shellPrompt myXPConfig)
@@ -389,7 +388,9 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        | (key, sc) <- zip [xK_w, xK_e, xK_r] [0 ..]
        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
        ]
-  where noNSP = ignoringWSs [scratchpadWorkspaceTag]
+  where
+    nonNSP = ignoringWSs [scratchpadWorkspaceTag]
+    nonEmptyNSP = hiddenWS :&: Not emptyWS :&: ignoringWSs [scratchpadWorkspaceTag]
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
@@ -410,13 +411,13 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
     )
 
   -- scroll the mouse wheel (button4 and button5)
-  , ((modm, button4)              , \w -> focus w >> moveTo Prev noNSP)
-  , ((modm, button5)              , \w -> focus w >> moveTo Next noNSP)
+  , ((modm, button4)              , \w -> focus w >> moveTo Prev nonNSP)
+  , ((modm, button5)              , \w -> focus w >> moveTo Next nonNSP)
 
   -- drag windows
   , ((modm .|. shiftMask, button1), dragWindow)
   ]
-  where noNSP = ignoringWSs [scratchpadWorkspaceTag]
+  where nonNSP = ignoringWSs [scratchpadWorkspaceTag]
 
 ------------------------------------------------------------------------
 -- XPrompt
@@ -604,6 +605,8 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
            <||> className
            =?   "Dragon"
            <||> className
+           =?   "qemu-system-x86_64"
+           <||> className
            =?   "noswallow"
            )
        )
@@ -670,7 +673,6 @@ mySB = statusBarProp
       , className =? "VirtualBox Manager" --> appIcon "<fn=4>\xea3e</fn>"
       , className =? "Lutris" --> appIcon "<fn=1>\xf11b</fn>"
       , className =? "Sxiv" --> appIcon "<fn=1>\xf03e</fn>"
-      -- , ("NVIM" `isSuffixOf`) <$> title --> appIcon "<fn=4>\xe6c5</fn>"
       ]
 
 ------------------------------------------------------------------------
@@ -693,8 +695,8 @@ myStartupHook = do
   spawnOnce "greenclip daemon"
   spawnOnce "numlockx"
   -- spawnOnce "emacs --daemon"
+  spawnOnce "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-  -- spawnOnce "pasystray -t --notify=systray_action"
   spawnOnce "ibus-daemon -drx"
   spawnOnce "xss-lock -- lockctl -t 30 -l"
   spawn "pulsepipe"
