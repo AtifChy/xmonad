@@ -45,7 +45,17 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
               , Run Com "/home/atif/.config/xmonad/scripts/tray-padding-icon.sh"
                       ["stalonetray"]
                       "tray" 5
-              , Run PipeReader " :/tmp/xmobar_volume" "pulse"
+              , Run Alsa "default" "Master"
+                      [ "-t", "<status> <volume>%"
+                      , "--"
+                      , "-C", "#98be65"
+                      , "-c", "#ff6c6b"
+                      , "-O", ""
+                      , "-o", "<fn=1>\xf6a9</fn>"
+                      , "-l", "<fn=1>\xf026</fn>"
+                      , "-m", "<fn=1>\xf027</fn>"
+                      , "-h", "<fn=1>\xf028</fn>"
+                      ]
               ]
         , sepChar = "%"
         , alignSep = "}{"
@@ -67,7 +77,7 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
             \<action=`pulsepipe -t` button=1>\
             \<action=`pulsepipe -i` button=4>\
             \<action=`pulsepipe -d` button=5>\
-            \<fc=#7a869f>%pulse%</fc>\
+            \<fc=#7a869f>%alsa:default:Master%</fc>\
             \</action></action></action>\
             \<fc=#434c5e> │ </fc>\
             \<fc=#c678dd>%date%</fc>\

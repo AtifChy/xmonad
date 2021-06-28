@@ -37,7 +37,7 @@ import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
                                                       shorten, wrap,
                                                       xmobarAction,
                                                       xmobarBorder, xmobarColor,
-                                                      xmobarStrip)
+                                                      xmobarFont, xmobarStrip)
 import           XMonad.Hooks.WindowSwallowing       (swallowEventHook)
 import           XMonad.Layout.Accordion             (Accordion (Accordion))
 import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
@@ -115,7 +115,7 @@ myClickJustFocuses = False
 -- Width of the window border in pixels.
 --
 myBorderWidth :: Dimension
-myBorderWidth = 2
+myBorderWidth = 1
 
 myGaps :: Num p => p
 myGaps = 8
@@ -140,15 +140,15 @@ altMask = mod1Mask
 --
 myWorkspaces :: [WorkspaceId]
 myWorkspaces =
-  [ "<fn=2>\xf8a3</fn>"
-  , "<fn=2>\xf8a6</fn>"
-  , "<fn=2>\xf8a9</fn>"
-  , "<fn=2>\xf8ac</fn>"
-  , "<fn=2>\xf8af</fn>"
-  , "<fn=2>\xf8b2</fn>"
-  , "<fn=2>\xf8b5</fn>"
-  , "<fn=2>\xf8b8</fn>"
-  , "<fn=2>\xf8bb</fn>"
+  [ "\xf8a3"
+  , "\xf8a6"
+  , "\xf8a9"
+  , "\xf8ac"
+  , "\xf8af"
+  , "\xf8b2"
+  , "\xf8b5"
+  , "\xf8b8"
+  , "\xf8bb"
   ]
 
 -- Get count of available windows on a workspace
@@ -168,8 +168,8 @@ windowCount =
 -- Border colors for unfocused and focused windows, respectively.
 --
 myNormalBorderColor, myFocusedBorderColor :: String
-myNormalBorderColor = "#1e2127"
-myFocusedBorderColor = "#4280bd"
+myNormalBorderColor = "#2c313a"
+myFocusedBorderColor = "#61afef"
 
 -- Custom font
 myFont :: String
@@ -208,7 +208,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
          )
 
        -- launch gmrun
-       --, ((modm .|. shiftMask, xK_p ), safeSpawn "gmrun" [])
+       -- , ((modm .|. shiftMask, xK_p )   , safeSpawn "gmrun" [])
 
        -- close focused window
        , ((modm .|. shiftMask, xK_c)    , kill1)
@@ -295,11 +295,11 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        -- CycleWS setup
        , ((modm, xK_Right)                , moveTo Next nonNSP)
        , ((modm, xK_Left)                 , moveTo Prev nonNSP)
-       , ((modm .|. controlMask, xK_Right), moveTo Next nonEmptyNSP)
-       , ((modm .|. controlMask, xK_Left) , moveTo Prev nonEmptyNSP)
+       , ((modm, xK_Tab)                  , moveTo Next nonEmptyNSP)
+       , ((modm .|. shiftMask, xK_Tab)    , moveTo Prev nonEmptyNSP)
        , ((modm .|. shiftMask, xK_Right)  , shiftTo Next nonNSP)
        , ((modm .|. shiftMask, xK_Left)   , shiftTo Prev nonNSP)
-       , ((modm, xK_Tab)                  , toggleWS' [scratchpadWorkspaceTag ])
+       , ((modm, xK_z)                    , toggleWS' [scratchpadWorkspaceTag])
        , ((modm .|. shiftMask, xK_f)      , moveTo Next emptyWS)
 
        -- Increase/Decrease spacing (gaps)
@@ -553,15 +553,12 @@ myManageHook =
       [ className =? "MPlayer" -?> doFloat
       , resource =? "desktop_window" -?> doIgnore
       , resource =? "kdesktop" -?> doIgnore
+      , resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat
       , resource =? "redshift-gtk" -?> doCenterFloat
       , className =? "ibus-ui-gtk3" -?> doIgnore
       , resource =? "gcr-prompter" -?> doCenterFloat
-      , resource =? "Browser" -?> doCenterFloat
-      , title =? "Picture-in-Picture" -?> doFloat
-      , title =? "Open Folder" -?> doCenterFloat
       , className =? "St-float" -?> doFloat
       , transience
-      , title =? "Save Image" <&&> className =? "Gimp" -?> doCenterFloat
       , isFullscreen -?> doFullFloat
       , isDialog -?> doCenterFloat
       , className =? "firefox" -?> doShift (myWorkspaces !! 1)
@@ -603,6 +600,10 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
            <||> className
            =?   "St-float"
            <||> className
+           =?   "kitty"
+           <||> className
+           =?   "org.wezfurlong.wezterm"
+           <||> className
            =?   "Dragon"
            <||> className
            =?   "qemu-system-x86_64"
@@ -631,8 +632,8 @@ mySB = statusBarProp
   myXmobarPP = def
     { ppSep           = gray " │ "
     , ppTitleSanitize = xmobarStrip
-    , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 2
-    , ppHidden        = lowWhite . wrap "" ""
+    , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 2 . wsFont
+    , ppHidden        = lowWhite . wrap "" "" . wsFont
     , ppWsSep         = "  "
     , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
     , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
@@ -653,6 +654,7 @@ mySB = statusBarProp
     lowWhite = xmobarColor "#a6aebf" ""
     gray     = xmobarColor "#434c5e" ""
     green    = xmobarColor "#c3e88d" ""
+    wsFont   = xmobarFont 2
 
   myIconConfig :: IconConfig
   myIconConfig = def { iconConfigIcons = myIcons
@@ -664,6 +666,7 @@ mySB = statusBarProp
       [ className =? "discord" --> appIcon "<fn=3>\xf392</fn>"
       , className =? "Discord" --> appIcon "<fn=3>\xf268</fn>"
       , className =? "firefox" --> appIcon "<fn=3>\xf269</fn>"
+      , className =? "Brave-browser" --> appIcon "<fn=3>\xf268</fn>"
       , className =? "St" --> appIcon "<fn=2>\xe795</fn>"
       , className =? "Emacs" --> appIcon "<fn=4>\xe926</fn>"
       , className =? "code-oss" --> appIcon "<fn=4>\xe60c</fn>"
@@ -699,7 +702,6 @@ myStartupHook = do
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce "ibus-daemon -drx"
   spawnOnce "xss-lock -- lockctl -t 30 -l"
-  spawn "pulsepipe"
   spawnOnce
     "stalonetray --geometry 1x1-6+4 --max-geometry 10x1-6+4 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
   -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1e2127  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"

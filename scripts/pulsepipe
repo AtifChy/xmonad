@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-SPEAKER=1
+SPEAKER=0
 MICROPHONE=0
 
 case $1 in
