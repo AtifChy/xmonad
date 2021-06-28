@@ -13,7 +13,7 @@ import           XMonad.Actions.CycleWS              (Direction1D (..),
                                                       emptyWS, hiddenWS,
                                                       ignoringWSs, moveTo,
                                                       shiftTo, toggleWS')
-import qualified XMonad.Actions.FlexibleResize       as Flex
+import qualified XMonad.Actions.FlexibleResize       as Flex (mouseResizeWindow)
 import           XMonad.Actions.Promote              (promote)
 import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.WithAll              (killAll, sinkAll)

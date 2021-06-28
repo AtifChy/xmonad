@@ -6,7 +6,7 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
                      Noto Sans CJK JP:size=10:style=Bold,
                      Noto Sans CJK KR:size=10:style=Bold"
         , additionalFonts = [ "xft:Font Awesome 5 Free Solid:size=10",
-                              "xft:Symbols Nerd Font:size=14",
+                              "xft:JetBrainsMono Nerd Font:size=14",
                               "xft:Font Awesome 5 Brands:size=11",
                               "xft:file\-icons:size=11" ]
         , bgColor = "#1e2127"
