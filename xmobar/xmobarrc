@@ -8,15 +8,16 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
         , additionalFonts = [ "xft:Font Awesome 5 Free Solid:size=10",
                               "xft:JetBrainsMono Nerd Font:size=14",
                               "xft:Font Awesome 5 Brands:size=11",
-                              "xft:file\-icons:size=11" ]
+                              "xft:file\-icons:size=11",
+                              "xft:JetBrainsMono Nerd Font:size=11" ]
         , bgColor = "#1e2127"
-        , fgColor = "#d8dee9"
-        , borderColor = "#434c5e"
+        , fgColor = "#a6aebf"
+        , borderColor = "#2c323a"
         , alpha = 255
         , position = Static {xpos = 0, ypos = 0, width = 1920, height = 28}
         , border = FullB
         , textOffset = 19
-        , textOffsets = [ 19, 20, 19, 20 ]
+        , textOffsets = [ 19, 20, 19, 20, 19 ]
         , lowerOnStart = True
         --, pickBroadest = False
         , persistent = True
@@ -24,39 +25,58 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
         --, allDesktops = True
         --, overrideRedirect = True
         , commands =
-              [ Run Cpu
-                      [ "-t", "<fn=1>\xf108</fn> <total>%"
-                      , "-L", "50"
-                      , "-H", "85"
-                      , "--low", "#98be65"
-                      , "--normal", "#ecbe8b"
-                      , "--high", "#ff6c6b"
-                      ] 20
-              , Run Memory
-                      [ "-t", "<fn=1>\xf538</fn> <usedratio>%"
-                      , "-L", "50"
-                      , "-H", "85"
-                      , "--low", "#98be65"
-                      , "--normal", "#ecbe8b"
-                      , "--high", "#ff6c6b"
-                      ] 30
-              , Run Date "<fn=1>\xf073</fn> %a %b %d, <fn=1>\xf017</fn> %l:%M %p" "date" 300
-              , Run UnsafeXMonadLog
-              , Run Com "/home/atif/.config/xmonad/scripts/tray-padding-icon.sh"
-                      ["stalonetray"]
-                      "tray" 5
-              , Run Alsa "default" "Master"
-                      [ "-t", "<status> <volume>%"
-                      , "--"
-                      , "-C", "#98be65"
-                      , "-c", "#ff6c6b"
-                      , "-O", ""
-                      , "-o", "<fn=1>\xf6a9</fn>"
-                      , "-l", "<fn=1>\xf026</fn>"
-                      , "-m", "<fn=1>\xf027</fn>"
-                      , "-h", "<fn=1>\xf028</fn>"
-                      ]
-              ]
+                [ Run Cpu
+                        [ "-t", "<fn=1>\xf108</fn> <total>%"
+                        , "-L", "50"
+                        , "-H", "85"
+                        , "--low",      "#98be65,#2c323a:4"
+                        , "--normal",   "#ecbe8b,#2c323a:4"
+                        , "--high",     "#ff6c6b,#2c323a:4"
+                        ] 20
+                , Run Memory
+                        [ "-t", "<fn=1>\xf538</fn> <usedratio>%"
+                        , "-L", "50"
+                        , "-H", "85"
+                        , "--low",      "#98be65,#2c323a:4"
+                        , "--normal",   "#ecbe8b,#2c323a:4"
+                        , "--high",     "#ff6c6b,#2c323a:4"
+                        ] 30
+                , Run Date "<fn=1>\xf017</fn> %l:%M %p" "date" 300
+                , Run UnsafeXMonadLog
+                , Run Com "/home/atif/.config/xmonad/scripts/tray-padding-icon.sh"
+                        ["stalonetray"]
+                        "tray" 5
+                , Run Alsa "default" "Master"
+                        [ "-t", "<status> <volume>%"
+                        , "--"
+                        , "-C", "#98be65,#2c323a:4"
+                        , "-c", "#ff6c6b,#2c323a:4"
+                        , "-O", ""
+                        , "-o", "<fn=1>\xf6a9</fn>"
+                        , "-l", "<fn=1>\xf026</fn>"
+                        , "-m", "<fn=1>\xf027</fn>"
+                        , "-h", "<fn=1>\xf028</fn>"
+                        ]
+                , Run MPD
+                        [ "-t"
+                        , "<action=`mpc prev`><fc=#51afef,#2c323a:4><fn=1>\xf048</fn></fc></action>\
+                                \ <statei> \
+                                \<action=`mpc next`><fc=#51afef,#2c323a:4><fn=1>\xf051</fn></fc></action>\
+                                \ <title> - <artist>"
+                        , "-h", "127.0.0.1"
+                        , "-p", "6601"
+                        , "--"
+                        , "-P", "<action=`mpc stop` button=3>\
+                                \<action=`mpc pause`><fc=#98be65,#2c323a:4>\
+                                \<fn=2>\xf144</fn></fc>\
+                                \</action></action>"
+                        , "-Z", "<action=`mpc stop` button=3>\
+                                \<action=`mpc play`>\
+                                \<fc=#ecbe8b,#2c323a:4><fn=2>\xf28b</fn></fc>\
+                                \</action></action>"
+                        , "-S", "<action=`mpc play`><fc=#ff6c6b,#2c323a:4><fn=2>\xf28d</fn></fc></action>"
+                        ] 5
+                ]
         , sepChar = "%"
         , alignSep = "}{"
         , template =
@@ -64,25 +84,34 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
             \<action=`xdotool key super+p` button=1>\
             \<fc=#7b6f9c><fn=2></fn></fc>\
             \</action>\
-            \<fc=#434c5e> │ </fc>\
-            \%UnsafeXMonadLog% }{ \
-            \<action=`st -e btm` button=1>\
-            \<fc=#56b6c2>%cpu%</fc>\
+            \ <fc=#2c323a><fn=5></fn></fc>\
+            \%UnsafeXMonadLog%\
+            \<fc=#2c323a><fn=5></fn></fc>\
+            \}<fc=#2c323a><fn=5></fn></fc>\
+            \<fc=#a6aebf,#2c323a:4>%mpd%</fc>\
+            \<fc=#2c323a><fn=5></fn></fc>{ \
+            \<action=`st -e htop -s PERCENT_CPU` button=1>\
+            \<fc=#2c323a><fn=5></fn></fc>\
+            \<fc=#56b6c2,#2c323a:4>%cpu%</fc>\
             \</action>\
-            \<fc=#434c5e> │ </fc>\
+            \<fc=#2c323a><fn=5></fn></fc> <fc=#2c323a><fn=5></fn></fc>\
             \<action=`st -e htop -s PERCENT_MEM` button=1>\
-            \<fc=#b58fae>%memory%</fc>\
+            \<fc=#b58fae,#2c323a:4>%memory%</fc>\
             \</action>\
-            \<fc=#434c5e> │ </fc>\
+            \<fc=#2c323a><fn=5></fn></fc> <fc=#2c323a><fn=5></fn></fc>\
             \<action=`pulsepipe -t` button=1>\
             \<action=`pulsepipe -i` button=4>\
             \<action=`pulsepipe -d` button=5>\
-            \<fc=#7a869f>%alsa:default:Master%</fc>\
-            \</action></action></action>\
-            \<fc=#434c5e> │ </fc>\
-            \<fc=#c678dd>%date%</fc>\
-            \<fc=#434c5e> │ </fc>\
-            \%tray%"
+            \<action=`st -e alsamixer` button=3>\
+            \<fc=#7a869f,#2c323a:4>%alsa:default:Master%</fc>\
+            \</action></action></action></action>\
+            \<fc=#2c323a><fn=5></fn></fc> <fc=#2c323a><fn=5></fn></fc>\
+            \<action=`~/.config/xmonad/scripts/date.sh`>\
+            \<fc=#51aeed,#2c323a:4>%date%</fc>\
+            \</action>\
+            \<fc=#2c323a><fn=5></fn></fc> <fc=#2c323a><fn=5></fn></fc>\
+            \%tray%\
+            \<fc=#2c323a><fn=5></fn></fc> "
         }
 
 -- vim:ft=config

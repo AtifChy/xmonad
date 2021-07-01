@@ -37,7 +37,7 @@ import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
                                                       shorten, wrap,
                                                       xmobarAction,
                                                       xmobarBorder, xmobarColor,
-                                                      xmobarFont, xmobarStrip)
+                                                      xmobarStrip)
 import           XMonad.Hooks.WindowSwallowing       (swallowEventHook)
 import           XMonad.Layout.Accordion             (Accordion (Accordion))
 import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
@@ -140,15 +140,15 @@ altMask = mod1Mask
 --
 myWorkspaces :: [WorkspaceId]
 myWorkspaces =
-  [ "\xf8a3"
-  , "\xf8a6"
-  , "\xf8a9"
-  , "\xf8ac"
-  , "\xf8af"
-  , "\xf8b2"
-  , "\xf8b5"
-  , "\xf8b8"
-  , "\xf8bb"
+  [ "<fn=2>\xf8a3</fn>"
+  , "<fn=2>\xf8a6</fn>"
+  , "<fn=2>\xf8a9</fn>"
+  , "<fn=2>\xf8ac</fn>"
+  , "<fn=2>\xf8af</fn>"
+  , "<fn=2>\xf8b2</fn>"
+  , "<fn=2>\xf8b5</fn>"
+  , "<fn=2>\xf8b8</fn>"
+  , "<fn=2>\xf8bb</fn>"
   ]
 
 -- Get count of available windows on a workspace
@@ -203,7 +203,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ( (modm, xK_c)
          , unsafeSpawn
            (myLauncher
-           ++ " -show Clipboard -modi 'Clipboard:greenclip print' -run-command '{cmd}'"
+           ++ " -show '\xf0ea Clipboard' -modi '\xf0ea Clipboard:greenclip print' -run-command '{cmd}'"
            )
          )
 
@@ -428,7 +428,7 @@ myXPConfig = def { font                = myFont
                  , fgColor             = "#d8dee9"
                  , bgHLight            = "#4280bd"
                  , fgHLight            = "#000000"
-                 , borderColor         = "#434c5e"
+                 , borderColor         = "#2c323a"
                  , promptBorderWidth   = 1
                  , promptKeymap        = defaultXPKeymap
                  , position            = Top
@@ -454,11 +454,11 @@ mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 -- Tab theme
 myTabConfig :: Theme
 myTabConfig = def { activeColor         = "#4280bd"
-                  , activeBorderColor   = "#434c5e"
+                  , activeBorderColor   = "#2c323a"
                   , activeTextColor     = "#d8dee9"
                   , inactiveColor       = "#1e2127"
                   , inactiveBorderColor = "#1e2127"
-                  , inactiveTextColor   = "#434c5e"
+                  , inactiveTextColor   = "#2c323a"
                   , fontName            = myFont
                   , decoHeight          = 22
                   , decoWidth           = maxBound
@@ -630,31 +630,30 @@ mySB = statusBarProp
  where
   myXmobarPP :: PP
   myXmobarPP = def
-    { ppSep           = gray " │ "
+    { ppSep           = "<fc=#2c323a><fn=5>\57524</fn></fc> <fc=#2c323a><fn=5>\57526</fn></fc>"
     , ppTitleSanitize = xmobarStrip
-    , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 2 . wsFont
-    , ppHidden        = lowWhite . wrap "" "" . wsFont
-    , ppWsSep         = "  "
+    , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 2
+    , ppHidden        = lowWhite . wrap "" ""
+    , ppWsSep         = "<fc=#2c323a,#2c323a:4>  </fc>"
     , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
     , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
-    , ppExtras        = [xmobarColorL "#ff6c6b" "" windowCount]
+    , ppExtras        = [xmobarColorL "#ff6c6b" "#2c323a:4" windowCount]
     , ppLayout        = green
                         . xmobarAction "xdotool key Super+space"       "1"
                         . xmobarAction "xdotool key Super+shift+space" "3"
     }
    where
     blue, lowWhite, magenta, green :: String -> String
-    magenta  = xmobarColor "#b48ead" ""
-    blue     = xmobarColor "#51afef" ""
-    -- purple   = xmobarColor "#bd93f9" ""
-    -- lowBlue  = xmobarColor "#8be9fd" ""
-    -- white    = xmobarColor "#f8f8f2" ""
-    -- yellow   = xmobarColor "#f1fa8c" ""
-    -- red      = xmobarColor "#ff6c6b" ""
-    lowWhite = xmobarColor "#a6aebf" ""
-    gray     = xmobarColor "#434c5e" ""
-    green    = xmobarColor "#c3e88d" ""
-    wsFont   = xmobarFont 2
+    magenta  = xmobarColor "#b48ead" "#2c323a:4"
+    blue     = xmobarColor "#51afef" "#2c323a:4"
+    -- purple   = xmobarColor "#bd93f9" "#2c323a:4"
+    -- lowBlue  = xmobarColor "#8be9fd" "#2c323a:4"
+    -- white    = xmobarColor "#f8f8f2" "#2c323a:4"
+    -- yellow   = xmobarColor "#f1fa8c" "#2c323a:4"
+    -- red      = xmobarColor "#ff6c6b" "#2c323a:4"
+    lowWhite = xmobarColor "#a6aebf" "#2c323a:4"
+    gray     = xmobarColor "#2c323a" "#2c323a:4"
+    green    = xmobarColor "#c3e88d" "#2c323a:4"
 
   myIconConfig :: IconConfig
   myIconConfig = def { iconConfigIcons = myIcons
@@ -700,10 +699,11 @@ myStartupHook = do
   -- spawnOnce "emacs --daemon"
   spawnOnce "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-  spawnOnce "ibus-daemon -drx"
+  spawnOnce "ibus-daemon -x"
+  spawnOnce "mpd --no-daemon"
   spawnOnce "xss-lock -- lockctl -t 30 -l"
   spawnOnce
-    "stalonetray --geometry 1x1-6+4 --max-geometry 10x1-6+4 --transparent --tint-color '#1E2127' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
+    "stalonetray --geometry 1x1-17+4 --max-geometry 10x1-17+4 --transparent --tint-color '#2c323a' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
   -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1e2127  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"
 
 ------------------------------------------------------------------------
