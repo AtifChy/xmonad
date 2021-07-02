@@ -14,10 +14,10 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
         , fgColor = "#a6aebf"
         , borderColor = "#2c323a"
         , alpha = 255
-        , position = Static {xpos = 0, ypos = 0, width = 1920, height = 28}
+        , position = Static {xpos = 0, ypos = 0, width = 1920, height = 30}
         , border = FullB
-        , textOffset = 19
-        , textOffsets = [ 19, 20, 19, 20, 19 ]
+        , textOffset = 20
+        , textOffsets = [ 20, 21, 20, 21, 20 ]
         , lowerOnStart = True
         --, pickBroadest = False
         , persistent = True
@@ -29,17 +29,17 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
                         [ "-t", "<fn=1>\xf108</fn> <total>%"
                         , "-L", "50"
                         , "-H", "85"
-                        , "--low",      "#98be65,#2c323a:4"
-                        , "--normal",   "#ecbe8b,#2c323a:4"
-                        , "--high",     "#ff6c6b,#2c323a:4"
+                        , "--low",      "#98be65,#2c323a:5"
+                        , "--normal",   "#ecbe8b,#2c323a:5"
+                        , "--high",     "#ff6c6b,#2c323a:5"
                         ] 20
                 , Run Memory
                         [ "-t", "<fn=1>\xf538</fn> <usedratio>%"
                         , "-L", "50"
                         , "-H", "85"
-                        , "--low",      "#98be65,#2c323a:4"
-                        , "--normal",   "#ecbe8b,#2c323a:4"
-                        , "--high",     "#ff6c6b,#2c323a:4"
+                        , "--low",      "#98be65,#2c323a:5"
+                        , "--normal",   "#ecbe8b,#2c323a:5"
+                        , "--high",     "#ff6c6b,#2c323a:5"
                         ] 30
                 , Run Date "<fn=1>\xf017</fn> %l:%M %p" "date" 300
                 , Run UnsafeXMonadLog
@@ -49,8 +49,8 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
                 , Run Alsa "default" "Master"
                         [ "-t", "<status> <volume>%"
                         , "--"
-                        , "-C", "#98be65,#2c323a:4"
-                        , "-c", "#ff6c6b,#2c323a:4"
+                        , "-C", "#98be65,#2c323a:5"
+                        , "-c", "#ff6c6b,#2c323a:5"
                         , "-O", ""
                         , "-o", "<fn=1>\xf6a9</fn>"
                         , "-l", "<fn=1>\xf026</fn>"
@@ -59,23 +59,24 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
                         ]
                 , Run MPD
                         [ "-t"
-                        , "<action=`mpc prev`><fc=#51afef,#2c323a:4><fn=1>\xf048</fn></fc></action>\
+                        , "<action=`mpc prev`><fc=#51afef,#2c323a:5><fn=1>\xf048</fn></fc></action>\
                                 \ <statei> \
-                                \<action=`mpc next`><fc=#51afef,#2c323a:4><fn=1>\xf051</fn></fc></action>\
+                                \<action=`mpc next`><fc=#51afef,#2c323a:5><fn=1>\xf051</fn></fc></action>\
                                 \ <title> - <artist>"
                         , "-h", "127.0.0.1"
                         , "-p", "6601"
                         , "--"
                         , "-P", "<action=`mpc stop` button=3>\
-                                \<action=`mpc pause`><fc=#98be65,#2c323a:4>\
+                                \<action=`mpc pause`><fc=#98be65,#2c323a:5>\
                                 \<fn=2>\xf144</fn></fc>\
                                 \</action></action>"
                         , "-Z", "<action=`mpc stop` button=3>\
                                 \<action=`mpc play`>\
-                                \<fc=#ecbe8b,#2c323a:4><fn=2>\xf28b</fn></fc>\
+                                \<fc=#ecbe8b,#2c323a:5><fn=2>\xf28b</fn></fc>\
                                 \</action></action>"
-                        , "-S", "<action=`mpc play`><fc=#ff6c6b,#2c323a:4><fn=2>\xf28d</fn></fc></action>"
+                        , "-S", "<action=`mpc play`><fc=#ff6c6b,#2c323a:5><fn=2>\xf28d</fn></fc></action>"
                         ] 5
+                , Run Com "/home/atif/.config/xmonad/scripts/check-updates.sh" [] "checkupdates" 36000
                 ]
         , sepChar = "%"
         , alignSep = "}{"
@@ -88,26 +89,30 @@ Config  { font = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=t
             \%UnsafeXMonadLog%\
             \<fc=#2c323a><fn=5></fn></fc>\
             \}<fc=#2c323a><fn=5></fn></fc>\
-            \<fc=#a6aebf,#2c323a:4>%mpd%</fc>\
+            \<fc=#a6aebf,#2c323a:5>%mpd%</fc>\
             \<fc=#2c323a><fn=5></fn></fc>{ \
-            \<action=`st -e htop -s PERCENT_CPU` button=1>\
             \<fc=#2c323a><fn=5></fn></fc>\
-            \<fc=#56b6c2,#2c323a:4>%cpu%</fc>\
+            \<action=`st -e paru`>\
+            \<fc=#ff6c6b,#2c323a:5><fn=1></fn> %checkupdates%</fc>\
+            \</action>\
+            \<action=`st -e htop -s PERCENT_CPU` button=1>\
+            \<fc=#2c323a><fn=5></fn></fc> <fc=#2c323a><fn=5></fn></fc>\
+            \<fc=#56b6c2,#2c323a:5>%cpu%</fc>\
             \</action>\
             \<fc=#2c323a><fn=5></fn></fc> <fc=#2c323a><fn=5></fn></fc>\
             \<action=`st -e htop -s PERCENT_MEM` button=1>\
-            \<fc=#b58fae,#2c323a:4>%memory%</fc>\
+            \<fc=#b58fae,#2c323a:5>%memory%</fc>\
             \</action>\
             \<fc=#2c323a><fn=5></fn></fc> <fc=#2c323a><fn=5></fn></fc>\
             \<action=`pulsepipe -t` button=1>\
             \<action=`pulsepipe -i` button=4>\
             \<action=`pulsepipe -d` button=5>\
             \<action=`st -e alsamixer` button=3>\
-            \<fc=#7a869f,#2c323a:4>%alsa:default:Master%</fc>\
+            \<fc=#7a869f,#2c323a:5>%alsa:default:Master%</fc>\
             \</action></action></action></action>\
             \<fc=#2c323a><fn=5></fn></fc> <fc=#2c323a><fn=5></fn></fc>\
             \<action=`~/.config/xmonad/scripts/date.sh`>\
-            \<fc=#51aeed,#2c323a:4>%date%</fc>\
+            \<fc=#51aeed,#2c323a:5>%date%</fc>\
             \</action>\
             \<fc=#2c323a><fn=5></fn></fc> <fc=#2c323a><fn=5></fn></fc>\
             \%tray%\

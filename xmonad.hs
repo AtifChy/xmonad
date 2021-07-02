@@ -31,6 +31,7 @@ import           XMonad.Hooks.ManageHelpers          (composeOne, doCenterFloat,
                                                       doFullFloat, isDialog,
                                                       isFullscreen, transience,
                                                       (-?>))
+import           XMonad.Hooks.RefocusLast            (refocusLastLogHook)
 import           XMonad.Hooks.StatusBar              (StatusBarConfig,
                                                       statusBarProp, withSB)
 import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
@@ -87,6 +88,7 @@ import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       customFloating,
                                                       namedScratchpadAction,
                                                       namedScratchpadManageHook,
+                                                      nsHideOnFocusLoss,
                                                       scratchpadWorkspaceTag)
 import           XMonad.Util.Run                     (safeSpawn, unsafeSpawn)
 import           XMonad.Util.SpawnOnce               (spawnOnce)
@@ -433,7 +435,7 @@ myXPConfig = def { font                = myFont
                  , promptKeymap        = defaultXPKeymap
                  , position            = Top
                  -- , position            = CenteredAt {xpCenterY = 0.3, xpWidth = 0.3}
-                 , height              = 28
+                 , height              = 30
                  , historySize         = 50
                  , historyFilter       = deleteAllDuplicates
                  , defaultText         = []
@@ -571,7 +573,6 @@ myManageHook =
       =?   "gnome-boxes"
       -?>  doShift (myWorkspaces !! 6)
       ]
-    <+> namedScratchpadManageHook myScratchpads
 
 ------------------------------------------------------------------------
 -- Event handling
@@ -620,8 +621,8 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
 
 -- Perform an arbitrary action on each internal state change or X event.
 --
--- myLogHook :: X ()
--- myLogHook = mempty
+myLogHook :: X ()
+myLogHook = refocusLastLogHook >> nsHideOnFocusLoss myScratchpads
 
 mySB :: StatusBarConfig
 mySB = statusBarProp
@@ -634,26 +635,26 @@ mySB = statusBarProp
     , ppTitleSanitize = xmobarStrip
     , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 2
     , ppHidden        = lowWhite . wrap "" ""
-    , ppWsSep         = "<fc=#2c323a,#2c323a:4>  </fc>"
+    , ppWsSep         = "<fc=#2c323a,#2c323a:5>  </fc>"
     , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
     , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
-    , ppExtras        = [xmobarColorL "#ff6c6b" "#2c323a:4" windowCount]
+    , ppExtras        = [xmobarColorL "#ff6c6b" "#2c323a:5" windowCount]
     , ppLayout        = green
                         . xmobarAction "xdotool key Super+space"       "1"
                         . xmobarAction "xdotool key Super+shift+space" "3"
     }
    where
     blue, lowWhite, magenta, green :: String -> String
-    magenta  = xmobarColor "#b48ead" "#2c323a:4"
-    blue     = xmobarColor "#51afef" "#2c323a:4"
-    -- purple   = xmobarColor "#bd93f9" "#2c323a:4"
-    -- lowBlue  = xmobarColor "#8be9fd" "#2c323a:4"
-    -- white    = xmobarColor "#f8f8f2" "#2c323a:4"
-    -- yellow   = xmobarColor "#f1fa8c" "#2c323a:4"
-    -- red      = xmobarColor "#ff6c6b" "#2c323a:4"
-    lowWhite = xmobarColor "#a6aebf" "#2c323a:4"
-    gray     = xmobarColor "#2c323a" "#2c323a:4"
-    green    = xmobarColor "#c3e88d" "#2c323a:4"
+    magenta  = xmobarColor "#b48ead" "#2c323a:5"
+    blue     = xmobarColor "#51afef" "#2c323a:5"
+    -- purple   = xmobarColor "#bd93f9" "#2c323a:5"
+    -- lowBlue  = xmobarColor "#8be9fd" "#2c323a:5"
+    -- white    = xmobarColor "#f8f8f2" "#2c323a:5"
+    -- yellow   = xmobarColor "#f1fa8c" "#2c323a:5"
+    -- red      = xmobarColor "#ff6c6b" "#2c323a:5"
+    lowWhite = xmobarColor "#a6aebf" "#2c323a:5"
+    -- gray     = xmobarColor "#2c323a" "#2c323a:5"
+    green    = xmobarColor "#c3e88d" "#2c323a:5"
 
   myIconConfig :: IconConfig
   myIconConfig = def { iconConfigIcons = myIcons
@@ -703,7 +704,7 @@ myStartupHook = do
   spawnOnce "mpd --no-daemon"
   spawnOnce "xss-lock -- lockctl -t 30 -l"
   spawnOnce
-    "stalonetray --geometry 1x1-17+4 --max-geometry 10x1-17+4 --transparent --tint-color '#2c323a' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
+    "stalonetray --geometry 1x1-17+5 --max-geometry 10x1-17+5 --transparent --tint-color '#2c323a' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
   -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1e2127  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"
 
 ------------------------------------------------------------------------
@@ -733,9 +734,9 @@ main = do
 
       -- hooks, layouts
     , layoutHook         = myLayout
-    , manageHook         = myManageHook
+    , manageHook         = myManageHook <+> namedScratchpadManageHook myScratchpads
     , handleEventHook    = myHandleEventHook
-    , logHook            = activateLogHook acMh <+> logHook def
+    , logHook            = activateLogHook acMh <+> myLogHook
     , startupHook        = myStartupHook
     }
 

@@ -4,3 +4,4 @@ xmonad.hi
 xmonad.o
 .stack-work
 stack.yaml.lock
+xmobarrc.*
