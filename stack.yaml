@@ -29,7 +29,7 @@ resolver: lts-18.0
 #   - auto-update
 #   - wai
 packages:
-  - xmonad-contrib
+  - .
 
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
@@ -45,10 +45,20 @@ extra-deps:
     commit: master@{now}
   - github: xmonad/xmonad
     commit: master@{now}
+  - github: xmonad/xmonad-contrib
+    commit: master@{now}
+  - xmobar-0.38
 
 # Override default flag values for local packages and extra-deps
-# flags: {}
-
+flags:
+  xmobar:
+    with_xpm: true
+    with_threaded: true
+    with_xft: true
+    with_rtsopts: true
+    with_alsa: true
+    with_mpd: true
+#
 # Extra package databases containing global packages
 # extra-package-dbs: []
 
@@ -69,6 +79,3 @@ arch: x86_64
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
-
-ghc-options:
-  "$everything": -haddock -threaded -j

@@ -1,13 +1,7 @@
 #!/bin/sh
 
-set -e
+# compile
+cd "$XMONAD_CONFIG_DIR" && stack build || exit
 
-exec stack ghc --  \
-  --make xmonad.hs \
-  -i               \
-  -ilib            \
-  -fforce-recomp   \
-  -main-is main    \
-  -v0              \
-  -j$(nproc)       \
-  -o "$1"
+# Create a hard link at the requested destination, replacing any existing one.
+ln -f -T "$(stack exec -- which xmonad)" "$1"

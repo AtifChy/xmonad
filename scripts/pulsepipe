@@ -3,22 +3,24 @@
 SPEAKER=0
 MICROPHONE=0
 
+STEP=5
+
 case $1 in
     -i)
         DATA=$(pamixer --get-volume)
-        [ "$DATA" -lt '200' ] && pamixer --allow-boost -u -i 5
+        [ "$DATA" -lt '200' ] && pamixer --allow-boost -u -i $STEP
         ;;
     -d)
-        pamixer --allow-boost -u -d 5
+        pamixer --allow-boost -u -d $STEP
         ;;
     -t)
         pamixer -t
         ;;
     -mi)
-        pamixer --default-source -u -i 5
+        pamixer --default-source -u -i $STEP
         ;;
     -md)
-        pamixer --default-source -u -d 5
+        pamixer --default-source -u -d $STEP
         ;;
     -mt)
         pamixer --default-source -t

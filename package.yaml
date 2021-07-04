@@ -1,0 +1,28 @@
+name: xmonad-atif
+version: 0.16
+synopsis: My xmonad configuration.
+license: MIT
+author: Atif
+maintainer: iftakhar.awal@yahoo.com
+homepage: https://github.com/AtifChy/dotfiles
+
+ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2
+
+dependencies:
+  - base
+  - containers
+  - unix
+  - xmobar
+  - xmonad
+  - xmonad-contrib >= 0.16
+  - X11
+  - utf8-string
+
+source-dirs: src
+
+executables:
+  xmonad:
+    main: xmonad.hs
+  xmobar:
+    main: xmobar.hs
+    ghc-options: -rtsopts -threaded -with-rtsopts=-N

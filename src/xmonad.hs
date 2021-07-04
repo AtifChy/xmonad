@@ -5,6 +5,10 @@ import           Control.Monad                       (liftM2)
 import qualified Data.Map                            as M
 import           Data.Monoid                         (All)
 import           System.Exit                         (exitSuccess)
+import           Theme.Theme                         (base00, base01, base02,
+                                                      base04, base05, base06,
+                                                      base07, basebg, basefg,
+                                                      myFont, myFontGTK)
 import           XMonad                              hiding ((|||))
 import           XMonad.Actions.CopyWindow           (copyToAll, kill1,
                                                       killAllOtherCopies)
@@ -38,7 +42,7 @@ import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
                                                       shorten, wrap,
                                                       xmobarAction,
                                                       xmobarBorder, xmobarColor,
-                                                      xmobarStrip)
+                                                      xmobarFont, xmobarStrip)
 import           XMonad.Hooks.WindowSwallowing       (swallowEventHook)
 import           XMonad.Layout.Accordion             (Accordion (Accordion))
 import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
@@ -153,29 +157,11 @@ myWorkspaces =
   , "<fn=2>\xf8bb</fn>"
   ]
 
--- Get count of available windows on a workspace
---
-windowCount :: X (Maybe String)
-windowCount =
-  gets
-    $ Just
-    . show
-    . length
-    . W.integrate'
-    . W.stack
-    . W.workspace
-    . W.current
-    . windowset
-
 -- Border colors for unfocused and focused windows, respectively.
 --
 myNormalBorderColor, myFocusedBorderColor :: String
-myNormalBorderColor = "#2c313a"
-myFocusedBorderColor = "#61afef"
-
--- Custom font
-myFont :: String
-myFont = "xft:JetBrains Mono:size=10:style=Bold:antialias=true:hinting=true"
+myNormalBorderColor = base00
+myFocusedBorderColor = base04
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -289,7 +275,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        -- Run xmessage with a summary of the default keybindings (useful for beginners)
        , ( (modm .|. shiftMask, xK_slash)
          , unsafeSpawn
-           ("printf \"" ++ help ++ "\" | gxmessage -fn 'JetBrains Mono' -file -")
+           ("printf \"" ++ help ++ "\" | gxmessage -title 'XMonad Keybind' -fn '" ++ myFontGTK ++ "' -file -")
          )
        , ((modm, xK_b)                  , sendMessage $ Toggle NOBORDERS)
        , ((modm, xK_f)                  , sendMessage $ Toggle NBFULL)
@@ -426,11 +412,11 @@ myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
 --
 myXPConfig :: XPConfig
 myXPConfig = def { font                = myFont
-                 , bgColor             = "#1e2127"
-                 , fgColor             = "#d8dee9"
-                 , bgHLight            = "#4280bd"
-                 , fgHLight            = "#000000"
-                 , borderColor         = "#2c323a"
+                 , bgColor             = basebg
+                 , fgColor             = basefg
+                 , bgHLight            = base04
+                 , fgHLight            = basebg
+                 , borderColor         = base00
                  , promptBorderWidth   = 1
                  , promptKeymap        = defaultXPKeymap
                  , position            = Top
@@ -455,12 +441,12 @@ mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 
 -- Tab theme
 myTabConfig :: Theme
-myTabConfig = def { activeColor         = "#4280bd"
-                  , activeBorderColor   = "#2c323a"
-                  , activeTextColor     = "#d8dee9"
-                  , inactiveColor       = "#1e2127"
-                  , inactiveBorderColor = "#1e2127"
-                  , inactiveTextColor   = "#2c323a"
+myTabConfig = def { activeColor         = base04
+                  , activeBorderColor   = base00
+                  , activeTextColor     = basefg
+                  , inactiveColor       = basebg
+                  , inactiveBorderColor = basebg
+                  , inactiveTextColor   = base00
                   , fontName            = myFont
                   , decoHeight          = 22
                   , decoWidth           = maxBound
@@ -561,6 +547,8 @@ myManageHook =
       , resource =? "gcr-prompter" -?> doCenterFloat
       , className =? "St-float" -?> doFloat
       , transience
+      , title =? "XMonad Keybind" -?> doCenterFloat
+      , className =? "Ibus-extension-gtk3" -?> doFloat
       , isFullscreen -?> doFullFloat
       , isDialog -?> doCenterFloat
       , className =? "firefox" -?> doShift (myWorkspaces !! 1)
@@ -626,35 +614,54 @@ myLogHook = refocusLastLogHook >> nsHideOnFocusLoss myScratchpads
 
 mySB :: StatusBarConfig
 mySB = statusBarProp
-    "xmobar ~/.config/xmonad/xmobar/xmobarrc"
+    "xmobar"
     (clickablePP =<< dynamicIconsPP myIconConfig (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP))
  where
   myXmobarPP :: PP
   myXmobarPP = def
-    { ppSep           = "<fc=#2c323a><fn=5>\57524</fn></fc> <fc=#2c323a><fn=5>\57526</fn></fc>"
+    { ppSep           = wrapSep " "
     , ppTitleSanitize = xmobarStrip
-    , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" "#8be9fd" 2
+    , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" base06 2
     , ppHidden        = lowWhite . wrap "" ""
-    , ppWsSep         = "<fc=#2c323a,#2c323a:5>  </fc>"
-    , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
+    , ppWsSep         = xmobarColor "" background "  "
+    , ppTitle         = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
     , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
-    , ppExtras        = [xmobarColorL "#ff6c6b" "#2c323a:5" windowCount]
+    , ppExtras        = [xmobarColorL base01 background windowCount]
     , ppLayout        = green
                         . xmobarAction "xdotool key Super+space"       "1"
                         . xmobarAction "xdotool key Super+shift+space" "3"
     }
    where
+    wrapSep :: String -> String
+    wrapSep = wrap (xmobarColor base00 "" (xmobarFont 5 "\57524")) (xmobarColor base00 "" (xmobarFont 5 "\57526"))
+
+    background :: String
+    background = base00 ++ ":5"
+
     blue, lowWhite, magenta, green :: String -> String
-    magenta  = xmobarColor "#b48ead" "#2c323a:5"
-    blue     = xmobarColor "#51afef" "#2c323a:5"
+    magenta  = xmobarColor base05 background
+    blue     = xmobarColor base04 background
     -- purple   = xmobarColor "#bd93f9" "#2c323a:5"
     -- lowBlue  = xmobarColor "#8be9fd" "#2c323a:5"
     -- white    = xmobarColor "#f8f8f2" "#2c323a:5"
     -- yellow   = xmobarColor "#f1fa8c" "#2c323a:5"
     -- red      = xmobarColor "#ff6c6b" "#2c323a:5"
-    lowWhite = xmobarColor "#a6aebf" "#2c323a:5"
-    -- gray     = xmobarColor "#2c323a" "#2c323a:5"
-    green    = xmobarColor "#c3e88d" "#2c323a:5"
+    lowWhite = xmobarColor base07 background
+    -- gray     = xmobarColor "" background
+    green    = xmobarColor base02 background
+
+    -- Get count of available windows on a workspace
+    windowCount :: X (Maybe String)
+    windowCount =
+      gets
+        $ Just
+        . show
+        . length
+        . W.integrate'
+        . W.stack
+        . W.workspace
+        . W.current
+        . windowset
 
   myIconConfig :: IconConfig
   myIconConfig = def { iconConfigIcons = myIcons

@@ -1,4 +1,0 @@
-[submodule "xmonad-contrib"]
-	path = xmonad-contrib
-	branch = master
-	url = https://github.com/xmonad/xmonad-contrib.git
