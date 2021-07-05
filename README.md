@@ -59,6 +59,7 @@ xmonad --recompile
 ```
 
 - Now you can start using xmonad. Start it using your `xinitrc`.
+  > Note: My xmonad config reads color from `Xresources`. [Here you find my Xresources](https://github.com/AtifChy/dotfiles/blob/main/.config/x11/Xresources). Merge it using `xrdb -merge /path/to/Xresources`.
 
 ### License
 
