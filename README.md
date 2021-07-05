@@ -2,10 +2,17 @@
 
 my [xmonad](https://github.com/xmonad/xmonad) configuration
 
+## Table of Contents
+
+- [Preview](#preview)
+- [About Setup](#about-setup)
+- [Installation](#installation)
+- [License](#license)
+
 ### Preview
 
-![xmonad 1](./preview/img_1.png)
-![xmonad 2](./preview/img_2.png)
+![preview 1](./preview/img_1.png)
+![preview 2](./preview/img_2.png)
 
 ### About Setup
 
@@ -24,7 +31,7 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
 - Wallpaper:
   <details><summary>Click Me</summary>
 
-  ![](./preview/the-neon-shallows-redish.png)
+  ![wallpaper](./preview/the-neon-shallows-redish.png)
 
   </details>
 
@@ -58,8 +65,15 @@ stack init && stack install
 xmonad --recompile
 ```
 
-- Now you can start using xmonad. Start it using your `xinitrc`.
-  > Note: My xmonad config reads color from `Xresources`. [Here you find my Xresources](https://github.com/AtifChy/dotfiles/blob/main/.config/x11/Xresources). Merge it using `xrdb -merge /path/to/Xresources`.
+- Now you can start using xmonad. Start it using your `xinitrc`. By putting
+
+```
+exec xmonad
+```
+
+in your `xinitrc`.
+
+> Note: My xmonad config reads color from `Xresources`. [Here you can find my Xresources](https://github.com/AtifChy/dotfiles/blob/main/.config/x11/Xresources). Merge it using `xrdb -merge /path/to/Xresources`.
 
 ### License
 
