@@ -1,0 +1,32 @@
+#!/bin/sh
+
+WALL_DIR=$HOME/Pictures/Wallpapers
+CACHE_PATH=${XDG_CACHE_DIR:-$HOME/.cache}/wallpaper.sh
+
+wallpaper() {
+        hsetroot -cover "$1"
+        cat <<EOF >"$CACHE_PATH"
+#!/bin/sh
+hsetroot -cover $1
+EOF
+        [ -x "$CACHE_PATH" ] || chmod +x "$CACHE_PATH"
+}
+
+random() {
+        img=$(find "$WALL_DIR" -type f | grep -v -E 'git|README.md' | shuf -n1)
+        hsetroot -cover "$img"
+}
+
+daemon() {
+        while :; do
+                random
+                sleep 10m
+        done
+}
+
+case $1 in
+        *.png | *.jpg) wallpaper "$1" ;;
+        random) random ;;
+        daemon) daemon ;;
+        *) "${XDG_CACHE_DIR:-$HOME/.cache}"/wallpaper.sh || random ;;
+esac

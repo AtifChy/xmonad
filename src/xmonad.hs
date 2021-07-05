@@ -695,7 +695,8 @@ mySB = statusBarProp
 myStartupHook :: X ()
 myStartupHook = do
   setDefaultCursor xC_left_ptr
-  spawnOnce "xwallpaper --zoom ~/Pictures/macOS-Big-Sur-night.jpg"
+  spawnOnce "wall"
+  -- spawnOnce "xwallpaper --zoom ~/Pictures/macOS-Big-Sur-night.jpg"
   -- spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0057.jpg"
   -- spawn "feh --bg-scale --randomize --no-fehbg ~/Pictures/Wallpapers/*"
   spawnOnce "picom"
