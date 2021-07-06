@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# compile
+# Recompile
 cd "$XMONAD_CONFIG_DIR" && stack build || exit
 
 # Create a hard link at the requested destination, replacing any existing one.

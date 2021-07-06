@@ -7,6 +7,7 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
 - [Preview](#preview)
 - [About Setup](#about-setup)
 - [Installation](#installation)
+- [Keybind](#keybind)
 - [License](#license)
 
 ### Preview
@@ -27,8 +28,9 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
 - Shell: [zsh](https://github.com/AtifChy/dotfiles/tree/main/.config/zsh)
   - Plugin Manager: [zinit](https://github.com/zdharma/zinit)
   - Prompt: [starship](https://github.com/AtifChy/dotfiles/blob/main/.config/starship.toml)
-- Editor: [neovim](https://github.com/AtifChy/dotfiles/tree/main/.config/nvim)
-- Image Preview: [sxiv](https://github.com/muennich/sxiv)
+- Editor: [Neovim](https://github.com/AtifChy/dotfiles/tree/main/.config/nvim)
+- Compositor: [Picom](https://github.com/AtifChy/dotfiles/blob/main/.config/picom/picom.conf)
+- Image Preview: [Sxiv](https://github.com/muennich/sxiv)
 - Wallpaper:
   <details><summary>Click Me</summary>
 
@@ -37,12 +39,14 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
   </details>
 
 - Wallpaper Setter: [hsetroot](https://github.com/himdel/hsetroot)
-- Night Light: [redshift](https://github.com/jonls/redshift)
-- Music Player: [ncmpcpp](https://github.com/AtifChy/dotfiles/tree/main/.config/ncmpcpp)
+- Screenshot: [shotgun](https://github.com/neXromancers/shotgun)
+  - Selector: [slop](https://github.com/naelstrof/slop)
+  - Script: [Here](https://github.com/AtifChy/xmonad/blob/main/scripts/shotclip)
+- Night Light: [Redshift](https://github.com/jonls/redshift)
+- Music Player: [ncmpcpp](https://github.com/AtifChy/dotfiles/tree/main/.config/ncmpcpp) + [mpd](https://github.com/AtifChy/dotfiles/blob/main/.config/mpd/mpd.conf) + mpc
 - Video Player: [mpv](https://github.com/AtifChy/dotfiles/blob/main/.config/mpv/mpv.conf)
-- Notification Daemon: [dunst](https://github.com/AtifChy/dotfiles/blob/main/.config/dunst/dunstrc)
-- Tray: [stalonetray](https://github.com/kolbusa/stalonetray)
-
+- Notification Daemon: [Dunst](https://github.com/AtifChy/dotfiles/blob/main/.config/dunst/dunstrc)
+- Tray: [Stalonetray](https://github.com/kolbusa/stalonetray)
 - [DOTFILES](https://github.com/AtifChy/dotfiles)
 
 ### Installation
@@ -78,6 +82,16 @@ exec xmonad
 in your `xinitrc`.
 
 > Note: My xmonad config reads color & font from `Xresources`. [Here you can find my Xresources](https://github.com/AtifChy/dotfiles/blob/main/.config/x11/Xresources). Merge it using `xrdb -merge /path/to/Xresources`.
+
+### Keybind
+
+Open a **gxmessage** window showing all available keybinds. (Requires. gxmessage)
+
+```
+Super+Shift+/
+```
+
+[All Keybinds](https://github.com/AtifChy/xmonad/blob/main/src/xmonad.hs#L753)
 
 ### License
 

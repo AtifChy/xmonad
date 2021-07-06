@@ -5,10 +5,10 @@ import           Control.Monad                       (liftM2)
 import qualified Data.Map                            as M
 import           Data.Monoid                         (All)
 import           System.Exit                         (exitSuccess)
-import           Theme.Theme                         (base00, base01, base02,
-                                                      base04, base05, base06,
-                                                      base07, basebg, basefg,
-                                                      myFont, myFontGTK)
+import           Theme.Theme                         (base00, base02, base04,
+                                                      base05, base06, base07,
+                                                      basebg, basefg, myFont,
+                                                      myFontGTK)
 import           XMonad                              hiding ((|||))
 import           XMonad.Actions.CopyWindow           (copyToAll, kill1,
                                                       killAllOtherCopies)
@@ -35,7 +35,6 @@ import           XMonad.Hooks.ManageHelpers          (composeOne, doCenterFloat,
                                                       doFullFloat, isDialog,
                                                       isFullscreen, transience,
                                                       (-?>))
-import           XMonad.Hooks.RefocusLast            (refocusLastLogHook)
 import           XMonad.Hooks.StatusBar              (StatusBarConfig,
                                                       statusBarProp, withSB)
 import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
@@ -87,12 +86,10 @@ import           XMonad.Util.ClickableWorkspaces     (clickablePP)
 import           XMonad.Util.Cursor                  (setDefaultCursor)
 import           XMonad.Util.DynamicScratchpads      (makeDynamicSP,
                                                       spawnDynamicSP)
-import           XMonad.Util.Loggers                 (xmobarColorL)
 import           XMonad.Util.NamedScratchpad         (NamedScratchpad (NS),
                                                       customFloating,
                                                       namedScratchpadAction,
                                                       namedScratchpadManageHook,
-                                                      nsHideOnFocusLoss,
                                                       scratchpadWorkspaceTag)
 import           XMonad.Util.Run                     (safeSpawn, unsafeSpawn)
 import           XMonad.Util.SpawnOnce               (spawnOnce)
@@ -609,8 +606,8 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
 
 -- Perform an arbitrary action on each internal state change or X event.
 --
-myLogHook :: X ()
-myLogHook = refocusLastLogHook >> nsHideOnFocusLoss myScratchpads
+-- myLogHook :: X ()
+-- myLogHook = refocusLastLogHook >> nsHideOnFocusLoss myScratchpads
 
 mySB :: StatusBarConfig
 mySB = statusBarProp
@@ -744,7 +741,7 @@ main = do
     , layoutHook         = myLayout
     , manageHook         = myManageHook <+> namedScratchpadManageHook myScratchpads
     , handleEventHook    = myHandleEventHook
-    , logHook            = activateLogHook acMh <+> myLogHook
+    , logHook            = activateLogHook acMh <+> logHook def
     , startupHook        = myStartupHook
     }
 
@@ -818,6 +815,14 @@ help = unlines
   , "mod-f                Switch to a free workSpace"
   , "mod-z                Switch between previously used workSpace"
   , ""
+  , "-- Cycle Workspaces"
+  , "mod-Tab              Cycle between active workspaces from left to right"
+  , "mod-Shift-Tab        Cycle between active workspaces from right to left"
+  , "mod-left             Go to next workspace"
+  , "mod-right            Go to preview workspace"
+  , "mod-Shift-left       Move focused window to next workspace"
+  , "mod-Shift-right      Move focused window to previous workspace"
+  , ""
   , "-- Mouse bindings: default actions bound to mouse events"
   , "mod-button1          Set the window to floating mode and move by dragging"
   , "mod-button2          Raise the window to the top of the stack"
@@ -839,13 +844,24 @@ help = unlines
   , "mod-Ctrl-period (.)  Move focus to the next window in the sublayout"
   , "mod-Ctrl-comma (,)   Move focus to the previous window in the sublayout"
   , ""
+  , "-- Copy windows"
+  , "mod-v                Copy focused window to all workspaces"
+  , "mod-Shift-v          Only keep currently focused copied window"
+  , ""
+  , "-- Scratchpad"
+  , "mod-Ctrl-Enter       Open a terminal in scratchpad"
+  , "mod-Shift-Equal (=)  Add currently focused window to scratchpad (1)"
+  , "mod-Equal (=)        Open scratchpad (1)"
+  , "mod-Shift-minus (-)  Add currently focused window to scratchpad (2)"
+  , "mod-minus (-)        Open scratchpad (2)"
+  , ""
   , "-- Shortcuts for taking screenshots"
   , "Print                Take fullscreen screenshot"
   , "Shift-Print          Take screenshot of selected screen"
   , "Ctrl-Print           Take screenshot of focused window"
   , ""
   , "-- Application"
-  , "All-e                Open emacs-client"
+  -- , "All-e                Open emacs-client"
   , "Alt-F9               Turn on/off picom"
   ]
 
