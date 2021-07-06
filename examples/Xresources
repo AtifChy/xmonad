@@ -1,0 +1,65 @@
+!-- Xft settings --!
+Xft.antialias:      1
+Xft.hinting:        1
+Xft.autohint:       0
+Xft.hintstyle:      hintslight
+Xft.rgba:           rgb
+Xft.lcdfilter:      lcddefault
+
+! Cursor theme
+Xcursor.theme:      bloom
+!Xcursor.size:       16
+
+! sxiv config
+Sxiv.font:          JetBrains Mono:style=Medium:size=9
+
+!Xmessage.font:      FiraCode Nerd Font:pixelsize=14
+
+! st settings
+st.font:            JetBrainsMono Nerd Font:size=10:weight=90
+st.borderpx:        10
+st.opacity:         255
+st.alpha:           1.0
+st.cursorshape:     1
+st.blinktimeout:    900
+
+! xmonad settings
+xmonad.font:        xft:JetBrains Mono:size=10:style=Bold
+xmonad.font.gtk:    JetBrains Mono Medium, 10
+
+! special
+*.foreground:       #c8ccd4
+*.background:       #1e2127
+*.cursorColor:      #abb2bf
+
+! black
+*.color0:           #2c313a
+*.color8:           #545862
+
+! red
+*.color1:           #ff6c6b
+*.color9:           #ff8b92
+
+! green
+*.color2:           #98be65
+*.color10:          #ddffa7
+
+! yellow
+*.color3:           #ffcb6b
+*.color11:          #ffe585
+
+! blue
+*.color4:           #51aeed
+*.color12:          #9cc4ff
+
+! magenta
+*.color5:           #b58fae
+*.color13:          #e1acff
+
+! cyan
+*.color6:           #56b6c2
+*.color14:          #a3f7ff
+
+! white
+*.color7:           #a6aebf
+*.color15:          #ffffff
