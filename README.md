@@ -19,6 +19,7 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
 - OS: [Arch Linux](https://archlinux.org/)
 - WM: [XMonad](https://github.com/xmonad/xmonad)
 - Bar: [Xmobar](https://github.com/jaor/xmobar)
+- Prompt: [XMonad Prompt](https://github.com/xmonad/xmonad-contrib)
 - Font:
   - Monospace: [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)
 - Colorscheme: onedark (slightly changed)
@@ -38,6 +39,9 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
 - Wallpaper Setter: [hsetroot](https://github.com/himdel/hsetroot)
 - Night Light: [redshift](https://github.com/jonls/redshift)
 - Music Player: [ncmpcpp](https://github.com/AtifChy/dotfiles/tree/main/.config/ncmpcpp)
+- Video Player: [mpv](https://github.com/AtifChy/dotfiles/blob/main/.config/mpv/mpv.conf)
+- Notification Daemon: [dunst](https://github.com/AtifChy/dotfiles/blob/main/.config/dunst/dunstrc)
+- Tray: [stalonetray](https://github.com/kolbusa/stalonetray)
 
 - [DOTFILES](https://github.com/AtifChy/dotfiles)
 
@@ -73,7 +77,7 @@ exec xmonad
 
 in your `xinitrc`.
 
-> Note: My xmonad config reads color from `Xresources`. [Here you can find my Xresources](https://github.com/AtifChy/dotfiles/blob/main/.config/x11/Xresources). Merge it using `xrdb -merge /path/to/Xresources`.
+> Note: My xmonad config reads color & font from `Xresources`. [Here you can find my Xresources](https://github.com/AtifChy/dotfiles/blob/main/.config/x11/Xresources). Merge it using `xrdb -merge /path/to/Xresources`.
 
 ### License
 
