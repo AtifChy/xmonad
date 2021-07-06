@@ -625,15 +625,15 @@ mySB = statusBarProp
     , ppHidden        = lowWhite . wrap "" ""
     , ppWsSep         = xmobarColor "" background "  "
     , ppTitle         = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
-    , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
-    , ppExtras        = [xmobarColorL base01 background windowCount]
+    -- , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
+    -- , ppExtras        = [xmobarColorL base01 background windowCount]
     , ppLayout        = green
                         . xmobarAction "xdotool key Super+space"       "1"
                         . xmobarAction "xdotool key Super+shift+space" "3"
     }
    where
     wrapSep :: String -> String
-    wrapSep = wrap (xmobarColor base00 "" (xmobarFont 5 "\57524")) (xmobarColor base00 "" (xmobarFont 5 "\57526"))
+    wrapSep = wrap (xmobarColor base00 "" (xmobarFont 5 "\xe0b4")) (xmobarColor base00 "" (xmobarFont 5 "\xe0b6"))
 
     background :: String
     background = base00 ++ ":5"
@@ -650,18 +650,18 @@ mySB = statusBarProp
     -- gray     = xmobarColor "" background
     green    = xmobarColor base02 background
 
-    -- Get count of available windows on a workspace
-    windowCount :: X (Maybe String)
-    windowCount =
-      gets
-        $ Just
-        . show
-        . length
-        . W.integrate'
-        . W.stack
-        . W.workspace
-        . W.current
-        . windowset
+    -- -- Get count of available windows on a workspace
+    -- windowCount :: X (Maybe String)
+    -- windowCount =
+    --   gets
+    --     $ Just
+    --     . show
+    --     . length
+    --     . W.integrate'
+    --     . W.stack
+    --     . W.workspace
+    --     . W.current
+    --     . windowset
 
   myIconConfig :: IconConfig
   myIconConfig = def { iconConfigIcons = myIcons
@@ -713,7 +713,7 @@ myStartupHook = do
   spawnOnce "xss-lock -- lockctl -t 30 -l"
   spawnOnce
     "stalonetray --geometry 1x1-17+5 --max-geometry 10x1-17+5 --transparent --tint-color '#2c323a' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
-  -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x1e2127  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"
+  -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x2c323a  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.

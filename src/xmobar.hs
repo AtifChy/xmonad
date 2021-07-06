@@ -46,7 +46,7 @@ config = defaultConfig
   , sepChar         = "%"
   , alignSep        = "}{"
   , template        =
-    " " ++ xmobarAction "xdotool key super+p" "1" (darkPurple (xmobarFont 2 "\58911")) ++ " "
+    " " ++ xmobarAction "xdotool key super+p" "1" (darkPurple (xmobarFont 2 "\xe61f")) ++ " "
     <> inWrapper "%UnsafeXMonadLog%"
     <> "}" ++ inWrapperC (white "%mpd%") ++ "{"
     <> concatMap
@@ -64,12 +64,12 @@ config = defaultConfig
   }
  where
   inWrapper :: String -> String
-  inWrapper = wrap (xmobarColor base00 "" (xmobarFont 5 "\57526"))
-                   (xmobarColor base00 "" (xmobarFont 5 "\57524") ++ " ")
+  inWrapper = wrap (xmobarColor base00 "" (xmobarFont 5 "\xe0b6"))
+                   (xmobarColor base00 "" (xmobarFont 5 "\xe0b4") ++ " ")
 
   inWrapperC :: String -> String
-  inWrapperC = wrap (xmobarColor base00 "" (xmobarFont 5 "\57526"))
-                    (xmobarColor base00 "" (xmobarFont 5 "\57524"))
+  inWrapperC = wrap (xmobarColor base00 "" (xmobarFont 5 "\xe0b6"))
+                    (xmobarColor base00 "" (xmobarFont 5 "\xe0b4"))
 
 -- | Commands to run xmobar modules on start
 myCommands :: [Runnable]
