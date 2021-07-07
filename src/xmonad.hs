@@ -47,8 +47,8 @@ import           XMonad.Layout.Accordion             (Accordion (Accordion))
 import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
 import           XMonad.Layout.LayoutCombinators     ((|||))
 import           XMonad.Layout.LayoutModifier        (ModifiedLayout)
-import           XMonad.Layout.MultiToggle           (EOT (..), Toggle (..),
-                                                      mkToggle, (??))
+import           XMonad.Layout.MultiToggle           (Toggle (..), mkToggle,
+                                                      single)
 import           XMonad.Layout.MultiToggle.Instances (StdTransformers (NBFULL, NOBORDERS))
 import           XMonad.Layout.NoBorders             (smartBorders)
 import           XMonad.Layout.Renamed               (Rename (Replace), renamed)
@@ -432,8 +432,7 @@ myXPConfig = def { font                = myFont
 
 ------------------------------------------------------------------------
 -- Spacing (gaps)
-mySpacing
-  :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a
+mySpacing :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a
 mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 
 -- Tab theme
@@ -460,8 +459,9 @@ myTabConfig = def { activeColor         = base04
 -- which denotes layout choice.
 --
 
-myLayout = avoidStruts
-  $ mkToggle (NBFULL ?? NOBORDERS ?? EOT)
+myLayout = mkToggle (single NBFULL)
+  $ avoidStruts
+  $ mkToggle (single NOBORDERS)
   $ tall ||| mtall ||| center
  where
   -- default tiling algorithm partitions the screen into two panes

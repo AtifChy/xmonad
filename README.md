@@ -79,17 +79,39 @@ xmonad --recompile
 exec xmonad
 ```
 
-in your `xinitrc`.
+in your `xinitrc`. By default xmonad recompiles on every login. If you don't want xmonad to recompile every time you start it then put
+
+```
+exec ~/.local/share/xmonad/xmonad-x86_64-linux
+```
+
+in your `xinitrc`. It will use previously compiled binary to start xmonad.
 
 > Note: My xmonad config reads color & font from `Xresources`. [Here you can find my Xresources](https://github.com/AtifChy/dotfiles/blob/main/.config/x11/Xresources). Merge it using `xrdb -merge /path/to/Xresources`.
 
 ### Keybind
 
-Open a **gxmessage** window showing all available keybinds. (Requires. gxmessage)
+Some basic keybinds
 
-```
-Super+Shift+/
-```
+| Keybind                  | Function                                  |
+| ------------------------ | ----------------------------------------- |
+| `Super + Shift + Enter`  | Launch terminal (st)                      |
+| `Super + Shift + C`      | Close window                              |
+| `Super + [1..9]`         | Switch workspaces                         |
+| `Super + Shift + [1..9]` | Move focused window to certain workspace  |
+| `Super + P`              | Open XMonad Prompt                        |
+| `Super + B`              | Toggle borders                            |
+| `Super + G`              | Toggle gaps (toggle to get screen space)  |
+| `Super + I`              | Increase gaps                             |
+| `Super + D`              | Decrease gaps                             |
+| `Super + J`              | Navigate through windows                  |
+| `Super + K`              | Navigate through windows                  |
+| `Super + Shift + B`      | Ignore the bar                            |
+| `Super + Space`          | Switch through layouts                    |
+| `Super + Shift + Space`  | Reset to default layout                   |
+| `Super + T`              | Make a floating window tiled              |
+| `Super + Shift + T`      | Tile all floating window                  |
+| `Super + Shift + \`      | Show all keybinds (Requires. `gxmessage`) |
 
 [All Keybinds](https://github.com/AtifChy/xmonad/blob/main/src/xmonad.hs#L753)
 
