@@ -23,6 +23,10 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
 - Prompt: [XMonad Prompt](https://github.com/xmonad/xmonad-contrib)
 - Font:
   - Monospace: [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono)
+  - Icon Fonts:
+    - [JetBrainsMono Nerd Font](https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/JetBrainsMono/Ligatures)
+    - [Font Awesome 5](https://fontawesome.com/download)
+    - [file-icons](https://github.com/file-icons/atom)
 - Colorscheme: onedark (slightly changed)
 - Terminal: [st](https://github.com/AtifChy/st)
 - Shell: [zsh](https://github.com/AtifChy/dotfiles/tree/main/.config/zsh)
@@ -112,6 +116,8 @@ Some basic keybinds
 | `Super + T`              | Make a floating window tiled              |
 | `Super + Shift + T`      | Tile all floating window                  |
 | `Super + Shift + \`      | Show all keybinds (Requires. `gxmessage`) |
+| `Super + Q`              | Reload xmonad                             |
+| `Super + Shift + Q`      | Exit xmonad                               |
 
 [All Keybinds](https://github.com/AtifChy/xmonad/blob/main/src/xmonad.hs#L753)
 

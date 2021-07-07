@@ -6,7 +6,7 @@ author: Atif
 maintainer: iftakhar.awal@yahoo.com
 homepage: https://github.com/AtifChy/dotfiles
 
-ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2
+ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2 -j
 
 dependencies:
   - base

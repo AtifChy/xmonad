@@ -22,7 +22,7 @@ executable xmobar
       Paths_xmonad_atif
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2 -rtsopts -threaded -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2 -j -rtsopts -threaded -with-rtsopts=-N
   build-depends:
       X11
     , base
@@ -42,7 +42,7 @@ executable xmonad
       Paths_xmonad_atif
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2 -j
   build-depends:
       X11
     , base
