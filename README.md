@@ -32,6 +32,7 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
 - Shell: [zsh](https://github.com/AtifChy/dotfiles/tree/main/.config/zsh)
   - Plugin Manager: [zinit](https://github.com/zdharma/zinit)
   - Prompt: [starship](https://github.com/AtifChy/dotfiles/blob/main/.config/starship.toml)
+- Clipboard Manager: [greenclip](https://github.com/erebe/greenclip)
 - Editor: [Neovim](https://github.com/AtifChy/dotfiles/tree/main/.config/nvim)
 - Compositor: [Picom](https://github.com/AtifChy/dotfiles/blob/main/.config/picom/picom.conf)
 - Image Preview: [Sxiv](https://github.com/muennich/sxiv)

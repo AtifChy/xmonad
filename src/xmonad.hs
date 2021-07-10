@@ -335,7 +335,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        -- Open apps
        , ( (altMask, xK_F9)
          , unGrab
-           >> unsafeSpawn
+           *> unsafeSpawn
                 "$(killall picom && notify-send -u critical -i picom 'System' 'Killed Picom') || $(picom & notify-send -u critical -i picom 'System' 'Picom running...')"
          )
        , ((altMask, xK_e), safeSpawn "emacsclient" ["-nc"])
@@ -343,13 +343,13 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- lock screen
        , ( (modm .|. shiftMask, xK_l)
-         , unGrab >> safeSpawn "loginctl" ["lock-session"]
+         , unGrab *> safeSpawn "loginctl" ["lock-session"]
          )
 
        -- Screenshot shortcuts (Requires: shotgun, slop, xdotool)
-       , ((0, xK_Print)                , unGrab >> safeSpawn "shotclip" ["-f"])
-       , ((0 .|. controlMask, xK_Print), unGrab >> safeSpawn "shotclip" ["-w"])
-       , ((0 .|. shiftMask, xK_Print)  , unGrab >> safeSpawn "shotclip" ["-s"])
+       , ((0, xK_Print)                , unGrab *> safeSpawn "shotclip" ["-f"])
+       , ((0 .|. controlMask, xK_Print), unGrab *> safeSpawn "shotclip" ["-w"])
+       , ((0 .|. shiftMask, xK_Print)  , unGrab *> safeSpawn "shotclip" ["-s"])
        ]
     ++
        --
@@ -439,7 +439,7 @@ mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 myTabConfig :: Theme
 myTabConfig = def { activeColor         = base04
                   , activeBorderColor   = base00
-                  , activeTextColor     = basefg
+                  , activeTextColor     = basebg
                   , inactiveColor       = basebg
                   , inactiveBorderColor = basebg
                   , inactiveTextColor   = base00

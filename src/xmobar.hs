@@ -19,13 +19,16 @@ import           Xmobar                    (Border (FullB), Command (Com),
 -- | Configures how things should be displayed on the bar
 config :: Config
 config = defaultConfig
-  { font            = myFont ++ ","
-                   ++ "Noto Sans:size=10:style=Bold,"
-                   ++ "Noto Sans Bengali:size=10:style=Bold,"
-                   ++ "Noto Sans Arabic:size=10:style=Bold,"
-                   ++ "Noto Color Emoji:size=10:style=Regular,"
-                   ++ "Noto Sans CJK JP:size=10:style=Bold,"
-                   ++ "Noto Sans CJK KR:size=10:style=Bold"
+  { font            = concatMap
+                        fontWrap
+                        [ myFont
+                        , "Noto Sans:size=10:style=Bold"
+                        , "Noto Sans Bengali:size=10:style=Bold"
+                        , "Noto Sans Arabic:size=10:style=Bold"
+                        , "Noto Color Emoji:size=10:style=Regular"
+                        , "Noto Sans CJK JP:size=10:style=Bold"
+                        , "Noto Sans CJK KR:size=10:style=Bold"
+                        ]
   , additionalFonts = [ "xft:Font Awesome 5 Free Solid:size=10"
                       , "xft:JetBrainsMono Nerd Font:size=14"
                       , "xft:Font Awesome 5 Brands:size=11"
@@ -46,13 +49,13 @@ config = defaultConfig
   , sepChar         = "%"
   , alignSep        = "}{"
   , template        =
-    " " ++ xmobarAction "xdotool key super+p" "1" (darkPurple (xmobarFont 2 "\xe61f")) ++ " "
+    wrap " " " " (xmobarAction "xdotool key super+p" "1" (darkPurple (xmobarFont 2 "\xe61f")))
     <> inWrapper "%UnsafeXMonadLog%"
-    <> "}" ++ inWrapperC (white "%mpd%") ++ "{"
+    <> wrap "}" "{" (inWrapper' (white "%mpd%"))
     <> concatMap
          inWrapper
-         [ xmobarAction "pgrep htop || st -e htop -s PERCENT_CPU" "1" (cyan "%cpu%")
-         , xmobarAction "pgrep htop || st -e htop -s PERCENT_MEM" "1" (purple "%memory%")
+         [ xmobarAction "pgrep -x htop || st -e htop -s PERCENT_CPU" "1" (cyan "%cpu%")
+         , xmobarAction "pgrep -x htop || st -e htop -s PERCENT_MEM" "1" (purple "%memory%")
          , xmobarAction "pamixer -t" "1"
          $ xmobarAction "st -e alsamixer" "3"
          $ xmobarAction "[ $(pamixer --get-volume) -lt 200 ] && pamixer --allow-boost -u -i 5" "4"
@@ -63,12 +66,15 @@ config = defaultConfig
          ]
   }
  where
+  fontWrap :: String -> String
+  fontWrap = wrap "" ","
+
   inWrapper :: String -> String
   inWrapper = wrap (xmobarColor base00 "" (xmobarFont 5 "\xe0b6"))
-                   (xmobarColor base00 "" (xmobarFont 5 "\xe0b4") ++ " ")
+                   (xmobarColor base00 "" (xmobarFont 5 "\xe0b4") <> " ")
 
-  inWrapperC :: String -> String
-  inWrapperC = wrap (xmobarColor base00 "" (xmobarFont 5 "\xe0b6"))
+  inWrapper' :: String -> String
+  inWrapper' = wrap (xmobarColor base00 "" (xmobarFont 5 "\xe0b6"))
                     (xmobarColor base00 "" (xmobarFont 5 "\xe0b4"))
 
 -- | Commands to run xmobar modules on start
@@ -77,32 +83,34 @@ myCommands =
   [ Run UnsafeXMonadLog
   , Run $ Cpu
     [ "-t"
-    , xmobarFont 1 "\xf108" ++ " <total>%"
+    , xmobarFont 1 "\xf108" <> " <total>%"
     , "-L"
     , "50"
     , "-H"
     , "85"
     , "--low"
-    , base02 ++ "," ++ background
+    , base02 <> "," <> background
     , "--normal"
-    , base03 ++ "," ++ background
+    , base03 <> "," <> background
     , "--high"
-    , base01 ++ "," ++ background
-    ] (2 `seconds`)
+    , base01 <> "," <> background
+    ]
+    (2 `seconds`)
   , Run $ Memory
     [ "-t"
-    , xmobarFont 1 "\xf538" ++ " <usedratio>%"
+    , xmobarFont 1 "\xf538" <> " <usedratio>%"
     , "-L"
     , "50"
     , "-H"
     , "85"
     , "--low"
-    , base02 ++ "," ++ background
+    , base02 <> "," <> background
     , "--normal"
-    , base03 ++ "," ++ background
+    , base03 <> "," <> background
     , "--high"
-    , base01 ++ "," ++ background
-    ] (3 `seconds`)
+    , base01 <> "," <> background
+    ]
+    (3 `seconds`)
   , Run $ Alsa
     "default"
     "Master"
@@ -110,9 +118,9 @@ myCommands =
     , "<status> <volume>%"
     , "--"
     , "-C"
-    , base02 ++ "," ++ background
+    , base02 <> "," <> background
     , "-c"
-    , base01 ++ "," ++ background
+    , base01 <> "," <> background
     , "-O"
     , ""
     , "-o"
@@ -127,9 +135,9 @@ myCommands =
   , Run $ MPD
     [ "-t"
     , xmobarAction "mpc prev" "1" (blue (xmobarFont 1 "\xf048"))
-    ++ " <statei> "
-    ++ xmobarAction "mpc next" "1" (blue (xmobarFont 1 "\xf051"))
-    ++ " <title> - <artist>"
+    <> " <statei> "
+    <> xmobarAction "mpc next" "1" (blue (xmobarFont 1 "\xf051"))
+    <> " <title> - <artist>"
     , "-h"
     , "127.0.0.1"
     , "-p"
@@ -141,9 +149,13 @@ myCommands =
     , xmobarAction "mpc stop" "3" $ xmobarAction "mpc play" "1" $ yellow (xmobarFont 2 "\xf28b")
     , "-S"
     , xmobarAction "mpc play" "1" $ red (xmobarFont 2 "\xf28d")
-    ] 5
-  , Run $ Date (xmobarFont 1 "\xf017" ++ " %l:%M %p") "date" (30 `seconds`)
-  , Run $ Com (homeDir ++ "/.config/xmonad/scripts/tray-padding-icon.sh") ["stalonetray"] "tray" 5
+    ]
+    5
+  , Run $ Date (xmobarFont 1 "\xf017" <> " %l:%M %p") "date" (30 `seconds`)
+  , Run $ Com (homeDir <> "/.config/xmonad/scripts/tray-padding-icon.sh")
+              ["stalonetray"]
+              "tray"
+              5
   ]
   where
     -- | Get home directory
@@ -157,7 +169,7 @@ myCommands =
 
 -- Colors
 background :: String
-background = base00 ++ ":5"
+background = base00 <> ":5"
 
 red, blue, green, cyan, yellow, purple, gray, white, darkPurple :: String -> String
 red = xmobarColor base01 background
