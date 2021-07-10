@@ -51,6 +51,8 @@ extra-deps:
 
 # Override default flag values for local packages and extra-deps
 flags:
+  # not sure about what xmobar flag to enable?
+  # check this page https://github.com/jaor/xmobar/blob/master/doc/compiling.org#optional-features
   xmobar:
     with_xpm: true
     with_threaded: true
@@ -58,6 +60,14 @@ flags:
     with_rtsopts: true
     with_alsa: true
     with_mpd: true
+    with_weather: false
+    with_dbus: false
+    with_mpris: false
+    with_inotify: false
+    with_nl80211: false
+    with_iwlib: false
+    with_datezone: false
+    with_uvmeter: false
 #
 # Extra package databases containing global packages
 # extra-package-dbs: []

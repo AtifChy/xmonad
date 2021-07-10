@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 --
 -- Imports
 --
@@ -5,7 +7,7 @@ import           Control.Monad                       (liftM2)
 import qualified Data.Map                            as M
 import           Data.Monoid                         (All)
 import           System.Exit                         (exitSuccess)
-import           Theme.Theme                         (base00, base02, base04,
+import           Theme.Theme                         (base00, base01, base04,
                                                       base05, base06, base07,
                                                       basebg, basefg, myFont,
                                                       myFontGTK)
@@ -272,20 +274,25 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        -- Run xmessage with a summary of the default keybindings (useful for beginners)
        , ( (modm .|. shiftMask, xK_slash)
          , unsafeSpawn
-           ("printf \"" ++ help ++ "\" | gxmessage -title 'XMonad Keybind' -fn '" ++ myFontGTK ++ "' -file -")
+           (  "printf \""
+           ++ help
+           ++ "\" | gxmessage -title 'XMonad Keybind' -fn '"
+           ++ myFontGTK
+           ++ "' -file -"
+           )
          )
        , ((modm, xK_b)                  , sendMessage $ Toggle NOBORDERS)
        , ((modm, xK_f)                  , sendMessage $ Toggle NBFULL)
 
        -- CycleWS setup
-       , ((modm, xK_Right)                , moveTo Next nonNSP)
-       , ((modm, xK_Left)                 , moveTo Prev nonNSP)
-       , ((modm, xK_Tab)                  , moveTo Next nonEmptyNSP)
-       , ((modm .|. shiftMask, xK_Tab)    , moveTo Prev nonEmptyNSP)
-       , ((modm .|. shiftMask, xK_Right)  , shiftTo Next nonNSP)
-       , ((modm .|. shiftMask, xK_Left)   , shiftTo Prev nonNSP)
-       , ((modm, xK_z)                    , toggleWS' [scratchpadWorkspaceTag])
-       , ((modm .|. shiftMask, xK_f)      , moveTo Next emptyWS)
+       , ((modm, xK_Right)              , moveTo Next nonNSP)
+       , ((modm, xK_Left)               , moveTo Prev nonNSP)
+       , ((modm, xK_Tab)                , moveTo Next nonEmptyNSP)
+       , ((modm .|. shiftMask, xK_Tab)  , moveTo Prev nonEmptyNSP)
+       , ((modm .|. shiftMask, xK_Right), shiftTo Next nonNSP)
+       , ((modm .|. shiftMask, xK_Left) , shiftTo Prev nonNSP)
+       , ((modm, xK_z)                  , toggleWS' [scratchpadWorkspaceTag])
+       , ((modm .|. shiftMask, xK_f)    , moveTo Next emptyWS)
 
        -- Increase/Decrease spacing (gaps)
        , ( (modm, xK_g)
@@ -304,8 +311,8 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm .|. controlMask, xK_k)     , sendMessage $ pullGroup U)
        , ((modm .|. controlMask, xK_j)     , sendMessage $ pullGroup D)
        , ((modm .|. controlMask, xK_space) , toSubl NextLayout)
-       , ((modm .|. controlMask, xK_m)     , withFocused (sendMessage . MergeAll))
-       , ((modm .|. controlMask, xK_u)     , withFocused (sendMessage . UnMerge))
+       , ((modm .|. controlMask, xK_m), withFocused (sendMessage . MergeAll))
+       , ((modm .|. controlMask, xK_u), withFocused (sendMessage . UnMerge))
        , ((modm .|. controlMask, xK_comma) , onGroup W.focusUp')
        , ((modm .|. controlMask, xK_period), onGroup W.focusDown')
 
@@ -326,7 +333,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- Easily switch your layouts
        , ((altMask, xK_t)               , sendMessage $ JumpToLayout "Tall")
-       , ((altMask, xK_c)               , sendMessage $ JumpToLayout "Centered Master")
+       , ((altMask, xK_c), sendMessage $ JumpToLayout "Centered Master")
 
        -- XPrompt
        , ((modm, xK_p)                  , shellPrompt myXPConfig)
@@ -373,9 +380,10 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        | (key, sc) <- zip [xK_w, xK_e, xK_r] [0 ..]
        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
        ]
-  where
-    nonNSP = ignoringWSs [scratchpadWorkspaceTag]
-    nonEmptyNSP = hiddenWS :&: Not emptyWS :&: ignoringWSs [scratchpadWorkspaceTag]
+ where
+  nonNSP = ignoringWSs [scratchpadWorkspaceTag]
+  nonEmptyNSP =
+    hiddenWS :&: Not emptyWS :&: ignoringWSs [scratchpadWorkspaceTag]
 
 ------------------------------------------------------------------------
 -- Mouse bindings: default actions bound to mouse events
@@ -432,7 +440,8 @@ myXPConfig = def { font                = myFont
 
 ------------------------------------------------------------------------
 -- Spacing (gaps)
-mySpacing :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a
+mySpacing
+  :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a
 mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 
 -- Tab theme
@@ -459,10 +468,13 @@ myTabConfig = def { activeColor         = base04
 -- which denotes layout choice.
 --
 
-myLayout = mkToggle (single NBFULL)
-  $ avoidStruts
-  $ mkToggle (single NOBORDERS)
-  $ tall ||| mtall ||| center
+myLayout =
+  mkToggle (single NBFULL)
+    $   avoidStruts
+    $   mkToggle (single NOBORDERS)
+    $   tall
+    ||| mtall
+    ||| center
  where
   -- default tiling algorithm partitions the screen into two panes
   tall =
@@ -476,7 +488,7 @@ myLayout = mkToggle (single NBFULL)
       $ ResizableTall nmaster delta ratio []
 
   mtall =
-    renamed [Replace "Mirror Tall"]
+    renamed [Replace "MirrorTall"]
       $ addTabs shrinkText myTabConfig
       $ subLayout [] (Simplest ||| Accordion)
       $ windowNavigation
@@ -484,7 +496,7 @@ myLayout = mkToggle (single NBFULL)
       $ Mirror tall
 
   center =
-    renamed [Replace "Centered Master"]
+    renamed [Replace "ThreeCol"]
       $ smartBorders
       $ addTabs shrinkText myTabConfig
       $ subLayout [] (Simplest ||| Accordion)
@@ -533,31 +545,30 @@ myScratchpads = [
 --
 
 myManageHook :: ManageHook
-myManageHook =
-  composeOne
-      [ className =? "MPlayer" -?> doFloat
-      , resource =? "desktop_window" -?> doIgnore
-      , resource =? "kdesktop" -?> doIgnore
-      , resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat
-      , resource =? "redshift-gtk" -?> doCenterFloat
-      , className =? "ibus-ui-gtk3" -?> doIgnore
-      , resource =? "gcr-prompter" -?> doCenterFloat
-      , className =? "St-float" -?> doFloat
-      , transience
-      , title =? "XMonad Keybind" -?> doCenterFloat
-      , className =? "Ibus-extension-gtk3" -?> doFloat
-      , isFullscreen -?> doFullFloat
-      , isDialog -?> doCenterFloat
-      , className =? "firefox" -?> doShift (myWorkspaces !! 1)
-      , className =? "discord" -?> doShift (myWorkspaces !! 2)
-      , className =? "code-oss" -?> doShift (myWorkspaces !! 3)
-      , className =? "Lutris" -?> doShift (myWorkspaces !! 5)
-      , className
-      =?   "VirtualBox Manager"
-      <||> className
-      =?   "gnome-boxes"
-      -?>  doShift (myWorkspaces !! 6)
-      ]
+myManageHook = composeOne
+  [ className =? "MPlayer" -?> doFloat
+  , resource =? "desktop_window" -?> doIgnore
+  , resource =? "kdesktop" -?> doIgnore
+  , resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat
+  , resource =? "redshift-gtk" -?> doCenterFloat
+  , className =? "ibus-ui-gtk3" -?> doIgnore
+  , resource =? "gcr-prompter" -?> doCenterFloat
+  , className =? "St-float" -?> doFloat
+  , transience
+  , title =? "XMonad Keybind" -?> doCenterFloat
+  , className =? "Ibus-extension-gtk3" -?> doFloat
+  , isFullscreen -?> doFullFloat
+  , isDialog -?> doCenterFloat
+  , className =? "firefox" -?> doShift (myWorkspaces !! 1)
+  , className =? "discord" -?> doShift (myWorkspaces !! 2)
+  , className =? "code-oss" -?> doShift (myWorkspaces !! 3)
+  , className =? "Lutris" -?> doShift (myWorkspaces !! 5)
+  , className
+  =?   "VirtualBox Manager"
+  <||> className
+  =?   "gnome-boxes"
+  -?>  doShift (myWorkspaces !! 6)
+  ]
 
 ------------------------------------------------------------------------
 -- Event handling
@@ -611,8 +622,11 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
 
 mySB :: StatusBarConfig
 mySB = statusBarProp
-    "xmobar"
-    (clickablePP =<< dynamicIconsPP myIconConfig (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP))
+  "xmobar"
+  (clickablePP =<< dynamicIconsPP
+    myIconConfig
+    (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP)
+  )
  where
   myXmobarPP :: PP
   myXmobarPP = def
@@ -621,31 +635,39 @@ mySB = statusBarProp
     , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" base06 2
     , ppHidden        = lowWhite . wrap "" ""
     , ppWsSep         = xmobarColor "" background "  "
-    , ppTitle         = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
+    , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten
+                  40
     -- , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
     -- , ppExtras        = [xmobarColorL base01 background windowCount]
-    , ppLayout        = green
+    , ppLayout        = red
                         . xmobarAction "xdotool key Super+space"       "1"
                         . xmobarAction "xdotool key Super+shift+space" "3"
+                        . (\case
+                            "Tall"       -> "<icon=Tall.xpm/>"
+                            "MirrorTall" -> "<icon=MirrorTall.xpm/>"
+                            "ThreeCol"   -> "<icon=ThreeCol.xpm/>"
+                            _            -> "?"
+                          )
     }
    where
     wrapSep :: String -> String
-    wrapSep = wrap (xmobarColor base00 "" (xmobarFont 5 "\xe0b4")) (xmobarColor base00 "" (xmobarFont 5 "\xe0b6"))
+    wrapSep = wrap (xmobarColor base00 "" (xmobarFont 5 "\xe0b4"))
+                   (xmobarColor base00 "" (xmobarFont 5 "\xe0b6"))
 
     background :: String
     background = base00 ++ ":5"
 
-    blue, lowWhite, magenta, green :: String -> String
+    blue, lowWhite, magenta, red :: String -> String
     magenta  = xmobarColor base05 background
     blue     = xmobarColor base04 background
     -- purple   = xmobarColor "#bd93f9" "#2c323a:5"
     -- lowBlue  = xmobarColor "#8be9fd" "#2c323a:5"
     -- white    = xmobarColor "#f8f8f2" "#2c323a:5"
     -- yellow   = xmobarColor "#f1fa8c" "#2c323a:5"
-    -- red      = xmobarColor "#ff6c6b" "#2c323a:5"
+    red      = xmobarColor base01 background
     lowWhite = xmobarColor base07 background
     -- gray     = xmobarColor "" background
-    green    = xmobarColor base02 background
+    -- green    = xmobarColor base02 background
 
     -- -- Get count of available windows on a workspace
     -- windowCount :: X (Maybe String)
@@ -703,7 +725,8 @@ myStartupHook = do
   spawnOnce "greenclip daemon"
   spawnOnce "numlockx"
   -- spawnOnce "emacs --daemon"
-  spawnOnce "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
+  spawnOnce
+    "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce "ibus-daemon -x"
   spawnOnce "mpd --no-daemon"
@@ -739,7 +762,7 @@ main = do
 
       -- hooks, layouts
     , layoutHook         = myLayout
-    , manageHook         = myManageHook <+> namedScratchpadManageHook myScratchpads
+    , manageHook = myManageHook <+> namedScratchpadManageHook myScratchpads
     , handleEventHook    = myHandleEventHook
     , logHook            = activateLogHook acMh <+> logHook def
     , startupHook        = myStartupHook

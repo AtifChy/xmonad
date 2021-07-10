@@ -37,7 +37,7 @@ executable xmonad
       Paths_xmonad_atif
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2 -j -dynamic -Wno-missing-signatures
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2 -j -dynamic
   build-depends:
       X11 >=1.10
     , base

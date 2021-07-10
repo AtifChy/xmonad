@@ -8,7 +8,7 @@ import           Theme.Theme               (base00, base01, base02, base03,
 import           XMonad.Hooks.StatusBar.PP (wrap, xmobarAction, xmobarColor,
                                             xmobarFont)
 import           Xmobar                    (Border (FullB), Command (Com),
-                                            Config (additionalFonts, alignSep, alpha, bgColor, border, borderColor, commands, fgColor, font, lowerOnStart, persistent, position, sepChar, template, textOffset, textOffsets),
+                                            Config (additionalFonts, alignSep, alpha, bgColor, border, borderColor, commands, fgColor, font, iconRoot, lowerOnStart, persistent, position, sepChar, template, textOffset, textOffsets),
                                             Date (Date),
                                             Monitors (Alsa, Cpu, MPD, Memory),
                                             Runnable (..),
@@ -45,6 +45,7 @@ config = defaultConfig
   , alpha           = 255
   , lowerOnStart    = True
   , persistent      = True
+  , iconRoot        = homeDir <> "/.config/xmonad/icons"
   , commands        = myCommands
   , sepChar         = "%"
   , alignSep        = "}{"
@@ -155,17 +156,17 @@ myCommands =
   , Run $ Com (homeDir <> "/.config/xmonad/scripts/tray-padding-icon.sh")
               ["stalonetray"]
               "tray"
-              5
+              (1 `seconds`)
   ]
   where
-    -- | Get home directory
-    homeDir :: String
-    homeDir = unsafeDupablePerformIO . getEnv $ "HOME"
-
     -- | Convenience functions
     seconds :: Int -> Int
     seconds = (* 10)
     -- minutes = (60 *). seconds
+
+-- | Get home directory
+homeDir :: String
+homeDir = unsafeDupablePerformIO . getEnv $ "HOME"
 
 -- Colors
 background :: String

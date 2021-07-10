@@ -21,7 +21,6 @@ executables:
       - xmonad
       - containers
       - X11 >= 1.10
-    ghc-options:  -Wno-missing-signatures
   xmobar:
     main: xmobar.hs
     dependencies:
