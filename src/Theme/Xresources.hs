@@ -10,17 +10,14 @@
 
 module Theme.Xresources (xprop) where
 
-import           Prelude          (IO, Int, Maybe, ShowS, String, dropWhile,
-                                   fst, lines, snd, splitAt, tail, ($), (.),
-                                   (<$>), (==))
-
 import           Data.Bifunctor   (bimap)
 import           Data.Char        (isSpace)
 import           Data.List        (dropWhileEnd, elemIndex, find)
 import           Data.Maybe       (catMaybes, fromMaybe)
-
+import           Prelude          (IO, Int, Maybe, ShowS, String, dropWhile,
+                                   fst, lines, snd, splitAt, tail, ($), (.),
+                                   (<$>), (==))
 import           System.IO.Unsafe (unsafeDupablePerformIO)
-
 import           XMonad.Util.Run  (runProcessWithInput)
 
 xProperty :: String -> IO String

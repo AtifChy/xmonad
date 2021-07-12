@@ -237,10 +237,10 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm, xK_l)                  , sendMessage Expand)
 
        -- Shrink focused windows height
-       , ((modm, xK_a)                  , sendMessage MirrorShrink)
+       , ((modm .|. altMask, xK_j)      , sendMessage MirrorShrink)
 
        -- Expand focused windows height
-       , ((modm, xK_s)                  , sendMessage MirrorExpand)
+       , ((modm .|. altMask, xK_k)      , sendMessage MirrorExpand)
 
        -- Push window back into tiling
        , ((modm, xK_t)                  , withFocused $ windows . W.sink)

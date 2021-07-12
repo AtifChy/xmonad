@@ -2,7 +2,7 @@
 
 # Required softwares: shotgun, xdotool, xclip, dunst
 
-img="shot_$(date '+%m-%d_%H-%M-%S').png"
+img="shot_$(date '+%Y-%m-%d_%H-%M-%S').png"
 [ ! -d "$HOME/Pictures/Screenshots" ] && mkdir "$HOME/Pictures/Screenshots"
 file="$HOME/Pictures/Screenshots/$img"
 
@@ -26,14 +26,15 @@ case $1 in
                 ;;
 
         *)
-                printf " Take screenshots with scrot\n"
-                printf "<===========================>\n"
-                printf " Usage:\n"
-                printf "  -f, full         Take fullscreen screenshot\n"
-                printf "  -w, window       Take screenshot of focused window\n"
-                printf "  -s, selection    Take screenshot of interactively chosen window or rectangle\n"
-                printf "  -d, shadow       Add background shadow to screenshots\n"
-                printf "  -h, help         Display all available options\n"
+                printf '%b' "\
+ Take screenshots with scrot
+<===========================>
+ Usage:
+  -f, full         Take fullscreen screenshot
+  -w, window       Take screenshot of focused window
+  -s, selection    Take screenshot of interactively chosen window or rectangle
+  -d, shadow       Add background shadow to screenshots
+  -h, help         Display all available options\n"
                 exit 0
                 ;;
 esac

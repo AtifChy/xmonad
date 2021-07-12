@@ -7,7 +7,7 @@ cabal-version: 1.12
 name:           xmonad-atif
 version:        0.16
 synopsis:       My xmonad configuration.
-homepage:       https://github.com/AtifChy/dotfiles
+homepage:       https://github.com/AtifChy/xmonad
 author:         Atif
 maintainer:     iftakhar.awal@yahoo.com
 license:        MIT
