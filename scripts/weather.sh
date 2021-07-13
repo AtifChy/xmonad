@@ -1,5 +1,6 @@
 #!/bin/sh
 weather=$(curl -s wttr.in/?format="%x+%t\n")
+[ -z "$weather" ] && exit 1
 condition=${weather% *}
 temperature=${weather##* }
 

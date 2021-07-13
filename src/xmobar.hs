@@ -51,7 +51,7 @@ config = defaultConfig
     <> wrap "}" "{" (inWrapper' (white "%mpd%"))
     <> concatMap
          inWrapper
-         [ "%wttr%"
+         [ red "%wttr%"
          , xmobarAction "pgrep -x htop || st -e htop -s PERCENT_CPU" "1" (cyan "%cpu%")
          , xmobarAction "pgrep -x htop || st -e htop -s PERCENT_MEM" "1" (purple "%memory%")
          , xmobarAction "pamixer -t" "1"
@@ -150,7 +150,7 @@ myCommands =
     ]
     5
   , Run $ Date (xmobarFont 1 "\xf017" <> " %l:%M %p") "date" (30 `seconds`)
-  , Run $ Com (homeDir <> "/.config/xmonad/scripts/weather.sh") ["bar"] "wttr" (15 `minutes`)
+  , Run $ ComX (homeDir <> "/.config/xmonad/scripts/weather.sh") ["bar"] "N/A" "wttr" (15 `minutes`)
   , Run $ Com (homeDir <> "/.config/xmonad/scripts/tray-padding-icon.sh")
               ["stalonetray"]
               "tray"
