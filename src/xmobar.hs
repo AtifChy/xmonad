@@ -7,14 +7,7 @@ import           Theme.Theme               (base00, base01, base02, base03,
                                             basebg, basefg, myFont)
 import           XMonad.Hooks.StatusBar.PP (wrap, xmobarAction, xmobarColor,
                                             xmobarFont)
-import           Xmobar                    (Border (FullB), Command (Com),
-                                            Config (additionalFonts, alignSep, alpha, bgColor, border, borderColor, commands, fgColor, font, hideOnStart, iconOffset, iconRoot, lowerOnStart, overrideRedirect, persistent, position, sepChar, template, textOffset, textOffsets),
-                                            Date (Date),
-                                            Monitors (Alsa, Cpu, MPD, Memory),
-                                            Runnable (..),
-                                            XMonadLog (UnsafeXMonadLog),
-                                            XPosition (Static, height, width, xpos, ypos),
-                                            defaultConfig, xmobar)
+import           Xmobar
 
 -- | Configures how things should be displayed on the bar
 config :: Config

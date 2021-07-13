@@ -1,69 +1,69 @@
 #!/bin/sh
-weather=$(curl -s wttr.in/?format="%C+%t\n")
-
+weather=$(curl -s wttr.in/?format="%x+%t\n")
 condition=${weather% *}
 temperature=${weather##* }
 
 hour=$(date +%H)
 night_yet() {
-        [ "$hour" -ge 20 ] && icon=$*
+        [ "$hour" -ge 19 ] && icon=$*
         [ "$hour" -le 4 ] && icon=$*
 }
 
 case $condition in
-        "Unknown") icon=" " ;;
-        "Cloudy") icon=" " ;;
-        "Fog" | "Mist")
-                icon=" "
-                night_yet " "
+        "?") icon="" ;;
+        "mm") icon="" ;;
+        "=" )
+                icon=""
+                night_yet ""
                 ;;
-        "Heavy rain") icon=" " ;;
-        "Heavy showers") icon=" " ;;
-        "Heavy snow") icon=" " ;;
-        "Heavy snow showers") icon=" " ;;
-        "Light rain")
-                icon=" "
-                night_yet " "
+        "///") icon="" ;;
+        "//") icon="" ;;
+        "**") icon="" ;;
+        "*/*") icon="" ;;
+        "/")
+                icon=""
+                night_yet ""
                 ;;
-        "Light showers")
-                icon=" "
-                night_yet " "
+        ".")
+                icon=""
+                night_yet ""
                 ;;
-        "Light sleet")
-                icon=" "
-                night_yet " "
+        "x")
+                icon=""
+                night_yet ""
                 ;;
-        "Light sleet showers")
-                icon=" "
-                night_yet " "
+        "x/")
+                icon=""
+                night_yet ""
                 ;;
-        "Light snow")
-                icon=" "
-                night_yet " "
+        "*")
+                icon=""
+                night_yet ""
                 ;;
-        "Light snow showers")
-                icon=" "
-                night_yet " "
+        "*/")
+                icon=""
+                night_yet ""
                 ;;
-        "Partly cloudy")
-                icon=" "
-                night_yet " "
+        "m")
+                icon=""
+                night_yet ""
                 ;;
-        "Sunny")
-                icon=" "
+        "o")
+                icon=""
                 night_yet ""
                 ;;
-        "Thundery heavy rain") icon=" " ;;
-        "Thundery showers") icon=" " ;;
-        "Thundery snow showers")
-                icon=" "
-                night_yet " "
+        "/!/") icon="" ;;
+        "!/") icon="" ;;
+        "*!*")
+                icon=""
+                night_yet ""
                 ;;
-        "Very cloudy") icon=" " ;;
+        "mmm") icon="" ;;
         *) icon=$condition ;;
 esac
 
 case $1 in
-        bar) printf '%b' "<fc=#ffcb6b,#2c313a:5>${icon} </fc><fc=#a6aebf,#2c313a:5>${temperature}</fc>" ;;
-        *) printf '%b' "${icon} ${temperature}" ;;
+        bar) printf "<fc=#ffcb6b,#2c313a:5>%s</fc><fc=#a6aebf,#2c313a:5> %s</fc>\n" \
+                "$icon" "$temperature" ;;
+        *) printf "%s  %s\n" "$icon" "$temperature" ;;
 esac

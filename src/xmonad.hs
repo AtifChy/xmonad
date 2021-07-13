@@ -20,6 +20,7 @@ import           XMonad.Actions.CycleWS              (Direction1D (..),
                                                       ignoringWSs, moveTo,
                                                       shiftTo, toggleWS')
 import qualified XMonad.Actions.FlexibleResize       as Flex (mouseResizeWindow)
+import           XMonad.Actions.NoBorders            (toggleBorder)
 import           XMonad.Actions.Promote              (promote)
 import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.WithAll              (killAll, sinkAll)
@@ -49,15 +50,16 @@ import           XMonad.Layout.Accordion             (Accordion (Accordion))
 import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
 import           XMonad.Layout.LayoutCombinators     ((|||))
 import           XMonad.Layout.LayoutModifier        (ModifiedLayout)
-import           XMonad.Layout.MultiToggle           (Toggle (..), mkToggle,
-                                                      single)
+import           XMonad.Layout.MultiToggle           (EOT (EOT),
+                                                      Toggle (Toggle), mkToggle,
+                                                      (??))
 import           XMonad.Layout.MultiToggle.Instances (StdTransformers (NBFULL, NOBORDERS))
 import           XMonad.Layout.NoBorders             (smartBorders)
 import           XMonad.Layout.Renamed               (Rename (Replace), renamed)
 import           XMonad.Layout.ResizableTile         (MirrorResize (..),
                                                       ResizableTall (..))
 import           XMonad.Layout.Simplest              (Simplest (Simplest))
-import           XMonad.Layout.Spacing               (Border (..), Spacing,
+import           XMonad.Layout.Spacing               (Border (Border), Spacing,
                                                       decScreenSpacing,
                                                       decScreenWindowSpacing,
                                                       decWindowSpacing,
@@ -258,7 +260,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        -- Use this binding with avoidStruts from Hooks.ManageDocks.
        -- See also the statusBar function from Hooks.DynamicLog.
        --
-       , ((modm .|. shiftMask, xK_b)    , sendMessage ToggleStruts)
+       , ((modm .|. controlMask, xK_b)    , sendMessage ToggleStruts)
 
        -- Quit xmonad
        , ( (modm .|. shiftMask, xK_q)
@@ -281,7 +283,13 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
            ++ "' -file -"
            )
          )
-       , ((modm, xK_b)                  , sendMessage $ Toggle NOBORDERS)
+       -- Toggle border on focused window
+       , ((modm, xK_b)                  , withFocused toggleBorder)
+
+       -- Toggle all borders
+       , ((modm .|. shiftMask, xK_b)    , sendMessage $ Toggle NOBORDERS)
+
+       -- Toggle Fullscreen
        , ((modm, xK_f)                  , sendMessage $ Toggle NBFULL)
 
        -- CycleWS setup
@@ -469,12 +477,12 @@ myTabConfig = def { activeColor         = base04
 --
 
 myLayout =
-  mkToggle (single NBFULL)
-    $   avoidStruts
-    $   mkToggle (single NOBORDERS)
+  avoidStruts
+    .   mkToggle (NOBORDERS ?? NBFULL ?? EOT)
     $   tall
     ||| mtall
     ||| center
+    ||| monocle
  where
   -- default tiling algorithm partitions the screen into two panes
   tall =
@@ -504,6 +512,8 @@ myLayout =
       $ draggingVisualizer
       $ mySpacing myGaps
       $ ThreeColMid nmaster delta ratio
+
+  monocle = renamed [Replace "Monocle"] $ smartBorders $ mySpacing myGaps Full
 
   -- The default number of windows in the master pane
   nmaster = 1
@@ -646,6 +656,7 @@ mySB = statusBarProp
                             "Tall"       -> "<icon=Tall.xpm/>"
                             "MirrorTall" -> "<icon=MirrorTall.xpm/>"
                             "ThreeCol"   -> "<icon=ThreeCol.xpm/>"
+                            "Monocle"    -> "<icon=Monocle.xpm/>"
                             _            -> "?"
                           )
     }
