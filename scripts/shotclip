@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 
 # Required softwares: shotgun, xdotool, xclip, dunst
 
@@ -27,8 +27,8 @@ case $1 in
 
         *)
                 printf '%b' "\
- Take screenshots with scrot
-<===========================>
+ Take screenshots with shotgun
+<=============================>
  Usage:
   -f, full         Take fullscreen screenshot
   -w, window       Take screenshot of focused window
@@ -41,14 +41,16 @@ esac
 
 case $2 in
         -d | shadow)
-                convert "$file" \( +clone -background black -shadow 75x10+0+0 \) +swap -bordercolor none -border 10 -background none -layers merge +repage "$file"
+                convert "$file" \( +clone -background black -shadow 75x10+0+0 \) \
+                        +swap -bordercolor none -border 10 -background none -layers merge +repage "$file"
                 ;;
 esac
 
 xclip -selection clipboard -target image/png -i "$file"
 
-ACTION=$(dunstify -u low -A "mouse1,Open" -I "$file" "Shotgun" "Screenshot saved!")
+ACTION=$(dunstify -u low -A "default,Open" -I "$file" "Shotgun" "Screenshot saved!")
 
 case "$ACTION" in
-        "mouse1") mimeopen "$file" ;;
+        "default") mimeopen "$file" ;;
+        "2") rm "$file" ;;
 esac

@@ -11,28 +11,27 @@ import           Theme.Theme                         (base00, base01, base04,
                                                       base05, base06, base07,
                                                       basebg, basefg, myFont,
                                                       myFontGTK)
-import           XMonad                              hiding ((|||))
+import           XMonad
 import           XMonad.Actions.CopyWindow           (copyToAll, kill1,
                                                       killAllOtherCopies)
-import           XMonad.Actions.CycleWS              (Direction1D (..),
+import           XMonad.Actions.CycleWS              (Direction1D (Next, Prev),
                                                       WSType (Not, (:&:)),
                                                       emptyWS, hiddenWS,
                                                       ignoringWSs, moveTo,
                                                       shiftTo, toggleWS')
-import qualified XMonad.Actions.FlexibleResize       as Flex (mouseResizeWindow)
+import qualified XMonad.Actions.FlexibleResize       as Flex
 import           XMonad.Actions.NoBorders            (toggleBorder)
 import           XMonad.Actions.Promote              (promote)
 import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.WithAll              (killAll, sinkAll)
-import           XMonad.Hooks.DynamicIcons           (IconConfig, appIcon,
-                                                      dynamicIconsPP,
-                                                      iconConfigFmt,
-                                                      iconConfigIcons,
+import           XMonad.Hooks.DynamicIcons           (IconConfig (..),
+                                                      appIcon, dynamicIconsPP,
                                                       iconsFmtReplace,
+                                                      iconsGetFocus,
                                                       wrapUnwords)
 import           XMonad.Hooks.EwmhDesktops           (activateLogHook, ewmh,
                                                       ewmhFullscreen)
-import           XMonad.Hooks.ManageDocks            (ToggleStruts (..),
+import           XMonad.Hooks.ManageDocks            (ToggleStruts (ToggleStruts),
                                                       avoidStruts, docks)
 import           XMonad.Hooks.ManageHelpers          (composeOne, doCenterFloat,
                                                       doFullFloat, isDialog,
@@ -48,7 +47,6 @@ import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
 import           XMonad.Hooks.WindowSwallowing       (swallowEventHook)
 import           XMonad.Layout.Accordion             (Accordion (Accordion))
 import           XMonad.Layout.DraggingVisualizer    (draggingVisualizer)
-import           XMonad.Layout.LayoutCombinators     ((|||))
 import           XMonad.Layout.LayoutModifier        (ModifiedLayout)
 import           XMonad.Layout.MultiToggle           (EOT (EOT),
                                                       Toggle (Toggle), mkToggle,
@@ -56,8 +54,8 @@ import           XMonad.Layout.MultiToggle           (EOT (EOT),
 import           XMonad.Layout.MultiToggle.Instances (StdTransformers (NBFULL, NOBORDERS))
 import           XMonad.Layout.NoBorders             (smartBorders)
 import           XMonad.Layout.Renamed               (Rename (Replace), renamed)
-import           XMonad.Layout.ResizableTile         (MirrorResize (..),
-                                                      ResizableTall (..))
+import           XMonad.Layout.ResizableTile         (MirrorResize (MirrorExpand, MirrorShrink),
+                                                      ResizableTall (ResizableTall))
 import           XMonad.Layout.Simplest              (Simplest (Simplest))
 import           XMonad.Layout.Spacing               (Border (Border), Spacing,
                                                       decScreenSpacing,
@@ -69,16 +67,16 @@ import           XMonad.Layout.Spacing               (Border (Border), Spacing,
                                                       spacingRaw,
                                                       toggleScreenSpacingEnabled,
                                                       toggleWindowSpacingEnabled)
-import           XMonad.Layout.SubLayouts            (GroupMsg (..), onGroup,
-                                                      pullGroup, subLayout,
-                                                      toSubl)
-import           XMonad.Layout.Tabbed                (Theme (..), addTabs,
+import           XMonad.Layout.SubLayouts            (GroupMsg (MergeAll, UnMerge),
+                                                      onGroup, pullGroup,
+                                                      subLayout, toSubl)
+import           XMonad.Layout.Tabbed                (Direction2D (D, L, R, U),
+                                                      Theme (..), addTabs,
                                                       shrinkText)
 import           XMonad.Layout.ThreeColumns          (ThreeCol (ThreeColMid))
-import           XMonad.Layout.WindowNavigation      (Direction2D (..),
-                                                      windowNavigation)
+import           XMonad.Layout.WindowNavigation      (windowNavigation)
 import           XMonad.Prompt                       (XPConfig (..),
-                                                      XPPosition (..),
+                                                      XPPosition (Top),
                                                       defaultXPKeymap,
                                                       deleteAllDuplicates)
 import           XMonad.Prompt.ConfirmPrompt         (confirmPrompt)
@@ -147,15 +145,15 @@ altMask = mod1Mask
 --
 myWorkspaces :: [WorkspaceId]
 myWorkspaces =
-  [ "<fn=2>\xf8a3</fn>"
-  , "<fn=2>\xf8a6</fn>"
-  , "<fn=2>\xf8a9</fn>"
-  , "<fn=2>\xf8ac</fn>"
-  , "<fn=2>\xf8af</fn>"
-  , "<fn=2>\xf8b2</fn>"
-  , "<fn=2>\xf8b5</fn>"
-  , "<fn=2>\xf8b8</fn>"
-  , "<fn=2>\xf8bb</fn>"
+  [ "\xf8a3"
+  , "\xf8a6"
+  , "\xf8a9"
+  , "\xf8ac"
+  , "\xf8af"
+  , "\xf8b2"
+  , "\xf8b5"
+  , "\xf8b8"
+  , "\xf8bb"
   ]
 
 -- Border colors for unfocused and focused windows, respectively.
@@ -573,12 +571,8 @@ myManageHook = composeOne
   , className =? "discord" -?> doShift (myWorkspaces !! 2)
   , className =? "code-oss" -?> doShift (myWorkspaces !! 3)
   , className =? "Lutris" -?> doShift (myWorkspaces !! 5)
-  , className
-  =?   "VirtualBox Manager"
-  <||> className
-  =?   "gnome-boxes"
-  -?>  doShift (myWorkspaces !! 6)
-  ]
+  , className =?   "VirtualBox Manager" <||> className =?   "gnome-boxes" -?>  doShift (myWorkspaces !! 6)
+  ] <+> namedScratchpadManageHook myScratchpads
 
 ------------------------------------------------------------------------
 -- Event handling
@@ -633,20 +627,16 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
 mySB :: StatusBarConfig
 mySB = statusBarProp
   "xmobar"
-  (clickablePP =<< dynamicIconsPP
-    myIconConfig
-    (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP)
-  )
+  (clickablePP =<< dynamicIconsPP myIconConfig (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP))
  where
   myXmobarPP :: PP
   myXmobarPP = def
     { ppSep           = wrapSep " "
     , ppTitleSanitize = xmobarStrip
-    , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" base06 2
-    , ppHidden        = lowWhite . wrap "" ""
+    , ppCurrent       = blue . wrap "" "" . xmobarBorder "Bottom" base06 2 . xmobarFont 2
+    , ppHidden        = lowWhite . wrap "" "" . xmobarFont 2
     , ppWsSep         = xmobarColor "" background "  "
-    , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten
-                  40
+    , ppTitle = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
     -- , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
     -- , ppExtras        = [xmobarColorL base01 background windowCount]
     , ppLayout        = red
@@ -696,6 +686,7 @@ mySB = statusBarProp
   myIconConfig :: IconConfig
   myIconConfig = def { iconConfigIcons = myIcons
                      , iconConfigFmt   = iconsFmtReplace (wrapUnwords "" "")
+                     , iconConfigFilter = iconsGetFocus
                      }
    where
     myIcons :: Query [String]
@@ -773,7 +764,7 @@ main = do
 
       -- hooks, layouts
     , layoutHook         = myLayout
-    , manageHook = myManageHook <+> namedScratchpadManageHook myScratchpads
+    , manageHook = myManageHook
     , handleEventHook    = myHandleEventHook
     , logHook            = activateLogHook acMh <+> logHook def
     , startupHook        = myStartupHook
@@ -792,7 +783,6 @@ help = unlines
   , "mod-c                Launch greenclip with rofi"
   --, "Alt-p                Launch dmenu"
   --, "Alt-c                Launch greenclip with dmenu"
-  --, "mod-Shift-p          Launch gmrun"
   , "mod-Shift-c          Close/kill the focused window"
   , "mod-Space            Rotate through the available layout algorithms"
   , "mod-Shift-Space      Reset the layouts on the current workSpace to default"
