@@ -1,2 +1,8 @@
 #!/bin/sh
-notify-send 'Date' "$(date)" -u low -i gnome-calendar
+month=$(date '+%B %Y')
+calendar() {
+        today=$(date +%d)
+        cal | tail -n7 | sed "s|$today|<u><b>$today</b></u>|"
+}
+
+dunstify -u low "$month" "$(calendar)"

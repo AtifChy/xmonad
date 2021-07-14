@@ -24,8 +24,8 @@ import           XMonad.Actions.NoBorders            (toggleBorder)
 import           XMonad.Actions.Promote              (promote)
 import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.WithAll              (killAll, sinkAll)
-import           XMonad.Hooks.DynamicIcons           (IconConfig (..),
-                                                      appIcon, dynamicIconsPP,
+import           XMonad.Hooks.DynamicIcons           (IconConfig (..), appIcon,
+                                                      dynamicIconsPP,
                                                       iconsFmtReplace,
                                                       iconsGetFocus,
                                                       wrapUnwords)
@@ -273,13 +273,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
 
        -- Run xmessage with a summary of the default keybindings (useful for beginners)
        , ( (modm .|. shiftMask, xK_slash)
-         , unsafeSpawn
-           (  "printf \""
-           ++ help
-           ++ "\" | gxmessage -title 'XMonad Keybind' -fn '"
-           ++ myFontGTK
-           ++ "' -file -"
-           )
+         , unsafeSpawn ("printf \"" ++ help ++ "\" | gxmessage -title 'XMonad Keybind' -fn '" ++ myFontGTK ++ "' -file -")
          )
        -- Toggle border on focused window
        , ((modm, xK_b)                  , withFocused toggleBorder)
@@ -559,6 +553,7 @@ myManageHook = composeOne
   , resource =? "kdesktop" -?> doIgnore
   , resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat
   , resource =? "redshift-gtk" -?> doCenterFloat
+  , className =? "Gammastep-indicator" -?> doCenterFloat
   , className =? "ibus-ui-gtk3" -?> doIgnore
   , resource =? "gcr-prompter" -?> doCenterFloat
   , className =? "St-float" -?> doFloat
@@ -723,18 +718,17 @@ myStartupHook = do
   spawnOnce "picom"
   spawnOnce "dunst"
   spawnOnce "nm-applet"
-  spawnOnce "redshift-gtk"
+  -- spawnOnce "redshift-gtk"
+  spawnOnce "gammastep-indicator"
   spawnOnce "greenclip daemon"
   spawnOnce "numlockx"
   -- spawnOnce "emacs --daemon"
-  spawnOnce
-    "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
+  spawnOnce "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce "ibus-daemon -x"
   spawnOnce "mpd --no-daemon"
   spawnOnce "xss-lock -- lockctl -t 30 -l"
-  spawnOnce
-    "stalonetray --geometry 1x1-17+5 --max-geometry 10x1-17+5 --transparent --tint-color '#2c323a' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
+  spawnOnce ("stalonetray --geometry 1x1-17+5 --max-geometry 10x1-17+5 --transparent --tint-color '" ++ base00 ++ "' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar")
   -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x2c323a  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"
 
 ------------------------------------------------------------------------

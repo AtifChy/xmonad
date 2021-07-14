@@ -1,5 +1,7 @@
 #!/bin/sh
-weather=$(curl -s wttr.in/?format="%x+%t\n")
+for i in 1 2 3; do
+        weather=$(curl -s wttr.in/?format="%x+%t\n") && break || sleep 2s
+done
 [ -z "$weather" ] && exit 1
 condition=${weather% *}
 temperature=${weather##* }

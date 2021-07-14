@@ -1,19 +1,19 @@
 #!/bin/sh
 
-WALL_DIR=$HOME/Pictures/Wallpapers
-CACHE_PATH=${XDG_CACHE_DIR:-$HOME/.cache}/wallpaper.sh
+wall_dir=$HOME/Pictures/Wallpapers
+cached_wall=${XDG_CACHE_DIR:-$HOME/.cache}/wallpaper.sh
 
 wallpaper() {
         hsetroot -cover "$1"
-        cat <<EOF >"$CACHE_PATH"
+        cat <<EOF >"$cached_wall"
 #!/bin/sh
 hsetroot -cover $1
 EOF
-        [ -x "$CACHE_PATH" ] || chmod +x "$CACHE_PATH"
+        [ -x "$cached_wall" ] || chmod +x "$cached_wall"
 }
 
 random() {
-        img=$(find "$WALL_DIR" -type f | grep -v -E 'git|README.md' | shuf -n1)
+        img=$(find "$wall_dir" -type f | grep -v -E 'git|README.md' | shuf -n1)
         hsetroot -cover "$img"
 }
 
@@ -28,5 +28,5 @@ case $1 in
         *.png | *.jpg) wallpaper "$1" ;;
         random) random ;;
         daemon) daemon ;;
-        *) "${XDG_CACHE_DIR:-$HOME/.cache}"/wallpaper.sh || random ;;
+        *) cached_wall || random ;;
 esac
