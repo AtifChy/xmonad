@@ -46,7 +46,7 @@ extra-deps:
   - github: xmonad/xmonad
     commit: master@{now}
   - github: xmonad/xmonad-contrib
-    commit: 5d0a3de24dae6035acb4426ff54748aa77e99d94
+    commit: da2fb360b81c969854a66e246cc37a0864edf8d0
   - xmobar-0.38
 
 # Override default flag values for local packages and extra-deps

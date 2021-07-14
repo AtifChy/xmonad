@@ -27,7 +27,7 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
     - [JetBrainsMono Nerd Font](https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/JetBrainsMono/Ligatures)
     - [Font Awesome 5](https://fontawesome.com/download)
     - [file-icons](https://github.com/file-icons/atom)
-- Colorscheme: onedark (slightly changed)
+- Colorscheme: [onedark (slightly changed)](https://github.com/AtifChy/dotfiles/blob/main/.config/x11/colorschemes/onedark)
 - Terminal: [st](https://github.com/AtifChy/st)
 - Shell: [zsh](https://github.com/AtifChy/dotfiles/tree/main/.config/zsh)
   - Plugin Manager: [zinit](https://github.com/zdharma/zinit)
@@ -47,7 +47,7 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
 - Screenshot: [shotgun](https://github.com/neXromancers/shotgun)
   - Selector: [slop](https://github.com/naelstrof/slop)
   - Script: [Here](https://github.com/AtifChy/xmonad/blob/main/scripts/shotclip)
-- Night Light: [Redshift](https://github.com/jonls/redshift)
+- Night Light: [gammastep](https://gitlab.com/chinstrap/gammastep)
 - Music Player: [ncmpcpp](https://github.com/AtifChy/dotfiles/tree/main/.config/ncmpcpp) + [mpd](https://github.com/AtifChy/dotfiles/blob/main/.config/mpd/mpd.conf) + mpc
 - Video Player: [mpv](https://github.com/AtifChy/dotfiles/blob/main/.config/mpv/mpv.conf)
 - Notification Daemon: [Dunst](https://github.com/AtifChy/dotfiles/blob/main/.config/dunst/dunstrc)

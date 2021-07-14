@@ -28,5 +28,5 @@ case $1 in
         *.png | *.jpg) wallpaper "$1" ;;
         random) random ;;
         daemon) daemon ;;
-        *) cached_wall || random ;;
+        *) $cached_wall || random ;;
 esac

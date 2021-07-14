@@ -136,10 +136,6 @@ myCommands =
     <> " <statei> "
     <> xmobarAction "mpc next" "1" (blue (xmobarFont 1 "\xf051"))
     <> " <title> - <artist>"
-    , "-h"
-    , "127.0.0.1"
-    , "-p"
-    , "6601"
     , "--"
     , "-P"
     , xmobarAction "mpc stop" "3" $ xmobarAction "mpc pause" "1" $ green (xmobarFont 2 "\xf144")
@@ -157,14 +153,14 @@ myCommands =
               (1 `seconds`)
   ]
   where
-    -- | Convenience functions
+    -- Convenience functions
     seconds, minutes :: Int -> Int
     seconds = (* 10)
     minutes = (60 *). seconds
 
 -- | Get home directory
 homeDir :: String
-homeDir = unsafeDupablePerformIO . getEnv $ "HOME"
+homeDir = unsafeDupablePerformIO (getEnv "HOME")
 
 -- Colors
 background :: String
