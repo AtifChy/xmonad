@@ -59,7 +59,7 @@ flags:
     with_xft: true
     with_rtsopts: true
     with_alsa: true
-    with_mpd: true
+    with_mpd: false
     with_weather: false
     with_dbus: false
     with_mpris: false
@@ -68,6 +68,7 @@ flags:
     with_iwlib: false
     with_datezone: false
     with_uvmeter: false
+#    with_kraken: false
 #
 # Extra package databases containing global packages
 # extra-package-dbs: []

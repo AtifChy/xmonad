@@ -48,7 +48,7 @@ config = defaultConfig
   , template         =
     wrap " " " " (xmobarAction "xdotool key super+p" "1" (darkPurple (xmobarFont 2 "\xe61f")))
     <> inWrapper "%UnsafeXMonadLog%"
-    <> wrap "}" "{" (inWrapper' (white "%mpd%"))
+    <> wrap "}" "{" (inWrapper' (white "%playerctl%"))
     <> concatMap
          inWrapper
          [ red "%wttr%"
@@ -130,27 +130,10 @@ myCommands =
     , "-h"
     , xmobarFont 1 "\xf028"
     ]
-  , Run $ MPD
-    [ "-t"
-    , xmobarAction "mpc prev" "1" (blue (xmobarFont 1 "\xf048"))
-    <> " <statei> "
-    <> xmobarAction "mpc next" "1" (blue (xmobarFont 1 "\xf051"))
-    <> " <title> - <artist>"
-    , "--"
-    , "-P"
-    , xmobarAction "mpc stop" "3" $ xmobarAction "mpc pause" "1" $ green (xmobarFont 2 "\xf144")
-    , "-Z"
-    , xmobarAction "mpc stop" "3" $ xmobarAction "mpc play" "1" $ yellow (xmobarFont 2 "\xf28b")
-    , "-S"
-    , xmobarAction "mpc play" "1" $ red (xmobarFont 2 "\xf28d")
-    ]
-    5
   , Run $ Date (xmobarFont 1 "\xf017" <> " %l:%M %p") "date" (30 `seconds`)
+  , Run $ CommandReader (homeDir <> "/.config/xmonad/scripts/playerctl.sh") "playerctl"
   , Run $ ComX (homeDir <> "/.config/xmonad/scripts/weather.sh") ["bar"] "N/A" "wttr" (15 `minutes`)
-  , Run $ Com (homeDir <> "/.config/xmonad/scripts/tray-padding-icon.sh")
-              ["stalonetray"]
-              "tray"
-              (1 `seconds`)
+  , Run $ Com (homeDir <> "/.config/xmonad/scripts/tray-padding-icon.sh") ["stalonetray"] "tray" 5
   ]
   where
     -- Convenience functions
@@ -166,12 +149,12 @@ homeDir = unsafeDupablePerformIO (getEnv "HOME")
 background :: String
 background = base00 <> ":5"
 
-red, blue, green, cyan, yellow, purple, white, darkPurple :: String -> String
+red, blue, cyan, purple, white, darkPurple :: String -> String
 red = xmobarColor base01 background
 blue = xmobarColor base04 background
-green = xmobarColor base02 background
+-- green = xmobarColor base02 background
 cyan = xmobarColor base06 background
-yellow = xmobarColor base03 background
+-- yellow = xmobarColor base03 background
 purple = xmobarColor base05 background
 -- gray = xmobarColor "#7a869f" background
 white = xmobarColor base07 background

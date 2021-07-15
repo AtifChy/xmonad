@@ -49,6 +49,7 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
   - Script: [Here](https://github.com/AtifChy/xmonad/blob/main/scripts/shotclip)
 - Night Light: [gammastep](https://gitlab.com/chinstrap/gammastep)
 - Music Player: [ncmpcpp](https://github.com/AtifChy/dotfiles/tree/main/.config/ncmpcpp) + [mpd](https://github.com/AtifChy/dotfiles/blob/main/.config/mpd/mpd.conf) + mpc
+  - Controller: [Playerctl](https://github.com/altdesktop/playerctl) + [mpDris2](https://github.com/eonpatapon/mpDris2)
 - Video Player: [mpv](https://github.com/AtifChy/dotfiles/blob/main/.config/mpv/mpv.conf)
 - Notification Daemon: [Dunst](https://github.com/AtifChy/dotfiles/blob/main/.config/dunst/dunstrc)
 - Tray: [Stalonetray](https://github.com/kolbusa/stalonetray)

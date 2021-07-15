@@ -727,6 +727,8 @@ myStartupHook = do
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce "ibus-daemon -x"
   spawnOnce "mpd --no-daemon"
+  spawnOnce "mpDris2"
+  spawnOnce "playerctld"
   spawnOnce "xss-lock -- lockctl -t 30 -l"
   spawnOnce ("stalonetray --geometry 1x1-17+5 --max-geometry 10x1-17+5 --transparent --tint-color '" ++ base00 ++ "' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar")
   -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x2c323a  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"
