@@ -9,7 +9,7 @@ version:        0.16
 synopsis:       My xmonad configuration.
 homepage:       https://github.com/AtifChy/xmonad
 author:         Atif
-maintainer:     iftakhar.awal@yahoo.com
+maintainer:     Atif
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple

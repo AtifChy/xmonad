@@ -14,21 +14,18 @@ stop="playerctl stop"
 
 icon() {
         if [ "$state" = "Playing" ]; then
-                printf '<action=`%s` button=3><action=`mpc play` button=2><action=%s><fc=%s,%s:5><fn=2></fn></fc></action></action></action>' \
-                        "$stop" "$pause" "$green" "$background"
-        elif [ "$state" = "Paused" ]; then
                 printf '<action=`%s` button=3><action=`mpc play` button=2><action=%s><fc=%s,%s:5><fn=2></fn></fc></action></action></action>' \
-                        "$stop" "$play" "$yellow" "$background"
+                        "$stop" "$pause" "$yellow" "$background"
         else
-                printf '<action=mpc play><fc=%s,%s:5><fn=2></fn></fc></action>' \
-                        "$red" "$background"
+                printf '<action=`%s` button=3><action=`mpc play` button=2><action=%s><fc=%s,%s:5><fn=2></fn></fc></action></action></action>' \
+                        "$stop" "$play" "$green" "$background"
         fi
 }
 
 prev="<action=playerctl previous><fc=${blue},${background}:5><fn=2>玲</fn></fc></action>"
 next="<action=playerctl next><fc=${blue},${background}:5><fn=2>怜</fn></fc></action>"
 
-playerctl metadata -f '{{ status }} {{ trunc(title, 20) }} - {{ artist }}' -F |
+playerctl metadata -f '{{ status }} {{ trunc(title, 25) }}' -F |
         while read -r state label; do
                 printf "%s %s %s %s\n" "$prev" "$(icon)" "$next" "$label"
         done
