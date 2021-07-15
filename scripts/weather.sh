@@ -15,7 +15,7 @@ night_yet() {
 case $condition in
         "?") icon="" ;;
         "mm") icon="" ;;
-        "=" )
+        "=")
                 icon=""
                 night_yet ""
                 ;;
@@ -66,7 +66,15 @@ case $condition in
 esac
 
 case $1 in
-        bar) printf "<fc=#ffcb6b,#2c313a:5>%s</fc><fc=#a6aebf,#2c313a:5> %s</fc>\n" \
-                "$icon" "$temperature" ;;
+        bar)
+                set -- $(xrdb -q | grep -E '*.color0:|*.color3:|*.color7:' | cut -f2 | tr '\n' ' ')
+
+                background=$1
+                yellow=$2
+                white=$3
+
+                printf '<fc=%s,%s:5>%s</fc><fc=%s,%s:5> %s</fc>\n' \
+                        "$yellow" "$background" "$icon" "$white" "$background" "$temperature"
+                ;;
         *) printf "%s  %s\n" "$icon" "$temperature" ;;
 esac
