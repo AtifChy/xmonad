@@ -132,14 +132,14 @@ myCommands =
     ]
   , Run $ Date (xmobarFont 1 "\xf017" <> " %l:%M %p") "date" (30 `seconds`)
   , Run $ CommandReader (homeDir <> "/.config/xmonad/scripts/playerctl.sh") "playerctl"
-  , Run $ ComX (homeDir <> "/.config/xmonad/scripts/weather.sh") ["bar"] "N/A" "wttr" (15 `minutes`)
+  , Run $ CommandReader (homeDir <> "/.config/xmonad/scripts/weather.sh bar") "wttr"
   , Run $ Com (homeDir <> "/.config/xmonad/scripts/tray-padding-icon.sh") ["stalonetray"] "tray" 5
   ]
   where
     -- Convenience functions
-    seconds, minutes :: Int -> Int
+    seconds :: Int -> Int
     seconds = (* 10)
-    minutes = (60 *). seconds
+    -- minutes = (60 *). seconds
 
 -- | Get home directory
 homeDir :: String
