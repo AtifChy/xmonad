@@ -113,22 +113,22 @@ myCommands =
     "default"
     "Master"
     [ "-t"
-    , "<status> <volume>%"
+    , "<status>"
     , "--"
     , "-C"
-    , base02 <> "," <> background
+    , base07 <> "," <> background
     , "-c"
-    , base01 <> "," <> background
+    , base07 <> "," <> background
     , "-O"
-    , ""
+    , " <volume>%"
     , "-o"
-    , xmobarFont 1 "\xf6a9"
+    , red (xmobarFont 1 "\xf6a9") <> " muted"
     , "-l"
-    , xmobarFont 1 "\xf026"
+    , red (xmobarFont 1 "\xf026")
     , "-m"
-    , xmobarFont 1 "\xf027"
+    , yellow (xmobarFont 1 "\xf027")
     , "-h"
-    , xmobarFont 1 "\xf028"
+    , green (xmobarFont 1 "\xf028")
     ]
   , Run $ Date (xmobarFont 1 "\xf017" <> " %l:%M %p") "date" (30 `seconds`)
   , Run $ CommandReader (homeDir <> "/.config/xmonad/scripts/playerctl.sh") "playerctl"
@@ -149,12 +149,12 @@ homeDir = unsafeDupablePerformIO (getEnv "HOME")
 background :: String
 background = base00 <> ":5"
 
-red, blue, cyan, purple, white, darkPurple :: String -> String
+red, blue, green, cyan, yellow, purple, white, darkPurple :: String -> String
 red = xmobarColor base01 background
 blue = xmobarColor base04 background
--- green = xmobarColor base02 background
+green = xmobarColor base02 background
 cyan = xmobarColor base06 background
--- yellow = xmobarColor base03 background
+yellow = xmobarColor base03 background
 purple = xmobarColor base05 background
 -- gray = xmobarColor "#7a869f" background
 white = xmobarColor base07 background
