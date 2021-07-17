@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase       #-}
 
+module Main (main) where
 --
 -- Imports
 --
@@ -23,6 +24,7 @@ import           XMonad.Actions.CycleWS              (Direction1D (Next, Prev),
 import qualified XMonad.Actions.FlexibleResize       as Flex
 import           XMonad.Actions.NoBorders            (toggleBorder)
 import           XMonad.Actions.Promote              (promote)
+import           XMonad.Actions.Submap               (submap)
 import           XMonad.Actions.TiledWindowDragging  (dragWindow)
 import           XMonad.Actions.WithAll              (killAll, sinkAll)
 import           XMonad.Hooks.DynamicIcons           (IconConfig (..), appIcon,
@@ -107,8 +109,7 @@ myTerminal = "st"
 -- My launcher
 --
 myLauncher :: String
-myLauncher =
-  "rofi -theme ~/.config/rofi/themes/slate.rasi -width 624 -lines 12"
+myLauncher = "rofi -theme ~/.config/rofi/themes/slate.rasi -width 624 -lines 12"
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
@@ -340,6 +341,15 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm, xK_p)                  , shellPrompt myXPConfig)
        , ((modm, xK_F1)                 , manPrompt myXPConfig)
 
+       -- mpd music control
+       , ((modm, xK_a), submap . M.fromList $
+           [ ((0, xK_n),     safeSpawn "mpc" ["next"])
+           , ((0, xK_p),     safeSpawn "mpc" ["prev"])
+           , ((0, xK_s),     safeSpawn "mpd" ["stop"])
+           , ((0, xK_z),     safeSpawn "mpc" ["random"])
+           , ((0, xK_space), safeSpawn "mpc" ["toggle"])
+           ])
+
        -- Open apps
        , ( (altMask, xK_F9)
          , unGrab
@@ -487,7 +497,7 @@ myLayout =
       ratio
       []
 
-  monocle = rn "Monocle" Full
+  monocle = rn "Monocle" . mySpacing myGaps $ Full
 
   -- Simplify things
   rn n = renamed [Replace n]
@@ -561,11 +571,7 @@ myManageHook =
       , className =? "discord" -?> doShift (myWorkspaces !! 2)
       , className =? "code-oss" -?> doShift (myWorkspaces !! 3)
       , className =? "Lutris" -?> doShift (myWorkspaces !! 5)
-      , className
-      =?   "VirtualBox Manager"
-      <||> className
-      =?   "gnome-boxes"
-      -?>  doShift (myWorkspaces !! 6)
+      , className =? "VirtualBox Manager" <||> className =? "gnome-boxes" -?>  doShift (myWorkspaces !! 6)
       ]
     <+> namedScratchpadManageHook myScratchpads
 
@@ -622,10 +628,7 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
 mySB :: StatusBarConfig
 mySB = statusBarProp
   "xmobar"
-  (clickablePP =<< dynamicIconsPP
-    myIconConfig
-    (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP)
-  )
+  (clickablePP =<< dynamicIconsPP myIconConfig (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP))
  where
   myXmobarPP :: PP
   myXmobarPP = def

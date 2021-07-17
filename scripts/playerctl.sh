@@ -1,12 +1,11 @@
 #!/bin/sh
 
-set -- $(xrdb -q | grep -E '*.color0:|*.color1:|*.color2:|*.color3:|*.color4:' | cut -f2 | tr '\n' ' ')
+set -- $(xrdb -q | grep -E '*.color0:|*.color2:|*.color3:|*.color4:' | cut -f2 | tr '\n' ' ')
 
 background=$1
-red=$2
-green=$3
-yellow=$4
-blue=$5
+green=$2
+yellow=$3
+blue=$4
 
 play="playerctl play"
 pause="playerctl pause"
