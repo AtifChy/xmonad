@@ -1,4 +1,5 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase       #-}
 
 --
 -- Imports
@@ -54,6 +55,7 @@ import           XMonad.Layout.MultiToggle           (EOT (EOT),
 import           XMonad.Layout.MultiToggle.Instances (StdTransformers (NBFULL, NOBORDERS))
 import           XMonad.Layout.NoBorders             (smartBorders)
 import           XMonad.Layout.Renamed               (Rename (Replace), renamed)
+import           XMonad.Layout.ResizableThreeColumns (ResizableThreeCol (ResizableThreeColMid))
 import           XMonad.Layout.ResizableTile         (MirrorResize (MirrorExpand, MirrorShrink),
                                                       ResizableTall (ResizableTall))
 import           XMonad.Layout.Simplest              (Simplest (Simplest))
@@ -73,7 +75,6 @@ import           XMonad.Layout.SubLayouts            (GroupMsg (MergeAll, UnMerg
 import           XMonad.Layout.Tabbed                (Direction2D (D, L, R, U),
                                                       Theme (..), addTabs,
                                                       shrinkText)
-import           XMonad.Layout.ThreeColumns          (ThreeCol (ThreeColMid))
 import           XMonad.Layout.WindowNavigation      (windowNavigation)
 import           XMonad.Prompt                       (XPConfig (..),
                                                       XPPosition (Top),
@@ -258,7 +259,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        -- Use this binding with avoidStruts from Hooks.ManageDocks.
        -- See also the statusBar function from Hooks.DynamicLog.
        --
-       , ((modm .|. controlMask, xK_b)    , sendMessage ToggleStruts)
+       , ((modm .|. controlMask, xK_b)  , sendMessage ToggleStruts)
 
        -- Quit xmonad
        , ( (modm .|. shiftMask, xK_q)
@@ -439,11 +440,6 @@ myXPConfig = def { font                = myFont
                  }
 
 ------------------------------------------------------------------------
--- Spacing (gaps)
-mySpacing
-  :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a
-mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
-
 -- Tab theme
 myTabConfig :: Theme
 myTabConfig = def { activeColor         = base04
@@ -469,43 +465,41 @@ myTabConfig = def { activeColor         = base04
 --
 
 myLayout =
-  avoidStruts
-    .   mkToggle (NOBORDERS ?? NBFULL ?? EOT)
-    $   tall
-    ||| mtall
-    ||| center
-    ||| monocle
+  avoidStruts . smartBorders . mkToggle (NOBORDERS ?? NBFULL ?? EOT) $ myLayouts
  where
   -- default tiling algorithm partitions the screen into two panes
-  tall =
-    renamed [Replace "Tall"]
-      $ smartBorders
-      $ addTabs shrinkText myTabConfig
-      $ subLayout [] (Simplest ||| Accordion)
-      $ windowNavigation
-      $ draggingVisualizer
-      $ mySpacing myGaps
-      $ ResizableTall nmaster delta ratio []
+  myLayouts = tall ||| horizon ||| threeCol ||| monocle
 
-  mtall =
-    renamed [Replace "MirrorTall"]
-      $ addTabs shrinkText myTabConfig
-      $ subLayout [] (Simplest ||| Accordion)
-      $ windowNavigation
-      $ draggingVisualizer
-      $ Mirror tall
+  -- my layouts
+  tall = rn "Tall" . mySpacing myGaps . mkTabbed . dragWindows $ ResizableTall
+    nmaster
+    delta
+    ratio
+    []
 
-  center =
-    renamed [Replace "ThreeCol"]
-      $ smartBorders
-      $ addTabs shrinkText myTabConfig
-      $ subLayout [] (Simplest ||| Accordion)
-      $ windowNavigation
-      $ draggingVisualizer
-      $ mySpacing myGaps
-      $ ThreeColMid nmaster delta ratio
+  horizon = rn "Horizon" . mySpacing myGaps . mkTabbed . dragWindows $ Mirror
+    (ResizableTall nmaster delta ratio [])
 
-  monocle = renamed [Replace "Monocle"] $ smartBorders $ mySpacing myGaps Full
+  threeCol =
+    rn "ThreeCol" . mySpacing myGaps . mkTabbed . dragWindows $ ResizableThreeColMid
+      nmaster
+      delta
+      ratio
+      []
+
+  monocle = rn "Monocle" Full
+
+  -- Simplify things
+  rn n = renamed [Replace n]
+  mkTabbed layout =
+    addTabs shrinkText myTabConfig
+      . subLayout [] (Simplest ||| Accordion)
+      $ layout
+  dragWindows layout = windowNavigation . draggingVisualizer $ layout
+
+  -- gaps
+  mySpacing :: Integer -> l a -> ModifiedLayout XMonad.Layout.Spacing.Spacing l a
+  mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
 
   -- The default number of windows in the master pane
   nmaster = 1
@@ -547,27 +541,33 @@ myScratchpads = [
 --
 
 myManageHook :: ManageHook
-myManageHook = composeOne
-  [ className =? "MPlayer" -?> doFloat
-  , resource =? "desktop_window" -?> doIgnore
-  , resource =? "kdesktop" -?> doIgnore
-  , resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat
-  , resource =? "redshift-gtk" -?> doCenterFloat
-  , className =? "Gammastep-indicator" -?> doCenterFloat
-  , className =? "ibus-ui-gtk3" -?> doIgnore
-  , resource =? "gcr-prompter" -?> doCenterFloat
-  , className =? "St-float" -?> doFloat
-  , transience
-  , title =? "XMonad Keybind" -?> doCenterFloat
-  , className =? "Ibus-extension-gtk3" -?> doFloat
-  , isFullscreen -?> doFullFloat
-  , isDialog -?> doCenterFloat
-  , className =? "firefox" -?> doShift (myWorkspaces !! 1)
-  , className =? "discord" -?> doShift (myWorkspaces !! 2)
-  , className =? "code-oss" -?> doShift (myWorkspaces !! 3)
-  , className =? "Lutris" -?> doShift (myWorkspaces !! 5)
-  , className =?   "VirtualBox Manager" <||> className =?   "gnome-boxes" -?>  doShift (myWorkspaces !! 6)
-  ] <+> namedScratchpadManageHook myScratchpads
+myManageHook =
+  composeOne
+      [ className =? "MPlayer" -?> doFloat
+      , resource =? "desktop_window" -?> doIgnore
+      , resource =? "kdesktop" -?> doIgnore
+      , resource =? "Toolkit" <||> resource =? "Browser" -?> doFloat
+      , resource =? "redshift-gtk" -?> doCenterFloat
+      , className =? "Gammastep-indicator" -?> doCenterFloat
+      , className =? "ibus-ui-gtk3" -?> doIgnore
+      , resource =? "gcr-prompter" -?> doCenterFloat
+      , className =? "St-float" -?> doFloat
+      , transience
+      , title =? "XMonad Keybind" -?> doCenterFloat
+      , className =? "Ibus-extension-gtk3" -?> doFloat
+      , isFullscreen -?> doFullFloat
+      , isDialog -?> doCenterFloat
+      , className =? "firefox" -?> doShift (myWorkspaces !! 1)
+      , className =? "discord" -?> doShift (myWorkspaces !! 2)
+      , className =? "code-oss" -?> doShift (myWorkspaces !! 3)
+      , className =? "Lutris" -?> doShift (myWorkspaces !! 5)
+      , className
+      =?   "VirtualBox Manager"
+      <||> className
+      =?   "gnome-boxes"
+      -?>  doShift (myWorkspaces !! 6)
+      ]
+    <+> namedScratchpadManageHook myScratchpads
 
 ------------------------------------------------------------------------
 -- Event handling
@@ -622,7 +622,10 @@ myHandleEventHook = handleEventHook def <+> swallowEventHook
 mySB :: StatusBarConfig
 mySB = statusBarProp
   "xmobar"
-  (clickablePP =<< dynamicIconsPP myIconConfig (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP))
+  (clickablePP =<< dynamicIconsPP
+    myIconConfig
+    (filterOutWsPP [scratchpadWorkspaceTag] myXmobarPP)
+  )
  where
   myXmobarPP :: PP
   myXmobarPP = def
@@ -634,16 +637,16 @@ mySB = statusBarProp
     , ppTitle         = magenta . xmobarAction "xdotool key Super+shift+c" "2" . shorten 40
     -- , ppOrder         = \[ws, l, t, ex] -> [ws, l, ex, t]
     -- , ppExtras        = [xmobarColorL base01 background windowCount]
-    , ppLayout        = red
-                        . xmobarAction "xdotool key Super+space"       "1"
-                        . xmobarAction "xdotool key Super+shift+space" "3"
-                        . (\case
-                            "Tall"       -> "<icon=Tall.xpm/>"
-                            "MirrorTall" -> "<icon=MirrorTall.xpm/>"
-                            "ThreeCol"   -> "<icon=ThreeCol.xpm/>"
-                            "Monocle"    -> "<icon=Monocle.xpm/>"
-                            _            -> "?"
-                          )
+    , ppLayout        = red . xmobarAction "xdotool key Super+space" "1" . xmobarAction
+                            "xdotool key Super+shift+space"
+                            "3"
+                            . (\case
+                                "Tall"     -> "<icon=Tall.xpm/>"
+                                "Horizon"  -> "<icon=Horizon.xpm/>"
+                                "ThreeCol" -> "<icon=ThreeCol.xpm/>"
+                                "Monocle"  -> "<icon=Monocle.xpm/>"
+                                _          -> "?"
+                              )
     }
    where
     wrapSep :: String -> String
@@ -679,8 +682,8 @@ mySB = statusBarProp
     --     . windowset
 
   myIconConfig :: IconConfig
-  myIconConfig = def { iconConfigIcons = myIcons
-                     , iconConfigFmt   = iconsFmtReplace (wrapUnwords "" "")
+  myIconConfig = def { iconConfigIcons  = myIcons
+                     , iconConfigFmt    = iconsFmtReplace (wrapUnwords "" "")
                      , iconConfigFilter = iconsGetFocus
                      }
    where
@@ -723,14 +726,19 @@ myStartupHook = do
   spawnOnce "greenclip daemon"
   spawnOnce "numlockx"
   -- spawnOnce "emacs --daemon"
-  spawnOnce "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
+  spawnOnce
+    "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce "ibus-daemon -x"
   spawnOnce "mpd --no-daemon"
   spawnOnce "mpDris2"
   spawnOnce "playerctld"
   spawnOnce "xss-lock -- lockctl -t 30 -l"
-  spawnOnce ("stalonetray --geometry 1x1-17+5 --max-geometry 10x1-17+5 --transparent --tint-color '" ++ base00 ++ "' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar")
+  spawnOnce
+    ("stalonetray --geometry 1x1-17+5 --max-geometry 10x1-17+5 --transparent --tint-color '"
+    ++ base00
+    ++ "' --tint-level 255 --grow-gravity NE --icon-gravity NW --icon-size 20 --sticky --window-type dock --window-strut top --skip-taskbar"
+    )
   -- spawnOnce "trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --monitor 0 --transparent true --alpha 0 --tint 0x2c323a  --height 22 --iconspacing 5 --distance 2,2 --distancefrom top,right"
 
 ------------------------------------------------------------------------
@@ -760,7 +768,7 @@ main = do
 
       -- hooks, layouts
     , layoutHook         = myLayout
-    , manageHook = myManageHook
+    , manageHook         = myManageHook
     , handleEventHook    = myHandleEventHook
     , logHook            = activateLogHook acMh <+> logHook def
     , startupHook        = myStartupHook

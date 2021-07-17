@@ -53,6 +53,7 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
 - Video Player: [mpv](https://github.com/AtifChy/dotfiles/blob/main/.config/mpv/mpv.conf)
 - Notification Daemon: [Dunst](https://github.com/AtifChy/dotfiles/blob/main/.config/dunst/dunstrc)
 - Tray: [Stalonetray](https://github.com/kolbusa/stalonetray)
+- Lockscreen: [i3lock-color](https://github.com/Raymo111/i3lock-color) + xss-lock
 - [DOTFILES](https://github.com/AtifChy/dotfiles)
 
 ### Installation
