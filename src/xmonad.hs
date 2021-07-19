@@ -263,9 +263,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((modm .|. controlMask, xK_b)  , sendMessage ToggleStruts)
 
        -- Quit xmonad
-       , ( (modm .|. shiftMask, xK_q)
-         , confirmPrompt myXPConfig "Quit" $ io exitSuccess
-         )
+       , ((modm .|. shiftMask, xK_q), confirmPrompt myXPConfig "Quit" $ io exitSuccess)
 
        -- Restart xmonad
        , ((modm, xK_q), unsafeSpawn "xmonad --recompile; xmonad --restart")

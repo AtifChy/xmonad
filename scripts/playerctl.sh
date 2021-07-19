@@ -10,14 +10,15 @@ blue=$4
 play="playerctl play"
 pause="playerctl pause"
 stop="playerctl stop"
+song="playerctl -a pause && playerctl --player=mpd play"
 
 icon() {
         if [ "$state" = "Playing" ]; then
-                printf '<action=`%s` button=3><action=`mpc play` button=2><action=%s><fc=%s,%s:5><fn=2></fn></fc></action></action></action>' \
-                        "$stop" "$pause" "$yellow" "$background"
+                printf '<action=`%s` button=3><action=`%s` button=2><action=%s><fc=%s,%s:5><fn=2></fn></fc></action></action></action>' \
+                        "$stop" "$song" "$pause" "$yellow" "$background"
         else
-                printf '<action=`%s` button=3><action=`mpc play` button=2><action=%s><fc=%s,%s:5><fn=2></fn></fc></action></action></action>' \
-                        "$stop" "$play" "$green" "$background"
+                printf '<action=`%s` button=3><action=`%s` button=2><action=%s><fc=%s,%s:5><fn=2></fn></fc></action></action></action>' \
+                        "$stop" "$song" "$play" "$green" "$background"
         fi
 }
 
