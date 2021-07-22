@@ -122,7 +122,7 @@ Some basic keybinds
 | `Super + Q`              | Reload xmonad                             |
 | `Super + Shift + Q`      | Exit xmonad                               |
 
-[All Keybinds](https://github.com/AtifChy/xmonad/blob/main/src/xmonad.hs#L753)
+[All Keybinds](https://github.com/AtifChy/xmonad/blob/main/src/xmonad.hs#L783)
 
 ### License
 
