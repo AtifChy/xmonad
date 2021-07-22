@@ -58,7 +58,7 @@ config = defaultConfig
          $ xmobarAction "st -e alsamixer" "3"
          $ xmobarAction "[ $(pamixer --get-volume) -lt 200 ] && pamixer --allow-boost -u -i 5" "4"
          $ xmobarAction "pamixer --allow-boost -u -d 5" "5"
-         $ white "%alsa:default:Master%"
+         $ white "%volwire%"
          , xmobarAction "~/.config/xmonad/scripts/date.sh" "1" (blue "%date%")
          , "%tray%"
          ]
@@ -109,28 +109,8 @@ myCommands =
     , base01 <> "," <> background
     ]
     (3 `seconds`)
-  , Run $ Alsa
-    "default"
-    "Master"
-    [ "-t"
-    , "<status>"
-    , "--"
-    , "-C"
-    , base07 <> "," <> background
-    , "-c"
-    , base07 <> "," <> background
-    , "-O"
-    , " <volume>%"
-    , "-o"
-    , red (xmobarFont 1 "\xf6a9") <> " muted"
-    , "-l"
-    , red (xmobarFont 1 "\xf026")
-    , "-m"
-    , yellow (xmobarFont 1 "\xf027")
-    , "-h"
-    , green (xmobarFont 1 "\xf028")
-    ]
   , Run $ Date (xmobarFont 1 "\xf017" <> " %l:%M %p") "date" (30 `seconds`)
+  , Run $ CommandReader (homeDir <> "/.config/xmonad/scripts/volume.sh") "volwire"
   , Run $ CommandReader (homeDir <> "/.config/xmonad/scripts/playerctl.sh") "playerctl"
   , Run $ CommandReader (homeDir <> "/.config/xmonad/scripts/weather.sh bar") "wttr"
   , Run $ Com (homeDir <> "/.config/xmonad/scripts/tray-padding-icon.sh") ["stalonetray"] "tray" 5
@@ -149,12 +129,12 @@ homeDir = unsafeDupablePerformIO (getEnv "HOME")
 background :: String
 background = base00 <> ":5"
 
-red, blue, green, cyan, yellow, purple, white, darkPurple :: String -> String
+red, blue, cyan, purple, white, darkPurple :: String -> String
 red = xmobarColor base01 background
 blue = xmobarColor base04 background
-green = xmobarColor base02 background
+-- green = xmobarColor base02 background
 cyan = xmobarColor base06 background
-yellow = xmobarColor base03 background
+-- yellow = xmobarColor base03 background
 purple = xmobarColor base05 background
 -- gray = xmobarColor "#7a869f" background
 white = xmobarColor base07 background

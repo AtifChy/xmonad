@@ -46,7 +46,7 @@ extra-deps:
   - github: xmonad/xmonad
     commit: master@{now}
   - github: xmonad/xmonad-contrib
-    commit: da2fb360b81c969854a66e246cc37a0864edf8d0
+    commit: 8a0a84f1d5cea8b1cc1d5a19932b0eca667cb436
   - xmobar-0.38
 
 # Override default flag values for local packages and extra-deps
@@ -58,7 +58,7 @@ flags:
     with_threaded: true
     with_xft: true
     with_rtsopts: true
-    with_alsa: true
+    with_alsa: false
     with_mpd: false
     with_weather: false
     with_dbus: false

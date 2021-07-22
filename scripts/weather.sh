@@ -3,11 +3,11 @@ refresh() {
         for _ in 1 2 3 4 5; do
                 if ping -q -c 1 -W 1 8.8.8.8 >/dev/null 2>&1; then
                         weather=$(curl -s wttr.in/?format="%x+%t\n") && break
-		else
-			sleep 2s
-		fi
+                else
+                        sleep 2s
+                fi
         done
-	[ -z "$weather" ] && return
+        [ -z "$weather" ] && return
 
         condition=${weather% *}
         temperature=${weather##* }
