@@ -43,7 +43,7 @@ import           XMonad.Hooks.ManageHelpers          (composeOne, doCenterFloat,
 import           XMonad.Hooks.StatusBar              (StatusBarConfig,
                                                       statusBarProp, withSB)
 import           XMonad.Hooks.StatusBar.PP           (PP (..), filterOutWsPP,
-                                                      shorten, wrap,
+                                                      shorten', wrap,
                                                       xmobarAction,
                                                       xmobarBorder, xmobarColor,
                                                       xmobarFont, xmobarStrip)
@@ -650,6 +650,9 @@ mySB = statusBarProp
                               )
     }
    where
+    shorten :: Int -> String -> String
+    shorten = shorten' "…"
+
     wrapSep :: String -> String
     wrapSep = wrap (xmobarColor base00 "" (xmobarFont 5 "\xe0b4"))
                    (xmobarColor base00 "" (xmobarFont 5 "\xe0b6"))

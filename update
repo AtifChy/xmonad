@@ -1,0 +1,43 @@
+#!/bin/sh
+
+set -e
+
+printf "checking...\n"
+
+_latest_xmonad=$(git ls-remote https://github.com/xmonad/xmonad.git HEAD | cut -f1)
+_latest_contrib=$(git ls-remote https://github.com/xmonad/xmonad-contrib.git HEAD | cut -f1)
+_latest_x11=$(git ls-remote https://github.com/xmonad/x11.git HEAD | cut -f1)
+_latest_xmobar=$(curl --silent "https://api.github.com/repos/jaor/xmobar/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+
+_current_xmonad=$(awk '/xmonad[/]xmonad$/{getline;print$2}' ./stack.yaml)
+_current_contrib=$(awk '/xmonad[/]xmonad-contrib$/{getline;print$2}' ./stack.yaml)
+_current_x11=$(awk '/xmonad[/]x11$/{getline;print$2}' ./stack.yaml)
+_current_xmobar=$(awk -F "-" '/xmobar/{print$3}' ./stack.yaml | awk '!/^$/')
+
+if [ "$_latest_xmonad" != "$_current_xmonad" ]; then
+	sed -i "s/${_current_xmonad}/${_latest_xmonad}/" ./stack.yaml
+	printf 'upgraded xmonad to latest\n'
+else
+	printf 'xmonad is up-to-date\n'
+fi
+
+if [ "$_latest_contrib" != "$_current_contrib" ]; then
+	sed -i "s/${_current_contrib}/${_latest_contrib}/" ./stack.yaml
+	printf 'upgraded xmonad-contrib to latest\n'
+else
+	printf 'xmonad-contrib is up-to-date\n'
+fi
+
+if [ "$_latest_x11" != "$_current_x11" ]; then
+	sed -i "s/${_current_x11}/${_latest_x11}/" ./stack.yaml
+	printf 'upgraded xmonad/x11 to latest\n'
+else
+	printf 'xmonad/x11 is up-to-date\n'
+fi
+
+if [ "$_latest_xmobar" != "$_current_xmobar" ]; then
+	sed -i "s/${_current_xmobar}/${_latest_xmobar}/" ./stack.yaml
+	printf 'upgraded xmobar to latest\n'
+else
+	printf 'xmobar is up-to-date\n'
+fi
