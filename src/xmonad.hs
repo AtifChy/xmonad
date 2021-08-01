@@ -106,6 +106,9 @@ import           XMonad.Util.Ungrab                  (unGrab)
 myTerminal :: String
 myTerminal = "st"
 
+myBrowser :: String
+myBrowser = "firefox"
+
 -- My launcher
 --
 myLauncher :: String
@@ -355,7 +358,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
                 "$(killall picom && notify-send -u critical -i picom 'System' 'Killed Picom') || $(picom & notify-send -u critical -i picom 'System' 'Picom running...')"
          )
        , ((altMask, xK_e), safeSpawn "emacsclient" ["-nc"])
-       , ((altMask, xK_b), safeSpawn "firefox" [])
+       , ((altMask, xK_b), spawn myBrowser)
 
        -- lock screen
        , ( (modm .|. shiftMask, xK_l)
@@ -718,7 +721,7 @@ mySB = statusBarProp
 myStartupHook :: X ()
 myStartupHook = do
   setDefaultCursor xC_left_ptr
-  spawnOnce "wall"
+  spawnOnce "wal"
   -- spawnOnce "xwallpaper --zoom ~/Pictures/macOS-Big-Sur-night.jpg"
   -- spawnOnce "feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/0057.jpg"
   -- spawn "feh --bg-scale --randomize --no-fehbg ~/Pictures/Wallpapers/*"
@@ -730,8 +733,7 @@ myStartupHook = do
   spawnOnce "greenclip daemon"
   spawnOnce "numlockx"
   -- spawnOnce "emacs --daemon"
-  spawnOnce
-    "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
+  spawnOnce "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce "ibus-daemon -x"
   spawnOnce "mpd --no-daemon"

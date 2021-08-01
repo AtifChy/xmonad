@@ -75,17 +75,17 @@ refresh() {
 myBar() {
         set -- $(xrdb -q | grep -E '*.color0:|*.color3:|*.color7:' | cut -f2 | tr '\n' ' ')
 
-        background=$1
+        background=${1}:5
         yellow=$2
         white=$3
 
         while :; do
                 refresh
                 if [ -z "$weather" ]; then
-                        printf 'Offline\n'
+                        printf 'Offline'
                         sleep 5m
                 else
-                        printf '<fc=%s,%s:5>%s</fc><fc=%s,%s:5> %s</fc>\n' \
+                        printf '<fc=%s,%s>%s</fc><fc=%s,%s> %s</fc>\n' \
                                 "$yellow" "$background" "$icon" "$white" "$background" "$temperature"
                         sleep 15m
                 fi

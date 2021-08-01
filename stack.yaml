@@ -17,7 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-18.2
+resolver: lts-18.5
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -44,9 +44,9 @@ extra-deps:
   - github: xmonad/x11
     commit: 9e29093ce91143250f5e5e4992bee40a15c13fd3
   - github: xmonad/xmonad
-    commit: af354f7528ada1de451365a0f5138ef10a318360
+    commit: f1d6316526433d00f0e130f2cd760805e6eb9c36
   - github: xmonad/xmonad-contrib
-    commit: 6b16e45166f40e623d10651cd983ab5e4fad3e20
+    commit: ad23988a99f5d0d082582fa583c24288e4dddd94
   - xmobar-0.38
 
 # Override default flag values for local packages and extra-deps
