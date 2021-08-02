@@ -82,7 +82,7 @@ myBar() {
         while :; do
                 refresh
                 if [ -z "$weather" ]; then
-                        printf 'Offline'
+                        printf 'Offline\n'
                         sleep 5m
                 else
                         printf '<fc=%s,%s>%s</fc><fc=%s,%s> %s</fc>\n' \
