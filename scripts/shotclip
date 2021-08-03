@@ -6,14 +6,12 @@ img="shot_$(date '+%Y-%m-%d_%H-%M-%S').png"
 [ ! -d "$HOME/Pictures/Screenshots" ] && mkdir "$HOME/Pictures/Screenshots"
 file="$HOME/Pictures/Screenshots/$img"
 
-sel_fail() {
-        dunstify -u critical -i gnome-screenshot "Shotgun" "Failed to take screenshot"
-        exit 1
-}
-
 case $1 in
         -s | selection)
-                grab=$(slop -f "%g") || sel_fail
+                grab=$(slop -b 2 -c 0.6,0.7,0.4,0.9 -f "%g") || {
+                        dunstify -u critical -i gnome-screenshot "Shotgun" "Failed to take screenshot"
+                        exit 1
+                }
                 shotgun -g "$grab" "$file"
                 ;;
 
@@ -39,18 +37,16 @@ case $1 in
                 ;;
 esac
 
-case $2 in
-        -d | shadow)
-                convert "$file" \( +clone -background black -shadow 75x10+0+0 \) \
-                        +swap -bordercolor none -border 10 -background none -layers merge +repage "$file"
-                ;;
-esac
+if [ "$2" = "-d" ] || [ "$2" = "shadow" ]; then
+        convert "$file" \( +clone -background black -shadow 75x10+0+0 \) \
+                +swap -bordercolor none -border 10 -background none -layers merge +repage "$file"
+fi
 
 xclip -selection clipboard -target image/png -i "$file"
 
 ACTION=$(dunstify -u low -A "default,Open" -I "$file" "Shotgun" "Screenshot saved!")
 
 case "$ACTION" in
-        "default") mimeopen "$file" ;;
+        "default") handlr open "$file" ;;
         "2") rm "$file" ;;
 esac

@@ -12,6 +12,7 @@ my [xmonad](https://github.com/xmonad/xmonad) configuration
 
 ### Preview
 
+![preview 3](./preview/img_3.png)
 ![preview 1](./preview/img_1.png)
 ![preview 2](./preview/img_2.png)
 
