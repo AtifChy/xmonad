@@ -47,8 +47,8 @@ update_cache() {
 pre_lock() {
         #pacmd suspend 1
 
-        pactl suspend-sink @DEFAULT_SINK@ true
-        pactl suspend-source @DEFAULT_SOURCE@ true
+        #pactl suspend-sink @DEFAULT_SINK@ true
+        #pactl suspend-source @DEFAULT_SOURCE@ true
 
         DEF_TIMEOUT=$(eval "(xset q | sed -n '25p')" | cut -d ' ' -f4)
         DEF_DPMS=$(xset q | awk '/^[[:blank:]]*DPMS is/ {print $(NF)}')
@@ -76,8 +76,8 @@ post_lock() {
 
         #pacmd suspend 0
 
-        pactl suspend-sink @DEFAULT_SINK@ false
-        pactl suspend-source @DEFAULT_SOURCE@ false
+        #pactl suspend-sink @DEFAULT_SINK@ false
+        #pactl suspend-source @DEFAULT_SOURCE@ false
 }
 
 i3lock_cmd() {
@@ -125,10 +125,10 @@ If you want to set a wallpaper then use the '-u' flag to cache a wallpaper.
                 --time-pos='x+140:h-100' \
                 --date-pos='x+170:h-75' \
                 --ind-pos='x+345:h-100' \
-                --inside-color=$insidecolor \
-                --ring-color=$ringcolor \
-                --keyhl-color=$keyhlcolor \
-                --bshl-color=$bshlcolor \
+                --inside-color="$insidecolor" \
+                --ring-color="$ringcolor" \
+                --keyhl-color="$keyhlcolor" \
+                --bshl-color="$bshlcolor" \
                 --ringver-color="$ringvercolor" \
                 --ringwrong-color="$ringwrongcolor" \
                 --insidever-color="$ringvercolor" \

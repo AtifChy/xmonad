@@ -361,9 +361,7 @@ myKeys conf@XConfig { XMonad.modMask = modm } =
        , ((altMask, xK_b), spawn myBrowser)
 
        -- lock screen
-       , ( (modm .|. shiftMask, xK_l)
-         , unGrab *> safeSpawn "loginctl" ["lock-session"]
-         )
+       , ((modm .|. shiftMask, xK_l) , unGrab *> safeSpawn "loginctl" ["lock-session"])
 
        -- Screenshot shortcuts (Requires: shotgun, slop, xdotool)
        , ((0, xK_Print)                , unGrab *> safeSpawn "shotclip" ["-f"])
@@ -482,17 +480,17 @@ myLayout =
   myLayouts = tall ||| horizon ||| threeCol ||| monocle
 
   -- my layouts
-  tall = rn "Tall" . mySpacing myGaps . mkTabbed . dragWindows $ ResizableTall
+  tall = rn "Tall" . mkTabbed . mySpacing myGaps . dragWindows $ ResizableTall
     nmaster
     delta
     ratio
     []
 
-  horizon = rn "Horizon" . mySpacing myGaps . mkTabbed . dragWindows $ Mirror
+  horizon = rn "Horizon" . mkTabbed . mySpacing myGaps . dragWindows $ Mirror
     (ResizableTall nmaster delta ratio [])
 
   threeCol =
-    rn "ThreeCol" . mySpacing myGaps . mkTabbed . dragWindows $ ResizableThreeColMid
+    rn "ThreeCol" . mkTabbed . mySpacing myGaps . dragWindows $ ResizableThreeColMid
       nmaster
       delta
       ratio

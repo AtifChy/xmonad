@@ -44,7 +44,7 @@ extra-deps:
   - github: xmonad/x11
     commit: 9e29093ce91143250f5e5e4992bee40a15c13fd3
   - github: xmonad/xmonad
-    commit: 206fc918bbd70c71eead8201401d4888e79dc2eb
+    commit: 2ac8f0ea27196fbc21fca6baf459a4b75bf0c679
   - github: xmonad/xmonad-contrib
     commit: 97508ac1091d5efa1a23d5efede710af767386a5
   - xmobar-0.38
