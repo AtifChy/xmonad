@@ -82,7 +82,7 @@ post_lock() {
 
 i3lock_cmd() {
         if [ -d "$HOME/.cache/i3lock" ]; then
-                style=${@:-blur}
+                style=${2:-blur}
                 case "$style" in
                         blur) IMAGE="$HOME/.cache/i3lock/lockscreen_blur.png" ;;
                         dim) IMAGE="$HOME/.cache/i3lock/lockscreen_dim.png" ;;
