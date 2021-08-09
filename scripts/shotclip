@@ -2,9 +2,10 @@
 
 # Required softwares: shotgun, xdotool, xclip, dunst
 
-img="shot_$(date '+%Y-%m-%d_%H-%M-%S').png"
-[ ! -d "$HOME/Pictures/Screenshots" ] && mkdir "$HOME/Pictures/Screenshots"
-file="$HOME/Pictures/Screenshots/$img"
+_img="shot_$(date '+%Y-%m-%d_%H-%M-%S').png"
+_dir=$(xdg-user-dir PICTURES)
+[ ! -d "${_dir}/Screenshots" ] && mkdir "${_dir}/Screenshots"
+file="${_dir}/Screenshots/${_img}"
 
 case $1 in
         -s | selection)

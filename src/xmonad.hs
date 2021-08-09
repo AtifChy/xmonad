@@ -10,7 +10,7 @@ import qualified Data.Map                            as M
 import           Data.Monoid                         (All)
 import           System.Exit                         (exitSuccess)
 import           Theme.Theme                         (base00, base01, base04,
-                                                      base05, base06, base07,
+                                                      base05, base06, base07, base08,
                                                       basebg, basefg, myFont,
                                                       myFontGTK)
 import           XMonad
@@ -165,7 +165,7 @@ myWorkspaces =
 --
 myNormalBorderColor, myFocusedBorderColor :: String
 myNormalBorderColor = base00
-myFocusedBorderColor = base04
+myFocusedBorderColor = base08
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.

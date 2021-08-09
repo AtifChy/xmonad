@@ -1,32 +1,44 @@
 #!/bin/sh
 
 wall_dir=$HOME/Pictures/Wallpapers
-cached_wall=${XDG_CACHE_DIR:-$HOME/.cache}/wallpaper.sh
+[ ! -d "$wall_dir" ] && mkdir -p "$wall_dir"
+restore=${XDG_CACHE_DIR:-$HOME/.cache}/wallpaper.sh
 
-wallpaper() {
-        hsetroot -cover "$1"
-        cat <<EOF >"$cached_wall"
-#!/bin/sh
-hsetroot -cover $1
-EOF
-        [ -x "$cached_wall" ] || chmod +x "$cached_wall"
+_wallpaper() {
+        img=$*
+        if ! echo "$img" | grep -q -i "home"; then
+                img=$(echo "$img" | sed "s|^|$HOME/|")
+        fi
+        hsetroot -cover "$img"
+        tee -a <<-END >"$restore"
+	#!/bin/sh
+	hsetroot -cover $img
+	END
+        [ -x "$restore" ] || chmod +x "$cached_wall"
 }
 
-random() {
+_random() {
         img=$(find "$wall_dir" -type f | grep -v -E 'git|README.md' | shuf -n1)
         hsetroot -cover "$img"
 }
 
-daemon() {
+_daemon() {
         while :; do
                 random
                 sleep 10m
         done
 }
 
+_download() {
+        link=$*
+        clean=$(echo "$link" | sed 's/\.jpg.*/.jpg/;s/\.png.*/.png/')
+        curl "$clean" -o "${wall_dir}"/"${clean##*/}"
+}
+
 case $1 in
-        *.png | *.jpg) wallpaper "$1" ;;
-        random) random ;;
-        daemon) daemon ;;
-        *) $cached_wall || random ;;
+        *.png | *.jpg) _wallpaper "$1" ;;
+        random) _random ;;
+        daemon) _daemon ;;
+        pull) _download "$2" ;;
+        *) $restore || _random ;;
 esac
