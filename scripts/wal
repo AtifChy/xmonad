@@ -1,7 +1,7 @@
 #!/bin/sh
 
-wall_dir=$HOME/Pictures/Wallpapers
-[ ! -d "$wall_dir" ] && mkdir -p "$wall_dir"
+dir=$(xdg-user-dir PICTURES)/Wallpapers
+[ ! -d "$dir" ] && mkdir -p "$dir"
 restore=${XDG_CACHE_DIR:-$HOME/.cache}/wallpaper.sh
 
 _wallpaper() {
@@ -32,7 +32,7 @@ _daemon() {
 _download() {
         link=$*
         clean=$(echo "$link" | sed 's/\.jpg.*/.jpg/;s/\.png.*/.png/')
-        curl "$clean" -o "${wall_dir}"/"${clean##*/}"
+        curl "$clean" -o "$dir"/"${clean##*/}"
 }
 
 case $1 in

@@ -25,15 +25,16 @@ case $1 in
                 ;;
 
         *)
-                printf '%b' "\
- Take screenshots with shotgun
-<=============================>
- Usage:
-  -f, full         Take fullscreen screenshot
-  -w, window       Take screenshot of focused window
-  -s, selection    Take screenshot of interactively chosen window or rectangle
-  -d, shadow       Add background shadow to screenshots
-  -h, help         Display all available options\n"
+                tee -a <<-END
+		Take screenshots with shotgun
+		-----------------------------
+		 Usage:
+		  -f, full         Take fullscreen screenshot
+		  -w, window       Take screenshot of focused window
+		  -s, selection    Take screenshot of interactively chosen window or rectangle
+		  -d, shadow       Add background shadow to screenshots
+		  -h, help         Display all available options\n"
+		END
                 exit 0
                 ;;
 esac
