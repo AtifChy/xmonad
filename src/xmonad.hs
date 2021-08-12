@@ -10,9 +10,9 @@ import qualified Data.Map                            as M
 import           Data.Monoid                         (All)
 import           System.Exit                         (exitSuccess)
 import           Theme.Theme                         (base00, base01, base04,
-                                                      base05, base06, base07, base08,
-                                                      basebg, basefg, myFont,
-                                                      myFontGTK)
+                                                      base05, base06, base07,
+                                                      base08, basebg, basefg,
+                                                      myFont, myFontGTK)
 import           XMonad
 import           XMonad.Actions.CopyWindow           (copyToAll, kill1,
                                                       killAllOtherCopies)
@@ -55,7 +55,8 @@ import           XMonad.Layout.MultiToggle           (EOT (EOT),
                                                       Toggle (Toggle), mkToggle,
                                                       (??))
 import           XMonad.Layout.MultiToggle.Instances (StdTransformers (NBFULL, NOBORDERS))
-import           XMonad.Layout.NoBorders             (smartBorders)
+import           XMonad.Layout.NoBorders             (Ambiguity (OnlyScreenFloat),
+                                                      lessBorders)
 import           XMonad.Layout.Renamed               (Rename (Replace), renamed)
 import           XMonad.Layout.ResizableThreeColumns (ResizableThreeCol (ResizableThreeColMid))
 import           XMonad.Layout.ResizableTile         (MirrorResize (MirrorExpand, MirrorShrink),
@@ -125,7 +126,7 @@ myClickJustFocuses = False
 -- Width of the window border in pixels.
 --
 myBorderWidth :: Dimension
-myBorderWidth = 1
+myBorderWidth = 2
 
 myGaps :: Num p => p
 myGaps = 8
@@ -451,14 +452,16 @@ myXPConfig = def { font                = myFont
 ------------------------------------------------------------------------
 -- Tab theme
 myTabConfig :: Theme
-myTabConfig = def { activeColor         = base04
-                  , activeBorderColor   = base00
-                  , activeTextColor     = basebg
-                  , inactiveColor       = basebg
+myTabConfig = def { activeColor         = base08
+                  , activeBorderColor   = base08
+                  , activeTextColor     = basefg
+                  , activeBorderWidth   = 0
+                  , inactiveColor       = base00
                   , inactiveBorderColor = basebg
-                  , inactiveTextColor   = base00
+                  , inactiveTextColor   = base07
+                  , inactiveBorderWidth = 2
                   , fontName            = myFont
-                  , decoHeight          = 22
+                  , decoHeight          = 30
                   , decoWidth           = maxBound
                   }
 
@@ -474,7 +477,7 @@ myTabConfig = def { activeColor         = base04
 --
 
 myLayout =
-  avoidStruts . smartBorders . mkToggle (NOBORDERS ?? NBFULL ?? EOT) $ myLayouts
+  avoidStruts . lessBorders OnlyScreenFloat . mkToggle (NOBORDERS ?? NBFULL ?? EOT) $ myLayouts
  where
   -- default tiling algorithm partitions the screen into two panes
   myLayouts = tall ||| horizon ||| threeCol ||| monocle
