@@ -477,7 +477,7 @@ myTabConfig = def { activeColor         = base08
 --
 
 myLayout =
-  avoidStruts . lessBorders OnlyScreenFloat . mkToggle (NOBORDERS ?? NBFULL ?? EOT) $ myLayouts
+  mkToggle (NOBORDERS ?? NBFULL ?? EOT) . avoidStruts . lessBorders OnlyScreenFloat $ myLayouts
  where
   -- default tiling algorithm partitions the screen into two panes
   myLayouts = tall ||| horizon ||| threeCol ||| monocle
@@ -800,8 +800,8 @@ help = unlines
   , "mod-n                Resize/refresh viewed windows to the correct size"
   , ""
   , "-- move focus up or down the window stack"
-  , "mod-Tab              Move focus to the next window"
-  , "mod-Shift-Tab        Move focus to the previous window"
+  -- , "mod-Tab              Move focus to the next window"
+  -- , "mod-Shift-Tab        Move focus to the previous window"
   , "mod-j                Move focus to the next window"
   , "mod-k                Move focus to the previous window"
   , "mod-m                Move focus to the master window"
@@ -814,8 +814,8 @@ help = unlines
   , "-- resizing the master/slave ratio"
   , "mod-h                Shrink the master width"
   , "mod-l                Expand the master width"
-  , "mod-a                Shrink the master height"
-  , "mod-s                Expand the master height"
+  , "mod-alt-j            Shrink the master height"
+  , "mod-alt-k            Expand the master height"
   , ""
   , "-- increase or decrease spacing (gaps)"
   , "mod-g                Toggle spacing/gaps"
@@ -828,6 +828,7 @@ help = unlines
   , ""
   , "-- floating layer support"
   , "mod-t                Push window back into tiling; unfloat and re-tile it"
+  , "mod-shift-t          Push all floating windows on screen into tilling"
   , ""
   , "-- increase or decrease number of windows in the master area"
   , "mod-comma  (mod-,)   Increment the number of windows in the master area"
@@ -847,8 +848,8 @@ help = unlines
   , "mod-Left             Switch to previous workSpace"
   , "mod-Shift-Right      Move client to next workSpace"
   , "mod-Shift-Left       Move client to previous workSpace"
-  , "mod-f                Switch to a free workSpace"
   , "mod-z                Switch between previously used workSpace"
+  , "mod-f                Focused window goes fullscreen"
   , ""
   , "-- Cycle Workspaces"
   , "mod-Tab              Cycle between active workspaces from left to right"
@@ -897,7 +898,8 @@ help = unlines
   , ""
   , "-- Application"
   -- , "All-e                Open emacs-client"
-  , "Alt-F9               Turn on/off picom"
+  , "alt-b                Open browser (Firefox)"
+  , "alt-F9               Turn on/off picom"
   ]
 
 --- vim:ft=haskell:expandtab
