@@ -1,0 +1,22 @@
+#define basebg #1e2127
+#define basefg #c8ccd4
+#define base00 #2c313a
+#define base08 #424957
+#define base01 #ff6c6b
+#define base09 #ff8b92
+#define base02 #98be65
+#define base0A #ddffa7
+#define base03 #ffcb6b
+#define base0B #ffe585
+#define base04 #51aeed
+#define base0C #9cc4ff
+#define base05 #b58fae
+#define base0D #e1acff
+#define base06 #56b6c2
+#define base0E #a3f7ff
+#define base07 #a6aebf
+#define base0F #ffffff
+
+!#define base16 #abb2bf
+
+! vim:ft=xdefaults

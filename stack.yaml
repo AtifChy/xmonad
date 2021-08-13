@@ -46,8 +46,8 @@ extra-deps:
   - github: xmonad/xmonad
     commit: 3e762702454b86a7eb35b893e424ad56a801067b
   - github: xmonad/xmonad-contrib
-    commit: a03d58cf6a071f9bacb3543e70e94c0c5603434c
-  - xmobar-0.38
+    commit: b4a13e6b1b146f051762998fa8e30868dd8e6152
+  - xmobar-0.39
 
 # Override default flag values for local packages and extra-deps
 flags:
@@ -68,7 +68,7 @@ flags:
     with_iwlib: false
     with_datezone: false
     with_uvmeter: false
-#    with_kraken: false
+    with_kraken: false
 #
 # Extra package databases containing global packages
 # extra-package-dbs: []

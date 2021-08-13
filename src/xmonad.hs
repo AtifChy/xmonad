@@ -431,20 +431,20 @@ myXPConfig = def { font                = myFont
                  , bgColor             = basebg
                  , fgColor             = basefg
                  , bgHLight            = base04
-                 , fgHLight            = basebg
+                 , fgHLight            = base00
                  , borderColor         = base00
                  , promptBorderWidth   = 1
                  , promptKeymap        = defaultXPKeymap
                  , position            = Top
                  -- , position            = CenteredAt {xpCenterY = 0.3, xpWidth = 0.3}
+                 , alwaysHighlight     = True           -- Disables tab cycle
                  , height              = 30
+                 , maxComplRows        = Just 10        -- set to 'Just 5' for 5 rows
                  , historySize         = 50
                  , historyFilter       = deleteAllDuplicates
                  , defaultText         = []
                  -- , autoComplete        = Just 100000,   -- set Just 100000 for .1 sec
                  , showCompletionOnTab = False          -- False means auto completion
-                 , alwaysHighlight     = True           -- Disables tab cycle
-                 , maxComplRows        = Just 10        -- set to 'Just 5' for 5 rows
                  , searchPredicate     = fuzzyMatch
                  , sorter              = fuzzySort
                  }

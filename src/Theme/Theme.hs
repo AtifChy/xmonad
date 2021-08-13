@@ -18,17 +18,17 @@ module Theme.Theme ( basebg
                    , base01
                    , base09
                    , base02
-                   , base10
+                   , base0A
                    , base03
-                   , base11
+                   , base0B
                    , base04
-                   , base12
+                   , base0C
                    , base05
-                   , base13
+                   , base0D
                    , base06
-                   , base14
+                   , base0E
                    , base07
-                   , base15
+                   , base0F
                    , myFont
                    , myFontGTK
                    , myBigFont
@@ -39,7 +39,7 @@ module Theme.Theme ( basebg
 import           Prelude          (String)
 import           Theme.Xresources (xprop)
 
-basebg, basefg, basecr, base00, base08, base01, base09, base02, base10, base03, base11, base04, base12, base05, base13, base06, base14, base07, base15 :: String
+basebg, basefg, basecr, base00, base08, base01, base09, base02, base0A, base03, base0B, base04, base0C, base05, base0D, base06, base0E, base07, base0F :: String
 basebg = xprop "*.background"
 basefg = xprop "*.foreground"
 basecr = xprop "*.cursorColor"
@@ -48,17 +48,17 @@ base08 = xprop "*.color8"
 base01 = xprop "*.color1"
 base09 = xprop "*.color9"
 base02 = xprop "*.color2"
-base10 = xprop "*.color10"
+base0A = xprop "*.color10"
 base03 = xprop "*.color3"
-base11 = xprop "*.color11"
+base0B = xprop "*.color11"
 base04 = xprop "*.color4"
-base12 = xprop "*.color12"
+base0C = xprop "*.color12"
 base05 = xprop "*.color5"
-base13 = xprop "*.color13"
+base0D = xprop "*.color13"
 base06 = xprop "*.color6"
-base14 = xprop "*.color14"
+base0E = xprop "*.color14"
 base07 = xprop "*.color7"
-base15 = xprop "*.color15"
+base0F = xprop "*.color15"
 
 myFont, myFontGTK,myBigFont, myBoldFont, myItalicFont :: String
 myFont = xprop "xmonad.font"

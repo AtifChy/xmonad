@@ -13,7 +13,7 @@ stop="playerctl stop"
 song="playerctl -a pause && playerctl --player=mpd play"
 
 icon() {
-        if [ "$state" = "Playing" ]; then
+        if [ "${_status}" = "Playing" ]; then
                 printf '<action=`%s` button=3><action=`%s` button=2><action=%s><fc=%s,%s:5><fn=2></fn></fc></action></action></action>' \
                         "$stop" "$song" "$pause" "$yellow" "$background"
         else
@@ -25,7 +25,7 @@ icon() {
 prev="<action=playerctl previous><fc=${blue},${background}:5><fn=2>玲</fn></fc></action>"
 next="<action=playerctl next><fc=${blue},${background}:5><fn=2>怜</fn></fc></action>"
 
-playerctl metadata -f '{{ status }} {{ trunc(title, 25) }}' -F |
-        while read -r state label; do
-                printf "%s %s %s %s\n" "$prev" "$(icon)" "$next" "$label"
+playerctl metadata -f '{{ status }}' -F |
+        while read -r _status; do
+                printf "%s %s %s\n" "$prev" "$(icon)" "$next"
         done
