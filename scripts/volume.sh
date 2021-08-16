@@ -9,26 +9,26 @@ yellow=$4
 blue=$5
 white=$6
 
-get_volume()  {
+get_volume() {
         volume=$(pamixer --get-volume-human)
         volume=${volume%%%}
 
         if [ "$volume" = 'muted' ]; then
                 printf '<fc=%s,%s><fn=1></fn></fc> <fc=%s,%s>%s</fc>\n' \
-			"$red" "$background" "$white" "$background" "$volume"
+                        "$red" "$background" "$white" "$background" "$volume"
         else
                 if [ "$volume" -gt '100' ]; then
-                        printf '<fc=%s,%s><fn=1></fn>!</fc> <fc=%s,%s>%s%%</fc>\n'  \
-				"$blue" "$background" "$white" "$background" "$volume"
+                        printf '<fc=%s,%s><fn=1></fn>!</fc> <fc=%s,%s>%s%%</fc>\n' \
+                                "$blue" "$background" "$white" "$background" "$volume"
                 elif [ "$volume" -gt '60' ]; then
                         printf '<fc=%s,%s><fn=1></fn></fc> <fc=%s,%s>%s%%</fc>\n' \
-				"$green" "$background" "$white" "$background" "$volume"
+                                "$green" "$background" "$white" "$background" "$volume"
                 elif [ "$volume" -gt '20' ]; then
                         printf '<fc=%s,%s><fn=1></fn></fc> <fc=%s,%s>%s%%</fc>\n' \
-				"$yellow" "$background" "$white" "$background" "$volume"
+                                "$yellow" "$background" "$white" "$background" "$volume"
                 else
                         printf '<fc=%s,%s><fn=1></fn></fc> <fc=%s,%s>%s%%</fc>\n' \
-				"$red" "$background" "$white" "$background" "$volume"
+                                "$red" "$background" "$white" "$background" "$volume"
                 fi
         fi
 }

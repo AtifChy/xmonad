@@ -734,7 +734,6 @@ myStartupHook = do
   spawnOnce "greenclip daemon"
   spawnOnce "numlockx"
   -- spawnOnce "emacs --daemon"
-  spawnOnce "dbus-launch --exit-with-session ~/.local/share/xmonad/xmonad-x86_64-linux"
   spawnOnce "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
   spawnOnce "ibus-daemon -x"
   spawnOnce "mpd --no-daemon"

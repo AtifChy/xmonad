@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 insidecolor=00000066
 ringcolor=6b8f3d88
 keyhlcolor=abc982ff
@@ -11,7 +9,7 @@ ringwrongcolor=e06c7588
 timecolor=ffffffff
 datecolor=ffffffff
 loginshadow=00000070
-font='JetBrains Mono'
+font='JetBrainsMono Nerd Font'
 locktext='Type password to unlock...'
 time_format='%I:%M %p'
 #LOCK_TIMEOUT=5
@@ -118,10 +116,11 @@ If you want to set a wallpaper then use the '-u' flag to cache a wallpaper.
                 --wrong-font="$font" \
                 --greeter-font="$font" \
                 --verif-size='16' \
-                --wrong-size='16' \
+                --wrong-size='35' \
                 --date-size='14' \
-                --layout-size='10' \
-                --greeter-size='14' \
+                --greeter-size='38' \
+                --greeter-pos='x+345:h-89' \
+                --wrong-pos='x+346:h-88' \
                 --time-pos='x+140:h-100' \
                 --date-pos='x+170:h-75' \
                 --ind-pos='x+345:h-100' \
@@ -134,8 +133,9 @@ If you want to set a wallpaper then use the '-u' flag to cache a wallpaper.
                 --insidever-color="$ringvercolor" \
                 --insidewrong-color="$ringwrongcolor" \
                 --line-uses-inside \
-                --radius=30 \
+                --radius=35 \
                 --ring-width=3 \
+                --greeter-text='' \
                 --verif-text='' \
                 --wrong-text='' \
                 --noinput-text='' \

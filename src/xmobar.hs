@@ -84,7 +84,7 @@ config =
   dateAction x = xmobarAction "~/.config/xmonad/scripts/date.sh" "1" x
   volAction x =
     xmobarAction "pamixer -t" "1" $
-      xmobarAction "st -e alsamixer" "3" $
+      xmobarAction "st -e pulsemixer" "3" $
         xmobarAction "[ $(pamixer --get-volume) -lt 200 ] && pamixer --allow-boost -u -i 5" "4" $
           xmobarAction "pamixer --allow-boost -u -d 5" "5" x
 
