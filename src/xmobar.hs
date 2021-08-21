@@ -131,9 +131,9 @@ myCommands =
     ]
     (3 `seconds`)
   , Run $ Date (blue $ xmobarFont 1 "\xf017" <> " %l:%M %p") "date" (30 `seconds`)
-  , Run $ CommandReader (homeDir <> "/.config/xmonad/scripts/volume.sh") "volwire"
-  , Run $ CommandReader (homeDir <> "/.config/xmonad/scripts/playerctl.sh") "playerctl"
-  , Run $ CommandReader (homeDir <> "/.config/xmonad/scripts/weather.sh bar") "wttr"
+  , Run $ CommandReader ("exec " <> homeDir <> "/.config/xmonad/scripts/volume.sh") "volwire"
+  , Run $ CommandReader ("exec " <> homeDir <> "/.config/xmonad/scripts/playerctl.sh") "playerctl"
+  , Run $ CommandReader ("exec " <> homeDir <> "/.config/xmonad/scripts/weather.sh bar") "wttr"
   , Run $ Com (homeDir <> "/.config/xmonad/scripts/tray-padding-icon.sh") ["stalonetray"] "tray" 5
   ]
   where
