@@ -142,6 +142,16 @@ If you want to set a wallpaper then use the '-u' flag to cache a wallpaper.
                 "$WALL" "$IMAGE"
 }
 
+help() {
+        cat <<-EOF
+	usage: $0
+	-u | --update    => Cache a wallpaper for login screen or update them.
+	-t | --timeout   => Timer for screen going blank. [note: use this flag before (-l|--lock) flag]
+	-k | --lock      => Lock your screen.
+	-h | --help      => Show all options and their description.
+	EOF
+}
+
 while :; do
         case "$1" in
                 -u | --update)
@@ -169,6 +179,11 @@ while :; do
                         else
                                 shift 1
                         fi
+
+                        break
+                        ;;
+                -h | --help)
+                        help
 
                         break
                         ;;
