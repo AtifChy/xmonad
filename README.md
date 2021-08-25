@@ -70,7 +70,7 @@ git clone https://github.com/AtifChy/xmonad.git ~/.config/xmonad
 - After cloning it go to that dir `cd ~/.config/xmonad` and run
 
 ```
-stack init && stack install
+stack install
 ```
 
 > Note: This command creates a `xmonad` executable file and moves it to `~/.local/bin`. Make sure `~/.local/bin` is added to your `$PATH`.
