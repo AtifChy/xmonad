@@ -1,3 +1,5 @@
+
+
 # XMonad
 
 my [xmonad](https://github.com/xmonad/xmonad) configuration
@@ -73,7 +75,7 @@ git clone https://github.com/AtifChy/xmonad.git ~/.config/xmonad
 stack install
 ```
 
-> Note: This command creates a `xmonad` executable file and moves it to `~/.local/bin`. Make sure `~/.local/bin` is added to your `$PATH`.
+> Note: This command compiles and installs the `xmonad` and `xmobar` executables to `~/.local/bin`. Make sure `~/.local/bin` is added to your `$PATH`.
 
 - Recompile xmonad
 
